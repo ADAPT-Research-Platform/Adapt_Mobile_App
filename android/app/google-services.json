@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "521845244145",
+    "project_id": "adapt-f0de7",
+    "storage_bucket": "adapt-f0de7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521845244145:android:0de7e38d1c3915be2c2950",
+        "android_client_info": {
+          "package_name": "com.adapt.adapt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_ePi7kyEwp0PI2jJHtwRWSMRMgb-mHwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521845244145:android:f33d6306cfdbe9b92c2950",
+        "android_client_info": {
+          "package_name": "com.adapt.marburg.adapt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_ePi7kyEwp0PI2jJHtwRWSMRMgb-mHwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
