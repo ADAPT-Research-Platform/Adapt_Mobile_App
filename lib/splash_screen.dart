@@ -1,4 +1,5 @@
 import 'package:adapt/landing_screen.dart';
+import 'package:adapt/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -19,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen>
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LandingScreen()),
+        MaterialPageRoute(builder: (context) => RegisterScreen()),
       );
     });
   }
