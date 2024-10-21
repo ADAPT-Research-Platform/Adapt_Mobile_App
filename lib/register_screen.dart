@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart'; // For Firestore
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -12,20 +13,40 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
+  String _name = ''; // New field to capture name
   String _errorMessage = '';
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await _auth.createUserWithEmailAndPassword(
+        // Create the user in Firebase Authentication
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
           email: _email,
           password: _password,
         );
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => LoginScreen()));
+
+        // Get the newly created user
+        User? user = userCredential.user;
+
+        if (user != null) {
+          // Save user details in Firestore
+          await _firestore.collection('users').doc(user.uid).set({
+            'name': _name, // User-provided name
+            'email': _email, // User email
+            'role': 'user', // Default role as 'user'
+            'created_at': FieldValue.serverTimestamp(), // Auto timestamp
+          });
+
+          // Navigate to login screen or home
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginScreen()));
+        }
       } on FirebaseAuthException catch (e) {
         setState(() {
           _errorMessage = e.message!;
@@ -54,6 +75,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             children: [
               SizedBox(height: getDeviceExactHeight(100.0, safeAreaSize)),
+              // Name input field
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  fillColor: AppColors.white,
+                  filled: true,
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) => _name = value,
+                validator: (value) => value!.isEmpty ? 'Enter your name' : null,
+              ),
+              SizedBox(height: getDeviceExactHeight(20.0, safeAreaSize)),
+              // Email input field
               TextFormField(
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -65,6 +99,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 validator: (value) => value!.isEmpty ? 'Enter an email' : null,
               ),
               SizedBox(height: getDeviceExactHeight(20.0, safeAreaSize)),
+              // Password input field
               TextFormField(
                 decoration: InputDecoration(
                   labelText: 'Password',
@@ -102,10 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(height: getDeviceExactHeight(20.0, safeAreaSize)),
               TextButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  );
+                  Navigator.pushReplacementNamed(context, '/');
                 },
                 child: Text(
                   'Already have an account? Login here',
