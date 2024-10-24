@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // For Firestore
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
+import 'utils/app_colors.dart';
 import 'login_screen.dart';
-import 'size_config.dart';
+import 'utils/size_config.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override

@@ -2,9 +2,9 @@ import 'package:adapt/register_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
+import 'utils/app_colors.dart';
 import 'landing_screen.dart';
-import 'size_config.dart';
+import 'utils/size_config.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
