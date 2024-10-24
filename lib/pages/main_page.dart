@@ -1,0 +1,43 @@
+import 'package:adapt/pages/main_index_page.dart';
+import 'package:adapt/pages/settings_page.dart';
+import 'package:flutter/material.dart';
+
+import '../widgets/hexagon_nav_bar.dart';
+import 'contact_page.dart';
+import 'diary_page.dart';
+import 'mode_page.dart';
+import 'overview_page.dart';
+
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: const [
+            OverviewPage(),
+            DiaryPage(),
+            ModePage(),
+            ContactPage(),
+            SettingsPage(),
+          ],
+        ),
+        bottomNavigationBar: HexagonNavigationBar(
+          currentIndex: _currentIndex,
+          onDestinationSelected: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+        ));
+  }
+}
