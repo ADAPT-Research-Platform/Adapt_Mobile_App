@@ -83,7 +83,11 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(height: 20),
                   Text(
                     'Login',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: AppColors.darkYellow, // Static text color
+                      fontSize: 40, // Static font size
+                      fontWeight: FontWeight.bold, // Static font weight
+                    ),
                   ),
                   SizedBox(height: 20),
                   Text(

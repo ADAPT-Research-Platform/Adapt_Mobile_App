@@ -29,10 +29,6 @@ class MyApp extends StatelessWidget {
         navigatorKey: globalNavigatorKey,
         onGenerateRoute: (settings) {
           switch (settings.name) {
-            case '/':
-              return MaterialPageRoute(
-                builder: (context) => const SplashPage(),
-              );
             case Routes.beehiveMain:
               return MaterialPageRoute(
                 builder: (context) => const MainPage(),
@@ -47,7 +43,7 @@ class MyApp extends StatelessWidget {
               );
             default:
               return MaterialPageRoute(
-                builder: (context) => const LoginPage(),
+                builder: (context) => const SplashPage(),
               );
           }
         }

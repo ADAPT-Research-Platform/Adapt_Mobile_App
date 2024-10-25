@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/custom_title_bar.dart';
+import '../widgets/app_title_bar.dart';
 
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});
@@ -9,7 +9,7 @@ class ContactPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomTitleBar(title: 'Contacts'),
+      appBar: AppTitleBar(title: 'Contacts'),
       body: Center(child: Text('Contact Page')),
     );
   }

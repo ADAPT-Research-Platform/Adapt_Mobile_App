@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
 
-class CustomTitleBar extends StatelessWidget implements PreferredSizeWidget {
+class AppTitleBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final IconData? leadingIcon;
   final VoidCallback? onIconPressed;
 
-  const CustomTitleBar({
-    Key? key,
+  const AppTitleBar({
+    super.key,
     required this.title,
     this.leadingIcon,
     this.onIconPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

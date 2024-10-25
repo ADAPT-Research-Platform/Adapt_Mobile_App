@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
-import '../widgets/custom_title_bar.dart';
+import '../widgets/app_title_bar.dart';
 import '../widgets/hexagon_grid.dart';
 
 class OverviewPage extends StatelessWidget {
@@ -10,7 +10,7 @@ class OverviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      appBar: CustomTitleBar(title: 'Overview'),
+      appBar: AppTitleBar(title: 'Overview'),
       body: Center(
           child: HexagonGrid(
         rows: 6,

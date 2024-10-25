@@ -1,4 +1,4 @@
-import 'package:adapt/widgets/custom_title_bar.dart';
+import 'package:adapt/widgets/app_title_bar.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -8,7 +8,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomTitleBar(title: 'Settings'),
+      appBar: AppTitleBar(title: 'Settings'),
       body: Center(child: Text('Settings Page')),
     );
   }

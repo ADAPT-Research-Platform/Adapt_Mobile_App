@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/custom_title_bar.dart';
+import '../widgets/app_title_bar.dart';
 
 class DiaryPage extends StatelessWidget {
   const DiaryPage({super.key});
@@ -9,7 +9,7 @@ class DiaryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomTitleBar(title: 'Diary'),
+      appBar: AppTitleBar(title: 'Diary'),
       body: Center(child: Text('Diary Page')),
     );
   }

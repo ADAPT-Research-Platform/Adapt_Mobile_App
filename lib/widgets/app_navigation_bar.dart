@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import 'hexagon_shape.dart';
 
-class HexagonNavigationBar extends StatefulWidget {
+class AppNavigationBar extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int> onDestinationSelected;
 
-  const HexagonNavigationBar({
+  const AppNavigationBar({
     super.key,
     required this.currentIndex,
     required this.onDestinationSelected
   });
 
   @override
-  State<HexagonNavigationBar> createState() => _HexagonNavigationBar();
+  State<AppNavigationBar> createState() => _AppNavigationBar();
 }
 
-class _HexagonNavigationBar extends State<HexagonNavigationBar> {
+class _AppNavigationBar extends State<AppNavigationBar> {
   int currentPageIndex = 0;
   double size = 65;
   double strokeWidth = 2.8;
@@ -43,38 +43,6 @@ class _HexagonNavigationBar extends State<HexagonNavigationBar> {
             currentPageIndex = index;
           });
         },
-        // onDestinationSelected: (int index) {
-        //   setState(() {
-        //     currentPageIndex = index;
-        //     switch(currentPageIndex){
-        //       case 0:
-        //         Navigator.of(context).pushNamed(
-        //           Routes.beehiveOverview,
-        //           arguments: "Overview",
-        //         );
-        //       case 1:
-        //         Navigator.of(context).pushNamed(
-        //           Routes.beehiveDiary,
-        //           arguments: "Diary",
-        //         );
-        //       case 2:
-        //         Navigator.of(context).pushNamed(
-        //           Routes.beehiveMode,
-        //           arguments: "Mode",
-        //         );
-        //       case 3:
-        //         Navigator.of(context).pushNamed(
-        //           Routes.beehiveContact,
-        //           arguments: "Contact",
-        //         );
-        //       case 4:
-        //         Navigator.of(context).pushNamed(
-        //           Routes.beehiveSettings,
-        //           arguments: "Settings",
-        //         );
-        //     }
-        //   });
-        // },
         height: 90,
         backgroundColor: Colors.transparent,
         indicatorColor: Colors.transparent,

@@ -80,13 +80,17 @@ class _SignUpPageState extends State<SignUpPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
-                    'assets/images/app_icon.png',
+                    'assets/images/hands_icon.png',
                     height: 100,
                   ),
                   SizedBox(height: 20),
                   Text(
                     'Sign Up',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: AppColors.darkYellow, // Static text color
+                      fontSize: 40, // Static font size
+                      fontWeight: FontWeight.bold, // Static font weight
+                    ),
                   ),
                   SizedBox(height: 20),
                   Text(
