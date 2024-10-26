@@ -4,6 +4,7 @@ import 'package:adapt/widgets/hexagon_grid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -16,12 +17,16 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
 
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordConfirmController = TextEditingController();
 
   @override
   void dispose(){
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _userEmailController.dispose();
     _passwordController.dispose();
     _passwordConfirmController.dispose();
@@ -29,18 +34,19 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _register() async{
+    String fName = _firstNameController.text.trim();
+    String lName = _lastNameController.text.trim();
     String userEmail = _userEmailController.text.trim();
     String password = _passwordController.text.trim();
     String passwordConfirm = _passwordConfirmController.text.trim();
 
     if (password == passwordConfirm) {
-      User? user = await _firebaseAuthService.signUp(userEmail, password);
+      User? user = await _firebaseAuthService.signUp(fName, lName, userEmail, password);
       if(user != null){
-        print("Register Successfull");
         Navigator.of(context).pushNamed(Routes.beehiveMain);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration Unsuccessfull!')),
+          const SnackBar(content: Text('SignUp Failed!')),
         );
       }
     } else {
@@ -88,16 +94,36 @@ class _SignUpPageState extends State<SignUpPage> {
                     'Sign Up',
                     style: TextStyle(
                       color: AppColors.darkYellow, // Static text color
-                      fontSize: 40, // Static font size
+                      fontSize: AppFontSizes.large, // Static font size
                       fontWeight: FontWeight.bold, // Static font weight
                     ),
                   ),
                   SizedBox(height: 20),
                   Text(
                     'Please fill your information.',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: AppFontSizes.small),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: _firstNameController,
+                    decoration: InputDecoration(
+                      labelText: 'First Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: _lastNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Last Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
                   TextField(
                     controller: _userEmailController,
                     decoration: InputDecoration(
@@ -107,7 +133,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
@@ -118,7 +144,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   TextField(
                     controller: _passwordConfirmController,
                     obscureText: true,

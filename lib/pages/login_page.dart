@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
 import '../services/firebase_auth_service.dart';
+import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
 
 class LoginPage extends StatefulWidget {
@@ -85,14 +86,14 @@ class _LoginPageState extends State<LoginPage> {
                     'Login',
                     style: TextStyle(
                       color: AppColors.darkYellow, // Static text color
-                      fontSize: 40, // Static font size
+                      fontSize: AppFontSizes.large, // Static font size
                       fontWeight: FontWeight.bold, // Static font weight
                     ),
                   ),
                   SizedBox(height: 20),
                   Text(
                     'Please login to your account.',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: AppFontSizes.small),
                   ),
                   SizedBox(height: 20),
                   TextField(

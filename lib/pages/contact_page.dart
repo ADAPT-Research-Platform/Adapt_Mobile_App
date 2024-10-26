@@ -103,7 +103,9 @@ class ContactSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         for (var section in sections)
-          Row(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
@@ -133,6 +135,7 @@ class ContactSection extends StatelessWidget {
               )),
             ],
           ),
+    )
       ],
     );
   }
