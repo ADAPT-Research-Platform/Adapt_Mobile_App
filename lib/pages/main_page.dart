@@ -1,8 +1,7 @@
-import 'package:adapt/pages/main_index_page.dart';
 import 'package:adapt/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/hexagon_nav_bar.dart';
+import '../widgets/app_navigation_bar.dart';
 import 'contact_page.dart';
 import 'diary_page.dart';
 import 'mode_page.dart';
@@ -31,7 +30,7 @@ class _MainPageState extends State<MainPage> {
             SettingsPage(),
           ],
         ),
-        bottomNavigationBar: HexagonNavigationBar(
+        bottomNavigationBar: AppNavigationBar(
           currentIndex: _currentIndex,
           onDestinationSelected: (index) {
             setState(() {

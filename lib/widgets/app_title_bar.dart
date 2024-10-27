@@ -1,18 +1,20 @@
+import 'package:adapt/utils/app_font_sizes.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
+import '../utils/app_font_sizes.dart';
 
-class CustomTitleBar extends StatelessWidget implements PreferredSizeWidget {
+class AppTitleBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final IconData? leadingIcon;
   final VoidCallback? onIconPressed;
 
-  const CustomTitleBar({
-    Key? key,
+  const AppTitleBar({
+    super.key,
     required this.title,
     this.leadingIcon,
     this.onIconPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +40,9 @@ class CustomTitleBar extends StatelessWidget implements PreferredSizeWidget {
         centerTitle: true,
         title: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.darkYellow, // Static text color
-            fontSize: 40, // Static font size
+            fontSize: AppFontSizes.large, // Static font size
             fontWeight: FontWeight.bold, // Static font weight
           ),
         ),
