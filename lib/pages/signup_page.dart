@@ -1,5 +1,5 @@
-import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/services/firebase_auth_service.dart';
+import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/hexagon_grid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +67,7 @@ class _SignUpPageState extends State<SignUpPage> {
         // clipBehavior: Clip.hardEdge,
         // fit: StackFit.loose,
         children: [
-          const Positioned.fill(
+           Positioned.fill(
             left: -45,
             top: -280,
             child: HexagonGrid(

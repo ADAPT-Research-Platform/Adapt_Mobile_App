@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/app_title_bar.dart';
-import '../utils/app_colors.dart';
 
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});

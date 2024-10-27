@@ -1,12 +1,11 @@
-import 'package:adapt/utils/navigator_keys.dart';
 import 'package:adapt/pages/settings_page.dart';
+import 'package:adapt/utils/navigator_keys.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/app_routes.dart';
 import 'contact_page.dart';
 import 'diary_page.dart';
 import 'mode_page.dart';
-import '../utils/navigator_keys.dart';
 import 'overview_page.dart';
 
 class MainIndexPage extends StatelessWidget {

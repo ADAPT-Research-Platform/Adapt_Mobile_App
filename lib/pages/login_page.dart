@@ -2,8 +2,8 @@ import 'package:adapt/widgets/hexagon_grid.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/app_colors.dart';
 import '../services/firebase_auth_service.dart';
+import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
 
@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
         // clipBehavior: Clip.hardEdge,
         // fit: StackFit.loose,
         children: [
-          const Positioned.fill(
+           Positioned.fill(
             left: -45,
             top: -180,
             child: HexagonGrid(
