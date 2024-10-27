@@ -1,4 +1,4 @@
-package com.adapt.marburg.adapt;
+package com.adapt.adapt;
 
 import io.flutter.embedding.android.FlutterActivity;
 
