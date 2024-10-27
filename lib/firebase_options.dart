@@ -50,19 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC_ePi7kyEwp0PI2jJHtwRWSMRMgb-mHwY',
-    appId: '1:521845244145:android:f33d6306cfdbe9b92c2950',
-    messagingSenderId: '521845244145',
-    projectId: 'adapt-f0de7',
-    storageBucket: 'adapt-f0de7.appspot.com',
+    apiKey: 'AIzaSyB7D_mTOpd-qEbhKWOQVLTDl_uaK7P3fLg',
+    appId: '1:281022954782:android:4b2107538ab2b64eeb9d0f',
+    messagingSenderId: '281022954782',
+    projectId: 'adapt-4703c',
+    storageBucket: 'adapt-4703c.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA1dawAsh_X9X6qdS5Z8sgVxmQ-7odlFRM',
-    appId: '1:521845244145:ios:d2b3f8d88c11ba4a2c2950',
-    messagingSenderId: '521845244145',
-    projectId: 'adapt-f0de7',
-    storageBucket: 'adapt-f0de7.appspot.com',
-    iosBundleId: 'com.adapt.marburg.adapt',
+    apiKey: 'AIzaSyB37Fvu4uXl8uIw11ZDmyqMXk3kSw8PvZY',
+    appId: '1:281022954782:ios:9b88e1d3f942222beb9d0f',
+    messagingSenderId: '281022954782',
+    projectId: 'adapt-4703c',
+    storageBucket: 'adapt-4703c.appspot.com',
+    iosBundleId: 'com.adapt.adapt',
   );
 }

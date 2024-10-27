@@ -7,7 +7,7 @@ import '../../pages/login_page.dart';
 import '../../pages/main_page.dart';
 import '../../pages/signup_page.dart';
 
-import 'services/firebase_options.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
