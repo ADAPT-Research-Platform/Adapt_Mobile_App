@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import '../services/firebase_module_service.dart';
 import 'hexagon_shape.dart';
 
+//THis is just a experiment class with clickable hexagon shapes
 class ModuleGrid extends StatelessWidget {
-  final int rows;
-  final int cols;
+  final int count;
   final double size;
   final Color fillColor;
   final Color strokeColor;
@@ -18,8 +18,7 @@ class ModuleGrid extends StatelessWidget {
   
   ModuleGrid({
     super.key,
-    required this.rows,
-    required this.cols,
+    required this.count,
     required this.size,
     required this.fillColor,
     this.strokeColor = Colors.transparent,
@@ -37,12 +36,12 @@ class ModuleGrid extends StatelessWidget {
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
       ),
-      itemCount: cols,
+      itemCount: count,
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
-            _firebaseModuleService.getModuleById("module_0$index");
             print("Hexagon clicked at index: $index");
+            _firebaseModuleService.getModuleById("module_0$index");
           },
           child: HexagonShape(
             size: size,

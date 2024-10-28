@@ -59,8 +59,7 @@ class _OverviewPageState extends State<OverviewPage> {
                   child: Container(
                 height: 300,
                 child: ModuleGrid(
-                  rows: 0,
-                  cols: _moduleCount,
+                  count: _moduleCount,
                   size: 100,
                   fillColor: AppColors.primaryYellow,
                   strokeColor: AppColors.white,
