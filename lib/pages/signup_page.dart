@@ -1,6 +1,7 @@
 import 'package:adapt/services/firebase_auth_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/hexagon_grid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -16,15 +17,17 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfirmController = TextEditingController();
+  final TextEditingController _passwordConfirmController =
+      TextEditingController();
 
   @override
-  void dispose(){
+  void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _userEmailController.dispose();
@@ -33,7 +36,7 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-  void _register() async{
+  void _register() async {
     String fName = _firstNameController.text.trim();
     String lName = _lastNameController.text.trim();
     String userEmail = _userEmailController.text.trim();
@@ -41,17 +44,33 @@ class _SignUpPageState extends State<SignUpPage> {
     String passwordConfirm = _passwordConfirmController.text.trim();
 
     if (password == passwordConfirm) {
-      User? user = await _firebaseAuthService.signUp(fName, lName, userEmail, password);
-      if(user != null){
+      User? user =
+          await _firebaseAuthService.signUp(fName, lName, userEmail, password);
+      if (user != null) {
+        // Save user details in Firestore
+        await _firestore.collection('users').doc(user.uid).set(
+          {
+            'id': user.uid, // User ID
+            'name': '${fName} ${lName}', // User-provided name
+            'email': userEmail, // User email
+            'role': 'user', // Default role as 'user'
+            'created_at': FieldValue.serverTimestamp(), // Auto timestamp
+          },
+        );
+
         Navigator.of(context).pushNamed(Routes.beehiveMain);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('SignUp Failed!')),
+          const SnackBar(
+            content: Text('SignUp Failed!'),
+          ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password doesn\'t match!')),
+        const SnackBar(
+          content: Text('Password doesn\'t match!'),
+        ),
       );
     }
   }
@@ -67,7 +86,7 @@ class _SignUpPageState extends State<SignUpPage> {
         // clipBehavior: Clip.hardEdge,
         // fit: StackFit.loose,
         children: [
-           Positioned.fill(
+          Positioned.fill(
             left: -45,
             top: -280,
             child: HexagonGrid(
@@ -76,8 +95,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 size: 175,
                 fillColor: AppColors.primaryYellow,
                 strokeColor: AppColors.white,
-                strokeWidth: 6
-            ),
+                strokeWidth: 6),
           ),
           Center(
             child: SingleChildScrollView(
@@ -158,7 +176,12 @@ class _SignUpPageState extends State<SignUpPage> {
                   SizedBox(height: 10),
                   Row(
                     children: [
-                      Checkbox(value: false, onChanged: (value) {}),
+                      Checkbox(
+                          value: false,
+                          onChanged: (value) {
+                            // Checkbox action
+                            value = value;
+                          }),
                       Expanded(
                         child: Text(
                           'I agree to the data protection regulations and would like to continue to participate.',

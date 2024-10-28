@@ -11,11 +11,10 @@ class ExercisePage extends StatefulWidget {
 }
 
 class _ExercisePageState extends State<ExercisePage> {
-
   final ScrollController _scrollController = ScrollController();
 
   // Example Markdown content
-  final String markdownData =  """
+  final String markdownData = """
 # Biologie der Angst – eine Reise in die faszinierende Welt der Angst
 
 Körperliche Veränderungen sind ein wichtiges Mittel, um uns oder anderen etwas mitzuteilen oder sich an Situationen anzupassen. Der Körper kann anfangen zu schwitzen, wenn die Temperatur warm ist, um nicht zu überhitzen. Andererseits kann der Körper auch mit Schwindel reagieren, weil wir zu wenig getrunken haben. Es kann also viele verschiedene Ursachen geben, warum der Körper andere Reaktionen auslöst. Eine Ursache können Emotionen sein. Es ist insgesamt so, dass jede Emotion mit körperlichen Veränderungen einhergeht. Bei Ekel wird einer Person beispielsweise übel oder bei Scham wird sie rot und fängt an zu Schwitzen. Es ist also ganz normal, dass sich im Körper etwas verändert. Dazu nutzt der Körper verschiedene Teile, um diese Reaktion oder Veränderung möglich zu machen – nämlich unser Nervensystem.
@@ -37,9 +36,9 @@ Zusammenfassend lässt sich sagen, dass der Körper alle Funktionen und Verände
   void _scroll(double offset) {
     position = position + offset;
 
-    if(position < 0) {
+    if (position < 0) {
       position = 0;
-    }else if(position > _scrollController.position.maxScrollExtent){
+    } else if (position > _scrollController.position.maxScrollExtent) {
       position = _scrollController.position.maxScrollExtent;
     }
 
@@ -51,7 +50,8 @@ Zusammenfassend lässt sich sagen, dass der Körper alle Funktionen und Verände
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppTitleBar(title: 'Mode Temp', leadingIcon: Icons.arrow_back_ios),
+      appBar:
+          AppTitleBar(title: 'Mode Temp', leadingIcon: Icons.arrow_back_ios),
       body: Column(
         children: [
           Expanded(
@@ -68,11 +68,13 @@ Zusammenfassend lässt sich sagen, dass der Körper alle Funktionen und Verände
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back_ios, color: AppColors.darkYellow, size: 25), // Static color
+                  icon: Icon(Icons.arrow_back_ios,
+                      color: AppColors.darkYellow, size: 25), // Static color
                   onPressed: () => _scroll(-250),
                 ),
                 IconButton(
-                  icon: Icon(Icons.arrow_forward_ios, color: AppColors.darkYellow, size: 25), // Static color
+                  icon: Icon(Icons.arrow_forward_ios,
+                      color: AppColors.darkYellow, size: 25), // Static color
                   onPressed: () => _scroll(250),
                 ),
               ],

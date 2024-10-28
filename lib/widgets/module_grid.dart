@@ -31,7 +31,7 @@ class ModuleGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4, // Adjust as needed
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
