@@ -1,15 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirebaseModuleService{
+class FirebaseModuleService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> getModuleById(String documentId) async {
     try {
       // Access the document by ID
-      DocumentSnapshot document = await _firestore
-          .collection('modules')
-          .doc(documentId)
-          .get();
+      DocumentSnapshot document =
+          await _firestore.collection('modules').doc(documentId).get();
 
       if (document.exists) {
         // Successfully retrieved the document
@@ -20,6 +18,17 @@ class FirebaseModuleService{
     } catch (e) {
       print('Error fetching Module: $e');
     }
+  }
+
+  Future<List<Map<String, dynamic>>> getModules() async {
+    QuerySnapshot snapshot = await _firestore.collection('modules').get();
+
+    return snapshot.docs.map((doc) {
+      return {
+        'id': doc.id,
+        ...doc.data() as Map<String, dynamic>,
+      };
+    }).toList();
   }
 
   Future<int> getModuleCount() async {

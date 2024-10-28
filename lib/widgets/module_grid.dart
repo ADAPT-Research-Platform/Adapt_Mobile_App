@@ -1,12 +1,11 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+
+import '../pages/modules_page.dart';
 import '../services/firebase_module_service.dart';
 import 'hexagon_shape.dart';
 
-//THis is just a experiment class with clickable hexagon shapes
 class ModuleGrid extends StatelessWidget {
-  final int count;
+  final int? count;
   final double size;
   final Color fillColor;
   final Color strokeColor;
@@ -15,10 +14,10 @@ class ModuleGrid extends StatelessWidget {
   final IconData? icon;
   final Color? iconColor;
   final FirebaseModuleService _firebaseModuleService = FirebaseModuleService();
-  
+
   ModuleGrid({
     super.key,
-    required this.count,
+    this.count,
     required this.size,
     required this.fillColor,
     this.strokeColor = Colors.transparent,
@@ -30,28 +29,51 @@ class ModuleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4, // Adjust as needed
-        mainAxisSpacing: 4,
-        crossAxisSpacing: 4,
-      ),
-      itemCount: count,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            print("Hexagon clicked at index: $index");
-            _firebaseModuleService.getModuleById("module_0$index");
-          },
-          child: HexagonShape(
-            size: size,
-            fillColor: fillColor,
-            strokeColor: strokeColor,
-            strokeWidth: strokeWidth,
-            strokeRadius: strokeRadius,
-            icon: icon,
-            iconColor: iconColor,
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _firebaseModuleService.getModules(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error loading modules"));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text("No modules available"));
+        }
+
+        final modules = snapshot.data!;
+
+        return GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 4,
           ),
+          itemCount:
+              count != null && count! < modules.length ? count : modules.length,
+          itemBuilder: (context, index) {
+            final module = modules[index];
+            final moduleId = module['id'];
+            return GestureDetector(
+              onTap: () {
+                // Navigate to the details page with the module ID
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ModuleDetailPage(moduleId: moduleId),
+                  ),
+                );
+              },
+              child: HexagonShape(
+                size: size,
+                fillColor: fillColor,
+                strokeColor: strokeColor,
+                strokeWidth: strokeWidth,
+                strokeRadius: strokeRadius,
+                icon: icon,
+                iconColor: iconColor,
+              ),
+            );
+          },
         );
       },
     );
