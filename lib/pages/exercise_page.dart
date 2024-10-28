@@ -51,7 +51,7 @@ Zusammenfassend lässt sich sagen, dass der Körper alle Funktionen und Verände
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppTitleBar(title: 'Mode Temp'),
+      appBar: AppTitleBar(title: 'Mode Temp', leadingIcon: Icons.arrow_back_ios),
       body: Column(
         children: [
           Expanded(
