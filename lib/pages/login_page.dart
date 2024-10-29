@@ -6,6 +6,7 @@ import '../services/firebase_auth_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
+import '../utils/navigator_keys.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
     User? user = await _firebaseAuthService.signIn(userEmail, password);
     if(user != null){
       print("Login Successfull");
-      Navigator.of(context).pushNamed(Routes.beehiveMain);
+      globalNavigatorKey.currentState!.pushNamed(Routes.beehiveMain);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login Unsuccessfull!')),
@@ -45,11 +46,11 @@ class _LoginPageState extends State<LoginPage> {
   //Temporary Method Just to ByPass login
   void _login_bypass() async{
     print("Login Successfull");
-    Navigator.of(context).pushNamed(Routes.beehiveMain);
+    globalNavigatorKey.currentState!.pushNamed(Routes.beehiveMain);
   }
 
   void _register() {
-    Navigator.of(context).pushNamed(Routes.beehiveSignUp);
+    globalNavigatorKey.currentState!.pushNamed(Routes.beehiveSignUp);
   }
 
   @override

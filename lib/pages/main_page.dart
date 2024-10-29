@@ -5,7 +5,7 @@ import '../widgets/app_navigation_bar.dart';
 import 'contact_page.dart';
 import 'diary_page.dart';
 import 'mode_page.dart';
-import 'overview_page.dart';
+import 'module_index_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -22,8 +22,8 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
         body: IndexedStack(
           index: _currentIndex,
-          children: const [
-            OverviewPage(),
+          children: [
+            ModuleIndexPage(),
             DiaryPage(),
             ModePage(),
             ContactPage(),

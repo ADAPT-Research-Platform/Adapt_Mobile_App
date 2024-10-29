@@ -1,8 +1,10 @@
+import 'package:adapt/utils/navigator_keys.dart';
 import 'package:adapt/widgets/app_title_bar.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
+import '../utils/app_routes.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -112,7 +114,7 @@ class SettingsPage extends StatelessWidget {
                 const SizedBox(width: 10),
                 ElevatedButton.icon(
                   onPressed: () {
-                    // Logout action
+                    globalNavigatorKey.currentState!.pushNamed(Routes.beehiveLogin);
                   },
                   icon: Icon(Icons.logout),
                   label: Text(

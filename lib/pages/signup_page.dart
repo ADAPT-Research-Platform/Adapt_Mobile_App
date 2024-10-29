@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
+import '../utils/navigator_keys.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -58,7 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
           },
         );
 
-        Navigator.of(context).pushNamed(Routes.beehiveMain);
+        globalNavigatorKey.currentState!.pushNamed(Routes.beehiveMain);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -76,7 +77,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _login() {
-    Navigator.of(context).pushNamed(Routes.beehiveLogin);
+    globalNavigatorKey.currentState!.pushNamed(Routes.beehiveLogin);
   }
 
   @override

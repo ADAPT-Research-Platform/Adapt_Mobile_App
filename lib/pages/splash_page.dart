@@ -1,6 +1,8 @@
-import 'package:adapt/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../utils/app_routes.dart';
+import '../utils/navigator_keys.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -17,11 +19,7 @@ class _SplashPageState extends State<SplashPage>
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     Future.delayed(const Duration(seconds: 2), () {
-      //Navigator.pushReplacement(context).pushNamed(Routes.beehiveLogin);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
+      globalNavigatorKey.currentState!.pushNamed(Routes.beehiveLogin);
     });
   }
 

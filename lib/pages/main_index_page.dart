@@ -6,6 +6,7 @@ import '../utils/app_routes.dart';
 import 'contact_page.dart';
 import 'diary_page.dart';
 import 'mode_page.dart';
+import 'module_index_page.dart';
 import 'overview_page.dart';
 
 class MainIndexPage extends StatelessWidget {
@@ -19,7 +20,7 @@ class MainIndexPage extends StatelessWidget {
           switch (settings.name) {
             case Routes.beehiveOverview:
               return MaterialPageRoute(
-                builder: (context) => OverviewPage(),
+                builder: (context) => ModuleIndexPage(),
               );
             case Routes.beehiveDiary:
               return MaterialPageRoute(
