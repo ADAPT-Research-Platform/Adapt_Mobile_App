@@ -5,6 +5,7 @@ import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
 import '../utils/navigator_keys.dart';
+import '../utils/string_formatter.dart';
 import '../widgets/app_exercise_card.dart';
 import '../widgets/app_title_bar.dart';
 
@@ -20,7 +21,7 @@ class ModulePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppTitleBar(
-        title: 'Module X',
+        title: convertIdToName(module.id),
         leadingIcon: Icons.arrow_back_ios,
         onIconPressed: (){
           moduleNavigatorKey.currentState!.pop(); //Go Backwards
@@ -28,9 +29,9 @@ class ModulePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          const Center(
+           Center(
             child: Text(
-              'About Fear',
+              module.title,
               style: TextStyle(
                 color: AppColors.darkYellow, // Static text color
                 fontSize: AppFontSizes.medium, // Static font size

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../utils/navigator_keys.dart';
+import '../utils/string_formatter.dart';
 
 class ExercisePage extends StatefulWidget {
   final Exercise exercise;
@@ -40,7 +41,7 @@ class _ExercisePageState extends State<ExercisePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppTitleBar(
-          title: 'Exercise X',
+          title: convertIdToName(widget.exercise.id),
           leadingIcon: Icons.arrow_back_ios,
           onIconPressed: (){
             moduleNavigatorKey.currentState!.pop(); //Go Backwards
