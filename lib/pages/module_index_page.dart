@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../models/module.dart';
 import '../utils/app_routes.dart';
 import 'exercise_page.dart';
-import 'modules_page.dart';
+import 'module_page.dart';
 import 'overview_page.dart';
 
 class ModuleIndexPage extends StatelessWidget {
