@@ -2,12 +2,11 @@ import 'package:adapt/utils/navigator_keys.dart';
 import 'package:flutter/material.dart';
 
 import '../models/module.dart';
-import '../services/firebase_module_service.dart';
 import '../utils/app_routes.dart';
 import 'hexagon_shape.dart';
 
 class ModuleGrid extends StatelessWidget {
-  final int? count;
+  final List<Module> modules;
   final double size;
   final Color fillColor;
   final Color strokeColor;
@@ -15,11 +14,10 @@ class ModuleGrid extends StatelessWidget {
   final double strokeRadius;
   final IconData? icon;
   final Color? iconColor;
-  final FirebaseModuleService _firebaseModuleService = FirebaseModuleService();
 
-  ModuleGrid({
+  const ModuleGrid({
     super.key,
-    this.count,
+    required this.modules,
     required this.size,
     required this.fillColor,
     this.strokeColor = Colors.transparent,
@@ -31,44 +29,28 @@ class ModuleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Module>>(
-      future: _firebaseModuleService.fetchModuleList(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text("Error loading modules"));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text("No modules available"));
-        }
-
-        final modules = snapshot.data!;
-
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4,
-          ),
-          itemCount:
-              count != null && count! < modules.length ? count : modules.length,
-          itemBuilder: (context, index) {
-            final module = modules[index];
-            return GestureDetector(
-              onTap: () {
-                moduleNavigatorKey.currentState!.pushNamed(Routes.beehiveModules, arguments: module);
-              },
-              child: HexagonShape(
-                size: size,
-                fillColor: fillColor,
-                strokeColor: strokeColor,
-                strokeWidth: strokeWidth,
-                strokeRadius: strokeRadius,
-                icon: icon,
-                iconColor: iconColor,
-              ),
-            );
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+      ),
+      itemCount: modules.length,
+      itemBuilder: (context, index) {
+        final module = modules[index];
+        return GestureDetector(
+          onTap: () {
+            moduleNavigatorKey.currentState!.pushNamed(Routes.beehiveModules, arguments: module);
           },
+          child: HexagonShape(
+            size: size,
+            fillColor: fillColor,
+            strokeColor: strokeColor,
+            strokeWidth: strokeWidth,
+            strokeRadius: strokeRadius,
+            icon: icon,
+            iconColor: iconColor,
+          ),
         );
       },
     );

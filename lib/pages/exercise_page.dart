@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:adapt/models/exercise.dart';
+import 'package:adapt/services/firebase_exercise_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/app_title_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:http/http.dart' as http;
 
 import '../utils/navigator_keys.dart';
 
@@ -20,31 +18,7 @@ class ExercisePage extends StatefulWidget {
 
 class _ExercisePageState extends State<ExercisePage> {
   final ScrollController _scrollController = ScrollController();
-
-  // Example Markdown content
-  String markdownContent = "";
-
-  @override
-  void initState() {
-    super.initState();
-    fetchMarkdownContent();
-  }
-
-  Future<void> fetchMarkdownContent() async {
-    try {
-      final response = await http.get(Uri.parse(widget.exercise.content));
-
-      if (response.statusCode == 200) {
-        setState(() {
-          markdownContent  = utf8.decode(response.bodyBytes, allowMalformed: true);
-        });
-      } else {
-        throw Exception("Failed to load markdown content");
-      }
-    } catch (e) {
-      print("Error fetching markdown content: $e");
-    }
-  }
+  final FirebaseExerciseService _firebaseExerciseService = FirebaseExerciseService();
 
   double position = 0;
 
@@ -69,38 +43,53 @@ class _ExercisePageState extends State<ExercisePage> {
           title: 'Exercise X',
           leadingIcon: Icons.arrow_back_ios,
           onIconPressed: (){
-            moduleNavigatorKey.currentState!.pop();
+            moduleNavigatorKey.currentState!.pop(); //Go Backwards
           }),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: MarkdownBody(
-                data: markdownContent,
+      body: FutureBuilder<String>(
+        future: _firebaseExerciseService.fetchExerciseFile(widget.exercise.url),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+          } else if (snapshot.hasError) {
+            return const Center(child: Text("Error loading exercise"));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No exercise available"));
+          }
+
+          final markdownContent = snapshot.data!;
+
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: MarkdownBody(
+                    data: markdownContent,
+                  ),
+                ),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back_ios,
-                      color: AppColors.darkYellow, size: 25), // Static color
-                  onPressed: () => _scroll(-250),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios,
+                          color: AppColors.darkYellow, size: 25), // Static color
+                      onPressed: () => _scroll(-250),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.arrow_forward_ios,
+                          color: AppColors.darkYellow, size: 25), // Static color
+                      onPressed: () => _scroll(250),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(Icons.arrow_forward_ios,
-                      color: AppColors.darkYellow, size: 25), // Static color
-                  onPressed: () => _scroll(250),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+              ),
+            ],
+          );
+        },
+      )
     );
   }
 }
