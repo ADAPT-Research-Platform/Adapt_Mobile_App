@@ -2,7 +2,6 @@ import 'package:adapt/utils/app_font_sizes.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
-import '../utils/app_font_sizes.dart';
 
 class AppTitleBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;

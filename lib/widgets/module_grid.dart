@@ -1,7 +1,9 @@
+import 'package:adapt/utils/navigator_keys.dart';
 import 'package:flutter/material.dart';
 
-import '../pages/modules_page.dart';
+import '../models/module.dart';
 import '../services/firebase_module_service.dart';
+import '../utils/app_routes.dart';
 import 'hexagon_shape.dart';
 
 class ModuleGrid extends StatelessWidget {
@@ -29,8 +31,8 @@ class ModuleGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: _firebaseModuleService.getModules(),
+    return FutureBuilder<List<Module>>(
+      future: _firebaseModuleService.fetchModuleList(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -52,16 +54,9 @@ class ModuleGrid extends StatelessWidget {
               count != null && count! < modules.length ? count : modules.length,
           itemBuilder: (context, index) {
             final module = modules[index];
-            final moduleId = module['id'];
             return GestureDetector(
               onTap: () {
-                // Navigate to the details page with the module ID
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ModuleDetailPage(moduleId: moduleId),
-                  ),
-                );
+                moduleNavigatorKey.currentState!.pushNamed(Routes.beehiveModules, arguments: module);
               },
               child: HexagonShape(
                 size: size,

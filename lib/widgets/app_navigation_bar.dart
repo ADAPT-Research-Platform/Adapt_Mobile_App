@@ -1,5 +1,6 @@
 import 'package:adapt/utils/navigator_keys.dart';
 import 'package:flutter/material.dart';
+
 import '../utils/app_colors.dart';
 import 'hexagon_shape.dart';
 
@@ -20,7 +21,7 @@ class AppNavigationBar extends StatefulWidget {
 class _AppNavigationBar extends State<AppNavigationBar> {
   int currentPageIndex = 0;
   double size = 65;
-  double strokeWidth = 2.8;
+  double strokeWidth = 2.2;
   double strokeRadius = 8;
   Color fillColor = AppColors.primaryYellow;
   Color iconColor = AppColors.white;

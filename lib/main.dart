@@ -1,12 +1,12 @@
 import 'package:adapt/pages/splash_page.dart';
+import 'package:adapt/utils/navigator_keys.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:adapt/utils/navigator_keys.dart';
-import '../../utils/app_routes.dart';
+
 import '../../pages/login_page.dart';
 import '../../pages/main_page.dart';
 import '../../pages/signup_page.dart';
-
+import '../../utils/app_routes.dart';
 import 'firebase_options.dart';
 
 void main() async {
