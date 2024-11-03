@@ -36,7 +36,7 @@ class _OverviewPageState extends State<OverviewPage> {
           final modules = snapshot.data!;
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: ListView(children: [
               const Center(
                 child: Text(
@@ -79,13 +79,9 @@ class _OverviewPageState extends State<OverviewPage> {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.only(bottom: 10),
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                  border: Border(
-                      bottom: BorderSide(color: AppColors.lightGrey, width: 2.5)),
-                ),
+              Divider(
+                color: AppColors.lightGrey, // Customize the color as needed
+                thickness: 2.5, // Customize the thickness as needed
               ),
               const Center(
                 child: Text(

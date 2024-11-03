@@ -14,7 +14,7 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppTitleBar(title: 'Settings'),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: ListView(
           children: [
             const Center(
@@ -136,13 +136,9 @@ class SettingsPage extends StatelessWidget {
                 ),
               ],
             ),
-            Container(
-                padding: const EdgeInsets.only(bottom: 10),
-                decoration: const BoxDecoration(
-                    color: Colors.transparent,
-                    border: Border(
-                        bottom: BorderSide(
-                            color: AppColors.lightGrey, width: 2.5)))
+            Divider(
+              color: AppColors.lightGrey, // Customize the color as needed
+              thickness: 2.5, // Customize the thickness as needed
             ),
             Center(
               child: Text(
@@ -154,13 +150,9 @@ class SettingsPage extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-                padding: const EdgeInsets.only(bottom: 10),
-                decoration: const BoxDecoration(
-                    color: Colors.transparent,
-                    border: Border(
-                        bottom: BorderSide(
-                            color: AppColors.lightGrey, width: 2.5)))
+            Divider(
+              color: AppColors.lightGrey, // Customize the color as needed
+              thickness: 2.5, // Customize the thickness as needed
             ),
             Center(
               child: Text(

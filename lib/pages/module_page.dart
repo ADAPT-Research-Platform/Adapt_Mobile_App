@@ -20,30 +20,28 @@ class ModulePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppTitleBar(
-        title: convertIdToName(module.id),
-        leadingIcon: Icons.arrow_back_ios,
-        onIconPressed: (){
-          moduleNavigatorKey.currentState!.pop(); //Go Backwards
-        }
-      ),
-      body: Column(
-        children: [
-           Center(
-            child: Text(
-              module.title,
-              style: TextStyle(
-                color: AppColors.darkYellow, // Static text color
-                fontSize: AppFontSizes.medium, // Static font size
-                fontWeight: FontWeight.bold, // Static font weight
+        appBar: AppTitleBar(
+            title: convertIdToName(module.moduleId),
+            leadingIcon: Icons.arrow_back_ios,
+            onIconPressed: () {
+              moduleNavigatorKey.currentState!.pop(); //Go Backwards
+            }),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Column(
+            children: [
+              Center(
+                child: Text(
+                  module.title,
+                  style: const TextStyle(
+                    color: AppColors.darkYellow, // Static text color
+                    fontSize: AppFontSizes.medium, // Static font size
+                    fontWeight: FontWeight.bold, // Static font weight
+                  ),
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                // Adds margin to ListView
+              const SizedBox(height: 8),
+              Expanded(
                 child: ListView.builder(
                   itemCount: module.exercises.length,
                   itemBuilder: (context, index) {
@@ -57,14 +55,16 @@ class ModulePage extends StatelessWidget {
                           answers: 2, //Hard Coded
                           progress: 0.75, //Hard Coded
                           onPressed: () {
-                            moduleNavigatorKey.currentState!.pushNamed(Routes.beehiveExercises, arguments: exercise);
+                            moduleNavigatorKey.currentState!.pushNamed(
+                                Routes.beehiveExercises,
+                                arguments: exercise);
                           },
                         ));
                   },
                 ),
-              )),
-        ],
-      ),
-    );
+              ),
+            ],
+          ),
+        ));
   }
 }
