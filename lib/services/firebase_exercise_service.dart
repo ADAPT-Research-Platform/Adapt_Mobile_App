@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/exercise.dart';
+import '../models/module.dart';
 
 class FirebaseExerciseService {
 
@@ -17,10 +18,11 @@ class FirebaseExerciseService {
 
       return querySnapshot.docs.map((document) {
         return Exercise(
-          id: document.id,
+          exerciseId: document.id,
           timeStamp: (document.get('timestamp') as Timestamp).toDate(),
           url: document.get('url'),
           title: document.get('title'),
+          progress: 0.0 //TODO: Need to Get Later
         );
       }).toList();
     } catch (e) {

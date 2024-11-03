@@ -17,7 +17,7 @@ class FirebaseModuleService {
 
       if (document.exists) {
         return Module(
-          id: document.id,
+          moduleId: document.id,
           title: document.get('title'),
           exercises: await _firebaseExerciseService.fetchExerciseList(document.id),
         );
@@ -42,7 +42,7 @@ class FirebaseModuleService {
         List<Exercise> exercises = await _firebaseExerciseService.fetchExerciseList(document.id);
 
         return Module(
-          id: document.id,
+          moduleId: document.id,
           title: document.get('title'),
           exercises: exercises, // Set exercises fetched from Firestore
         );
