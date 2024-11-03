@@ -40,7 +40,7 @@ class ModuleGrid extends StatelessWidget {
         final module = modules[index];
         return GestureDetector(
           onTap: () {
-            moduleNavigatorKey.currentState!.pushNamed(Routes.beehiveModules, arguments: module);
+            moduleNavigator.currentState!.pushNamed(Routes.routeModules, arguments: module);
           },
           child: HexagonShape(
             size: size,

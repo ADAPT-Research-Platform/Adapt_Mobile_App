@@ -14,18 +14,18 @@ class ModuleIndexPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Navigator(
-        key: moduleNavigatorKey,
+        key: moduleNavigator,
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
-            case Routes.beehiveOverview:
+            case Routes.routeOverview:
               return MaterialPageRoute(
                 builder: (context) => const OverviewPage(),
               );
-            case Routes.beehiveModules:
+            case Routes.routeModules:
               return MaterialPageRoute(
                 builder: (context) => ModulePage(module: settings.arguments! as Module),
               );
-            case Routes.beehiveExercises:
+            case Routes.routeExercises:
               return MaterialPageRoute(
                 builder: (context) => ExercisePage(exercise: settings.arguments! as Exercise),
               );

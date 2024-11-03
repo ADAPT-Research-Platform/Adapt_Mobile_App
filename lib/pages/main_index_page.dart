@@ -15,26 +15,26 @@ class MainIndexPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Navigator(
-        key: bottomNavigatorKey,
+        key: bottomNavigator,
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
-            case Routes.beehiveOverview:
+            case Routes.routeOverview:
               return MaterialPageRoute(
                 builder: (context) => ModuleIndexPage(),
               );
-            case Routes.beehiveDiary:
+            case Routes.routeDiary:
               return MaterialPageRoute(
                 builder: (context) => DiaryPage(),
               );
-            case Routes.beehiveMode:
+            case Routes.routeMode:
               return MaterialPageRoute(
                 builder: (context) => ModePage(),
               );
-            case Routes.beehiveContact:
+            case Routes.routeContact:
               return MaterialPageRoute(
                 builder: (context) => ContactPage(),
               );
-            case Routes.beehiveSettings:
+            case Routes.routeSettings:
               return MaterialPageRoute(
                 builder: (context) => SettingsPage(),
               );

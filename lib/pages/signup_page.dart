@@ -59,7 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
           },
         );
 
-        globalNavigatorKey.currentState!.pushNamed(Routes.beehiveMain);
+        mainNavigator.currentState!.pushNamed(Routes.routeMain);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -77,7 +77,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _login() {
-    globalNavigatorKey.currentState!.pushNamed(Routes.beehiveLogin);
+    mainNavigator.currentState!.pushNamed(Routes.routeLogin);
   }
 
   @override

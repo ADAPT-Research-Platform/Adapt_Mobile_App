@@ -125,7 +125,7 @@ class _ExercisePageState extends State<ExercisePage> {
             title: convertIdToName(widget.exercise.exerciseId),
             leadingIcon: Icons.arrow_back_ios,
             onIconPressed: () {
-              moduleNavigatorKey.currentState!.pop(); //Go Backwards
+              moduleNavigator.currentState!.pop(); //Go Backwards
             }),
         body: FutureBuilder<String>(
           future:

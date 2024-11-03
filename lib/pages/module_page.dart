@@ -24,7 +24,7 @@ class ModulePage extends StatelessWidget {
             title: convertIdToName(module.moduleId),
             leadingIcon: Icons.arrow_back_ios,
             onIconPressed: () {
-              moduleNavigatorKey.currentState!.pop(); //Go Backwards
+              moduleNavigator.currentState!.pop(); //Go Backwards
             }),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -55,8 +55,8 @@ class ModulePage extends StatelessWidget {
                           answers: 2, //Hard Coded
                           progress: 0.75, //Hard Coded
                           onPressed: () {
-                            moduleNavigatorKey.currentState!.pushNamed(
-                                Routes.beehiveExercises,
+                            moduleNavigator.currentState!.pushNamed(
+                                Routes.routeExercises,
                                 arguments: exercise);
                           },
                         ));

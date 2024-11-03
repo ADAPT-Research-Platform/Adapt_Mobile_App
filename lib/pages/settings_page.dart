@@ -114,7 +114,7 @@ class SettingsPage extends StatelessWidget {
                 const SizedBox(width: 10),
                 ElevatedButton.icon(
                   onPressed: () {
-                    globalNavigatorKey.currentState!.pushNamed(Routes.beehiveLogin);
+                    mainNavigator.currentState!.pushNamed(Routes.routeLogin);
                   },
                   icon: Icon(Icons.logout),
                   label: Text(

@@ -37,7 +37,7 @@ class _AppNavigationBar extends State<AppNavigationBar> {
           border:
               Border(top: BorderSide(color: AppColors.lightGrey, width: 2.5))),
       child: NavigationBar(
-        key: bottomNavigatorKey,
+        key: bottomNavigator,
         onDestinationSelected: (index) {
           widget.onDestinationSelected(index);
           setState(() {

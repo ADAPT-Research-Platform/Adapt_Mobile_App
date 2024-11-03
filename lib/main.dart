@@ -26,18 +26,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'ADAPT',
         debugShowCheckedModeBanner: false,
-        navigatorKey: globalNavigatorKey,
+        navigatorKey: mainNavigator,
         onGenerateRoute: (settings) {
           switch (settings.name) {
-            case Routes.beehiveMain:
+            case Routes.routeMain:
               return MaterialPageRoute(
                 builder: (context) => const MainPage(),
               );
-            case Routes.beehiveLogin:
+            case Routes.routeLogin:
               return MaterialPageRoute(
                 builder: (context) => const LoginPage(),
               );
-            case Routes.beehiveSignUp:
+            case Routes.routeSignUp:
               return MaterialPageRoute(
                 builder: (context) => const SignUpPage(),
               );

@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
     User? user = await _firebaseAuthService.signIn(userEmail, password);
     if(user != null){
       print("Login Successfull");
-      globalNavigatorKey.currentState!.pushNamed(Routes.beehiveMain);
+      mainNavigator.currentState!.pushNamed(Routes.routeMain);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login Unsuccessfull!')),
@@ -46,11 +46,11 @@ class _LoginPageState extends State<LoginPage> {
   //Temporary Method Just to ByPass login
   void _login_bypass() async{
     print("Login Successfull");
-    globalNavigatorKey.currentState!.pushNamed(Routes.beehiveMain);
+    mainNavigator.currentState!.pushNamed(Routes.routeMain);
   }
 
   void _register() {
-    globalNavigatorKey.currentState!.pushNamed(Routes.beehiveSignUp);
+    mainNavigator.currentState!.pushNamed(Routes.routeSignUp);
   }
 
   @override

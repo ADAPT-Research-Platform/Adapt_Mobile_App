@@ -1,6 +1,4 @@
 
-import 'module.dart';
-
 class Exercise {
   final String exerciseId;
   final DateTime timeStamp;
