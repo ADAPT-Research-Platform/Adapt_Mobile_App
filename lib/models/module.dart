@@ -1,9 +1,13 @@
 import 'exercise.dart';
 
 class Module {
-  final String id;
+  final String moduleId;
   final String title;
-  final List<Exercise> exercises;
+  List<Exercise> exercises;
 
-  Module({required this.id, required this.title, required this.exercises});
+  Module({
+    required this.moduleId,
+    required this.title,
+    required this.exercises
+  });
 }
