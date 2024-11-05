@@ -10,6 +10,7 @@ import '../models/user.dart';
 import '../utils/navigator_keys.dart';
 import '../utils/string_formatter.dart';
 import '../widgets/app_comment_card.dart';
+import '../widgets/youtube_player_builder.dart';
 
 class ExercisePage extends StatefulWidget {
   final Exercise exercise;
@@ -152,6 +153,9 @@ class _ExercisePageState extends State<ExercisePage> {
                         controller: _scrollController,
                         child: MarkdownBody(
                           data: markdownContent,
+                          builders: {
+                            'a': YouTubePlayerBuilder(),
+                          },
                         ),
                       ),
                     ),
