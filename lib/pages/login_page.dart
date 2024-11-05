@@ -57,12 +57,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        // clipBehavior: Clip.hardEdge,
-        // fit: StackFit.loose,
         children: [
-           Positioned.fill(
+           const Positioned.fill(
             left: -45,
-            top: -180,
+            top: -160,
             child: HexagonGrid(
               rows: 6,
               cols: 4,
@@ -72,111 +70,112 @@ class _LoginPageState extends State<LoginPage> {
               strokeWidth: 6
             ),
           ),
-         Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'assets/images/hands_icon.png',
-                    height: 100,
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Login',
-                    style: TextStyle(
-                      color: AppColors.darkYellow, // Static text color
-                      fontSize: AppFontSizes.large, // Static font size
-                      fontWeight: FontWeight.bold, // Static font weight
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Please login to your account.',
-                    style: TextStyle(fontSize: AppFontSizes.small),
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    controller: _userEmailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email Address',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text('Forgot Password?'),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Checkbox(value: false, onChanged: (value) {}),
-                      Expanded(
-                        child: Text(
-                          'I agree to the data protection regulations and would like to continue to participate.',
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _login,
-                    child: Text('Login'),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: AppColors.white,
-                      backgroundColor: AppColors.primaryYellow,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                      minimumSize: Size(double.infinity, 50),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _login_bypass,
-                    child: Text('Login ByPass'),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: AppColors.white,
-                      backgroundColor: AppColors.primaryYellow,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                      minimumSize: Size(double.infinity, 50),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Don't have an account? "),
-                      TextButton(
-                        onPressed: _register,
-                        child: Text('Register'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              ),
+          Positioned.fill(
+            top: -MediaQuery.of(context).size.height/1.5,
+            //bottom: MediaQuery.of(context).size.height/2,
+            child:  Image.asset(
+              'assets/images/hands_icon.png',
+              width: MediaQuery.of(context).size.width + 100, // Stretch to full screen width
+              fit: BoxFit.fitWidth, // Maintains the aspect ratio
             ),
           ),
+         Padding(padding: const EdgeInsets.symmetric(horizontal: 32),
+           child: Column(
+             mainAxisAlignment: MainAxisAlignment.center,
+             children: [
+               SizedBox(height: MediaQuery.of(context).size.height/3),
+               const Text(
+                 'Login',
+                 style: TextStyle(
+                   color: AppColors.darkYellow, // Static text color
+                   fontSize: AppFontSizes.large, // Static font size
+                   fontWeight: FontWeight.bold, // Static font weight
+                 ),
+               ),
+               SizedBox(height: 20),
+               const Text(
+                 'Please login to your account.',
+                 style: TextStyle(fontSize: AppFontSizes.small),
+               ),
+               SizedBox(height: 20),
+               TextField(
+                 controller: _userEmailController,
+                 decoration: InputDecoration(
+                   labelText: 'Email Address',
+                   border: OutlineInputBorder(
+                     borderRadius: BorderRadius.circular(6.0),
+                   ),
+                 ),
+               ),
+               const SizedBox(height: 10),
+               TextField(
+                 controller: _passwordController,
+                 obscureText: true,
+                 decoration: InputDecoration(
+                   labelText: 'Password',
+                   border: OutlineInputBorder(
+                     borderRadius: BorderRadius.circular(6.0),
+                   ),
+                 ),
+               ),
+               const SizedBox(height: 10),
+               Align(
+                 alignment: Alignment.centerRight,
+                 child: TextButton(
+                   onPressed: () {},
+                   child: Text('Forgot Password?'),
+                 ),
+               ),
+               Row(
+                 children: [
+                   Checkbox(value: false, onChanged: (value) {}),
+                   Expanded(
+                     child: Text(
+                       'I agree to the data protection regulations and would like to continue to participate.',
+                     ),
+                   ),
+                 ],
+               ),
+               SizedBox(height: 20),
+               ElevatedButton(
+                 onPressed: _login,
+                 child: Text('Login'),
+                 style: ElevatedButton.styleFrom(
+                   foregroundColor: AppColors.white,
+                   backgroundColor: AppColors.primaryYellow,
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(6.0),
+                   ),
+                   minimumSize: Size(double.infinity, 50),
+                 ),
+               ),
+               SizedBox(height: 10),
+               ElevatedButton(
+                 onPressed: _login_bypass,
+                 child: Text('Login ByPass'),
+                 style: ElevatedButton.styleFrom(
+                   foregroundColor: AppColors.white,
+                   backgroundColor: AppColors.primaryYellow,
+                   shape: RoundedRectangleBorder(
+                     borderRadius: BorderRadius.circular(6.0),
+                   ),
+                   minimumSize: Size(double.infinity, 50),
+                 ),
+               ),
+               SizedBox(height: 10),
+               Row(
+                 mainAxisAlignment: MainAxisAlignment.center,
+                 children: [
+                   Text("Don't have an account? "),
+                   TextButton(
+                     onPressed: _register,
+                     child: Text('Register'),
+                   ),
+                 ],
+               ),
+               const SizedBox(height: 20),
+             ],
+           )),
         ],
       ),
     );
