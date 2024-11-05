@@ -55,128 +55,134 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final bool isSmallScreen = size.height < 600; // Adjust based on your desired cutoff for small screens
+
     return Scaffold(
-      body: Stack(
-        children: [
-           const Positioned.fill(
-            left: -45,
-            top: -160,
-            child: HexagonGrid(
-              rows: 6,
-              cols: 4,
-              size: 175,
-              fillColor: AppColors.primaryYellow,
-              strokeColor: Colors.white,
-              strokeWidth: 6
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            const Positioned.fill(
+              left: -45,
+              top: -160,
+              child: HexagonGrid(
+                rows: 6,
+                cols: 4,
+                size: 175,
+                fillColor: AppColors.primaryYellow,
+                strokeColor: Colors.white,
+                strokeWidth: 6,
+              ),
             ),
-          ),
-          Positioned.fill(
-            top: -MediaQuery.of(context).size.height/1.5,
-            //bottom: MediaQuery.of(context).size.height/2,
-            child:  Image.asset(
-              'assets/images/hands_icon.png',
-              width: MediaQuery.of(context).size.width + 100, // Stretch to full screen width
-              fit: BoxFit.fitWidth, // Maintains the aspect ratio
+            Positioned.fill(
+              top: -size.height / 1.5,
+              child: Image.asset(
+                'assets/images/hands_icon.png',
+                width: size.width + 100, // Stretch to full screen width
+                fit: BoxFit.fitWidth, // Maintains the aspect ratio
+              ),
             ),
-          ),
-         Padding(padding: const EdgeInsets.symmetric(horizontal: 32),
-           child: Column(
-             mainAxisAlignment: MainAxisAlignment.center,
-             children: [
-               SizedBox(height: MediaQuery.of(context).size.height/3),
-               const Text(
-                 'Login',
-                 style: TextStyle(
-                   color: AppColors.darkYellow, // Static text color
-                   fontSize: AppFontSizes.large, // Static font size
-                   fontWeight: FontWeight.bold, // Static font weight
-                 ),
-               ),
-               SizedBox(height: 20),
-               const Text(
-                 'Please login to your account.',
-                 style: TextStyle(fontSize: AppFontSizes.small),
-               ),
-               SizedBox(height: 20),
-               TextField(
-                 controller: _userEmailController,
-                 decoration: InputDecoration(
-                   labelText: 'Email Address',
-                   border: OutlineInputBorder(
-                     borderRadius: BorderRadius.circular(6.0),
-                   ),
-                 ),
-               ),
-               const SizedBox(height: 10),
-               TextField(
-                 controller: _passwordController,
-                 obscureText: true,
-                 decoration: InputDecoration(
-                   labelText: 'Password',
-                   border: OutlineInputBorder(
-                     borderRadius: BorderRadius.circular(6.0),
-                   ),
-                 ),
-               ),
-               const SizedBox(height: 10),
-               Align(
-                 alignment: Alignment.centerRight,
-                 child: TextButton(
-                   onPressed: () {},
-                   child: Text('Forgot Password?'),
-                 ),
-               ),
-               Row(
-                 children: [
-                   Checkbox(value: false, onChanged: (value) {}),
-                   Expanded(
-                     child: Text(
-                       'I agree to the data protection regulations and would like to continue to participate.',
-                     ),
-                   ),
-                 ],
-               ),
-               SizedBox(height: 20),
-               ElevatedButton(
-                 onPressed: _login,
-                 child: Text('Login'),
-                 style: ElevatedButton.styleFrom(
-                   foregroundColor: AppColors.white,
-                   backgroundColor: AppColors.primaryYellow,
-                   shape: RoundedRectangleBorder(
-                     borderRadius: BorderRadius.circular(6.0),
-                   ),
-                   minimumSize: Size(double.infinity, 50),
-                 ),
-               ),
-               SizedBox(height: 10),
-               ElevatedButton(
-                 onPressed: _login_bypass,
-                 child: Text('Login ByPass'),
-                 style: ElevatedButton.styleFrom(
-                   foregroundColor: AppColors.white,
-                   backgroundColor: AppColors.primaryYellow,
-                   shape: RoundedRectangleBorder(
-                     borderRadius: BorderRadius.circular(6.0),
-                   ),
-                   minimumSize: Size(double.infinity, 50),
-                 ),
-               ),
-               SizedBox(height: 10),
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.center,
-                 children: [
-                   Text("Don't have an account? "),
-                   TextButton(
-                     onPressed: _register,
-                     child: Text('Register'),
-                   ),
-                 ],
-               ),
-               const SizedBox(height: 20),
-             ],
-           )),
-        ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: size.height / (isSmallScreen ? 4 : 3)),
+                  const Text(
+                    'Login',
+                    style: TextStyle(
+                      color: AppColors.darkYellow, // Static text color
+                      fontSize: AppFontSizes.large, // Static font size
+                      fontWeight: FontWeight.bold, // Static font weight
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  const Text(
+                    'Please login to your account.',
+                    style: TextStyle(fontSize: AppFontSizes.small),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _userEmailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email Address',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text('Forgot Password?'),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Checkbox(value: false, onChanged: (value) {}),
+                      Expanded(
+                        child: Text(
+                          'I agree to the data protection regulations and would like to continue to participate.',
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _login,
+                    child: Text('Login'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: AppColors.white,
+                      backgroundColor: AppColors.primaryYellow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      minimumSize: Size(double.infinity, 50),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _login_bypass,
+                    child: Text('Login ByPass'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: AppColors.white,
+                      backgroundColor: AppColors.primaryYellow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      minimumSize: Size(double.infinity, 50),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Don't have an account? "),
+                      TextButton(
+                        onPressed: _register,
+                        child: Text('Register'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
