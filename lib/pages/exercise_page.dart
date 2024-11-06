@@ -23,8 +23,7 @@ class ExercisePage extends StatefulWidget {
 
 class _ExercisePageState extends State<ExercisePage> {
   final ScrollController _scrollController = ScrollController();
-  final FirebaseExerciseService _firebaseExerciseService =
-      FirebaseExerciseService();
+  final FirebaseExerciseService _firebaseExerciseService = FirebaseExerciseService();
 
   double position = 0;
 
@@ -129,13 +128,10 @@ class _ExercisePageState extends State<ExercisePage> {
               moduleNavigator.currentState!.pop(); //Go Backwards
             }),
         body: FutureBuilder<String>(
-          future:
-              _firebaseExerciseService.fetchExerciseFile(widget.exercise.url),
+          future: _firebaseExerciseService.fetchExerciseFile(widget.exercise.url),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                  child:
-                      CircularProgressIndicator(color: AppColors.darkYellow));
+              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
             } else if (snapshot.hasError) {
               return const Center(child: Text("Error loading exercise"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

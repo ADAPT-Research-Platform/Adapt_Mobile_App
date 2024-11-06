@@ -17,7 +17,7 @@ class MotivationChart extends StatelessWidget {
           LineChartBarData(
             spots: modeData.map((data) => FlSpot(
               data.timeStamp.millisecondsSinceEpoch.toDouble(),
-              data.motivation,
+              data.motivation.toDouble(),
             ))
                 .toList(),
             isCurved: true,
