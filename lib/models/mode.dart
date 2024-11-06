@@ -3,7 +3,7 @@ class Mode {
   final String modeId;
   final DateTime timeStamp;
   final int feeling;
-  final double motivation;
+  final int motivation;
 
   Mode({
     required this.modeId,
