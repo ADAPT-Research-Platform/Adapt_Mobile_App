@@ -28,7 +28,8 @@ class _OverviewPageState extends State<OverviewPage> {
   @override
   void initState() {
     super.initState();
-    _modulesFuture = _firebaseModuleService.fetchModuleList(); // Initialize the Future
+    _modulesFuture =
+        _firebaseModuleService.fetchModuleList(); // Initialize the Future
   }
 
   @override
@@ -39,7 +40,9 @@ class _OverviewPageState extends State<OverviewPage> {
           future: _modulesFuture, // Use the initialized Future here
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+              return const Center(
+                  child:
+                      CircularProgressIndicator(color: AppColors.darkYellow));
             } else if (snapshot.hasError) {
               return const Center(child: Text("Error loading modules"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -63,7 +66,7 @@ class _OverviewPageState extends State<OverviewPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 300, //TODO: Need to adjust dynamically
+                      height: MediaQuery.of(context).size.height * 0.28,
                       child: ModuleGrid(
                         modules: modules,
                         size: 100,
@@ -78,73 +81,84 @@ class _OverviewPageState extends State<OverviewPage> {
                       // Customize the color as needed
                       thickness: 2.5, // Customize the thickness as needed
                     ),
-
-                    const Text(
-                      'Everyday Questions',
-                      style: TextStyle(
-                        color: AppColors.darkYellow, // Static text color
-                        fontSize: AppFontSizes.medium, // Static font size
-                        fontWeight: FontWeight.bold, // Static font weight
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'I’m feel today.',
-                      style: TextStyle(
-                        color: AppColors.fontColor, // Static text color
-                        fontSize: AppFontSizes.small, // Static font size
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Feeling Selector Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        _buildFeelingIcon(Icons.sentiment_satisfied_alt, 1, 'Happy'),
-                        _buildFeelingIcon(Icons.sentiment_dissatisfied, 2, 'Sad'),
-                        _buildFeelingIcon(Icons.sentiment_very_dissatisfied, 3, 'Angry'),
-                        _buildFeelingIcon(Icons.sentiment_neutral, 4, 'Tired'),
+                        const Text(
+                          'Everyday Questions',
+                          style: TextStyle(
+                            color: AppColors.darkYellow, // Static text color
+                            fontSize: AppFontSizes.medium, // Static font size
+                            fontWeight: FontWeight.bold, // Static font weight
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'I’m feeling today.',
+                          style: TextStyle(
+                            color: AppColors.fontColor, // Static text color
+                            fontSize: AppFontSizes.small, // Static font size
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        // Feeling Selector Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildFeelingIcon(
+                                Icons.sentiment_satisfied_alt, 1, 'Happy'),
+                            _buildFeelingIcon(
+                                Icons.sentiment_dissatisfied, 2, 'Sad'),
+                            _buildFeelingIcon(
+                                Icons.sentiment_very_dissatisfied, 3, 'Angry'),
+                            _buildFeelingIcon(
+                                Icons.sentiment_neutral, 4, 'Tired'),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'I’m motivated today.',
+                          style: TextStyle(
+                            color: AppColors.fontColor, // Static text color
+                            fontSize: AppFontSizes.small, // Static font size
+                          ),
+                        ),
+                        StarSlider(
+                          sliderLength: 5, //How many stars
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedMotivation = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            //TODO: Need to set userId dynamically
+                            _firebaseModeService.saveMode(
+                                'xZOnZ2mQvTWTObfryho7tbetU1V2',
+                                _selectedFeeling,
+                                _selectedMotivation);
+                            print('Selected Feeling: $_selectedFeeling');
+                            print('Motivation Rating: $_selectedMotivation');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: AppColors.white,
+                            backgroundColor: AppColors.primaryYellow,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(6.0),
+                            ),
+                            minimumSize: Size(double.infinity, 50),
+                          ),
+                          child: const Text(
+                            'Submit',
+                            style: TextStyle(
+                              fontSize: AppFontSizes.small,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ],
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'I’m motivated today.',
-                      style: TextStyle(
-                        color: AppColors.fontColor, // Static text color
-                        fontSize: AppFontSizes.small, // Static font size
-                      ),
-                    ),
-                    StarSlider(
-                      sliderLength: 10, //How many stars
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedMotivation = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        //TODO: Need to set userId dynamically
-                        _firebaseModeService.saveMode('xZOnZ2mQvTWTObfryho7tbetU1V2', _selectedFeeling, _selectedMotivation);
-                        print('Selected Feeling: $_selectedFeeling');
-                        print('Motivation Rating: $_selectedMotivation');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: AppColors.white,
-                        backgroundColor: AppColors.primaryYellow,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6.0),
-                        ),
-                        minimumSize: Size(double.infinity, 50),
-                      ),
-                      child: const Text(
-                        'Submit',
-                        style: TextStyle(
-                          fontSize: AppFontSizes.small,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ),
                   ]),
             );

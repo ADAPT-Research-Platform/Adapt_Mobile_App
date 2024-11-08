@@ -104,7 +104,7 @@ class _AppNavigationBar extends State<AppNavigationBar> {
                 strokeRadius: strokeRadius,
                 icon: Icons.area_chart_rounded,
                 iconColor: fillColor),
-            label: 'Mode',
+            label: 'Mood',
           ),
           NavigationDestination(
             selectedIcon: HexagonShape(

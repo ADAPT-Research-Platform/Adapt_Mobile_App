@@ -22,7 +22,7 @@ class _ModePageState extends State<ModePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppTitleBar(title: 'Mode'),
+        appBar: AppTitleBar(title: 'Mood'),
         body: FutureBuilder<List<Mode>>(
             future: _firebaseModeService.fetchModeList('xZOnZ2mQvTWTObfryho7tbetU1V2'),
             builder: (context, snapshot) {
