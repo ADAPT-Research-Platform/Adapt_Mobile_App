@@ -42,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             TextField(
               decoration: InputDecoration(
                 labelText: 'First Name',
@@ -97,7 +97,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(0, 40), // Smaller height for buttons
+                      minimumSize: const Size(double.infinity, 50), // Smaller height for buttons
                       foregroundColor: AppColors.white,
                       backgroundColor: AppColors.primaryYellow,
                       shape: RoundedRectangleBorder(
@@ -121,7 +121,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(0, 40),
+                      minimumSize: const Size(double.infinity, 50),
                       foregroundColor: AppColors.white,
                       backgroundColor: AppColors.darkYellow,
                       shape: RoundedRectangleBorder(
@@ -187,10 +187,9 @@ class _SettingsPageState extends State<SettingsPage> {
               thickness: 2.5,
             ),
             // Logout button at the bottom
-            Expanded(
-              child: ElevatedButton.icon(
+            ElevatedButton.icon(
                 onPressed: () {
-                  mainNavigator.currentState!.pushNamed(Routes.routeLogin);
+                  mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
                 },
                 icon: const Icon(Icons.logout, size: 18),
                 label: const Text(
@@ -209,7 +208,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),

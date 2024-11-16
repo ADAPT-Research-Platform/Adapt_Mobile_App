@@ -56,7 +56,13 @@ class _SignUpPageState extends State<SignUpPage> {
           },
         );
 
-        mainNavigator.currentState!.pushNamed(Routes.routeMain);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('SignUp Successfully!'),
+          ),
+        );
+
+        mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -71,10 +77,6 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       );
     }
-  }
-
-  void _login() {
-    mainNavigator.currentState!.pushNamed(Routes.routeLogin);
   }
 
   @override
@@ -200,7 +202,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     Text("Already have an account?"),
                     TextButton(
-                      onPressed: _login,
+                      onPressed: (){
+                        mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+                      },
                       child: Text('Login'),
                     ),
                   ],

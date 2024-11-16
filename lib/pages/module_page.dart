@@ -55,9 +55,7 @@ class ModulePage extends StatelessWidget {
                           answers: 2, //Hard Coded
                           progress: 0.75, //Hard Coded
                           onPressed: () {
-                            moduleNavigator.currentState!.pushNamed(
-                                Routes.routeExercises,
-                                arguments: exercise);
+                            moduleNavigator.currentState!.pushNamed(Routes.routeExercises, arguments: exercise);
                           },
                         ));
                   },

@@ -49,10 +49,6 @@ class _LoginPageState extends State<LoginPage> {
     mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
   }
 
-  void _register() {
-    mainNavigator.currentState!.pushNamed(Routes.routeSignUp);
-  }
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -172,7 +168,9 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Text("Don't have an account? "),
                       TextButton(
-                        onPressed: _register,
+                        onPressed: (){
+                          mainNavigator.currentState!.pushReplacementNamed(Routes.routeSignUp);
+                        },
                         child: Text('Register'),
                       ),
                     ],

@@ -19,7 +19,7 @@ class _SplashPageState extends State<SplashPage>
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     Future.delayed(const Duration(seconds: 2), () {
-      mainNavigator.currentState!.pushNamed(Routes.routeLogin);
+      mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
     });
   }
 
