@@ -2,7 +2,6 @@ import 'package:adapt/services/firebase_auth_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/hexagon_grid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/app_font_sizes.dart';
@@ -23,8 +22,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfirmController =
-      TextEditingController();
+  final TextEditingController _passwordConfirmController = TextEditingController();
 
   @override
   void dispose() {
@@ -41,180 +39,148 @@ class _SignUpPageState extends State<SignUpPage> {
     String password = _passwordController.text.trim();
     String passwordConfirm = _passwordConfirmController.text.trim();
 
-    if (password == passwordConfirm) {
-      User? user =
-          await _firebaseAuthService.signUp(displayName, userEmail, password);
-      if (user != null) {
-        // Save user details in Firestore
-        await _firestore.collection('users').doc(user.uid).set(
-          {
-            'id': user.uid, // User ID
-            'name': '${displayName}', // User-provided name
-            'email': userEmail, // User email
-            'role': 'user', // Default role as 'user'
-            'created_at': FieldValue.serverTimestamp(), // Auto timestamp
-          },
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('SignUp Successfully!'),
-          ),
-        );
-
-        mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('SignUp Failed!'),
-          ),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password doesn\'t match!'),
-        ),
-      );
-    }
+    _firebaseAuthService.register(displayName, userEmail, password, passwordConfirm);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        // clipBehavior: Clip.hardEdge,
-        // fit: StackFit.loose,
-        children: [
-           Positioned.fill(
-            left: -45,
-            top: -MediaQuery.of(context).size.height / 4,
-            child: const HexagonGrid(
-                rows: 6,
-                cols: 4,
-                size: 175,
-                fillColor: AppColors.primaryYellow,
-                strokeColor: Colors.white,
-                strokeWidth: 6),
-          ),
-          Positioned.fill(
-            top: -MediaQuery.of(context).size.height / 1.3,
-            //bottom: MediaQuery.of(context).size.height/2,
-            child: Image.asset(
-              'assets/images/hands_icon.png',
-              width: MediaQuery.of(context).size.width, // Stretch to full screen width
-              fit: BoxFit.fitWidth, // Maintains the aspect ratio
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height/3.2),
-                Text(
-                  'Sign Up',
-                  style: TextStyle(
-                    color: AppColors.darkYellow, // Static text color
-                    fontSize: AppFontSizes.large, // Static font size
-                    fontWeight: FontWeight.bold, // Static font weight
-                  ),
+    return ScaffoldMessenger(
+        key: registerPageScaffold,
+        child:  Scaffold(
+          body: Stack(
+            // clipBehavior: Clip.hardEdge,
+            // fit: StackFit.loose,
+            children: [
+              Positioned.fill(
+                left: -45,
+                top: -MediaQuery.of(context).size.height / 4,
+                child: const HexagonGrid(
+                    rows: 6,
+                    cols: 4,
+                    size: 175,
+                    fillColor: AppColors.primaryYellow,
+                    strokeColor: Colors.white,
+                    strokeWidth: 6),
+              ),
+              Positioned.fill(
+                top: -MediaQuery.of(context).size.height / 1.3,
+                //bottom: MediaQuery.of(context).size.height/2,
+                child: Image.asset(
+                  'assets/images/hands_icon.png',
+                  width: MediaQuery.of(context).size.width, // Stretch to full screen width
+                  fit: BoxFit.fitWidth, // Maintains the aspect ratio
                 ),
-                SizedBox(height: 20),
-                Text(
-                  'Please fill your information.',
-                  style: TextStyle(fontSize: AppFontSizes.small),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: _displayNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Display Name',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: _userEmailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email Address',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: _passwordConfirmController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    Checkbox(
-                        value: false,
-                        onChanged: (value) {
-                          // Checkbox action
-                          value = value;
-                        }),
-                    Expanded(
-                      child: Text(
-                        'I agree to the data protection regulations and would like to continue to participate.',
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _register,
-                  child: Text('Register'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: AppColors.white,
-                    backgroundColor: AppColors.primaryYellow,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                    minimumSize: Size(double.infinity, 50),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Row(
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Already have an account?"),
-                    TextButton(
-                      onPressed: (){
-                        mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
-                      },
-                      child: Text('Login'),
+                    SizedBox(height: MediaQuery.of(context).size.height/3.2),
+                    Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        color: AppColors.darkYellow, // Static text color
+                        fontSize: AppFontSizes.large, // Static font size
+                        fontWeight: FontWeight.bold, // Static font weight
+                      ),
                     ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Please fill your information.',
+                      style: TextStyle(fontSize: AppFontSizes.small),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: _displayNameController,
+                      decoration: InputDecoration(
+                        labelText: 'Display Name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: _userEmailController,
+                      decoration: InputDecoration(
+                        labelText: 'Email Address',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: _passwordConfirmController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Checkbox(
+                            value: false,
+                            onChanged: (value) {
+                              // Checkbox action
+                              value = value;
+                            }),
+                        Expanded(
+                          child: Text(
+                            'I agree to the data protection regulations and would like to continue to participate.',
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _register,
+                      child: Text('Register'),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: AppColors.white,
+                        backgroundColor: AppColors.primaryYellow,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                        minimumSize: Size(double.infinity, 50),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Already have an account?"),
+                        TextButton(
+                          onPressed: (){
+                            mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+                          },
+                          child: Text('Login'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 50),
                   ],
                 ),
-                const SizedBox(height: 50),
-              ],
-            ),
-          )
-        ],
-      ),
+              )
+            ],
+          ),
+        )
     );
   }
 }

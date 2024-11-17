@@ -28,8 +28,7 @@ class _OverviewPageState extends State<OverviewPage> {
   @override
   void initState() {
     super.initState();
-    _modulesFuture =
-        _firebaseModuleService.fetchModuleList(); // Initialize the Future
+    _modulesFuture = _firebaseModuleService.fetchModuleList(); // Initialize the Future
   }
 
   @override
@@ -40,9 +39,7 @@ class _OverviewPageState extends State<OverviewPage> {
           future: _modulesFuture, // Use the initialized Future here
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                  child:
-                      CircularProgressIndicator(color: AppColors.darkYellow));
+              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
             } else if (snapshot.hasError) {
               return const Center(child: Text("Error loading modules"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -134,13 +131,7 @@ class _OverviewPageState extends State<OverviewPage> {
                         const SizedBox(height: 20),
                         ElevatedButton(
                           onPressed: () {
-                            //TODO: Need to set userId dynamically
-                            _firebaseModeService.saveMode(
-                                'xZOnZ2mQvTWTObfryho7tbetU1V2',
-                                _selectedFeeling,
-                                _selectedMotivation);
-                            print('Selected Feeling: $_selectedFeeling');
-                            print('Motivation Rating: $_selectedMotivation');
+                            _firebaseModeService.saveMode(_selectedFeeling, _selectedMotivation);
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: AppColors.white,

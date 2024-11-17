@@ -1,6 +1,7 @@
 import 'package:adapt/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/navigator_keys.dart';
 import '../widgets/app_navigation_bar.dart';
 import 'contact_page.dart';
 import 'diary_page.dart';
@@ -19,24 +20,27 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: IndexedStack(
-          index: _currentIndex,
-          children: [
-            ModuleIndexPage(),
-            DiaryPage(),
-            ModePage(),
-            ContactPage(),
-            SettingsPage(),
-          ],
-        ),
-        bottomNavigationBar: AppNavigationBar(
-          currentIndex: _currentIndex,
-          onDestinationSelected: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-        ));
+    return ScaffoldMessenger(
+      key: mainPageScaffold,
+      child: Scaffold(
+          body: IndexedStack(
+            index: _currentIndex,
+            children: const [
+              ModuleIndexPage(),
+              DiaryPage(),
+              ModePage(),
+              ContactPage(),
+              SettingsPage(),
+            ],
+          ),
+          bottomNavigationBar: AppNavigationBar(
+            currentIndex: _currentIndex,
+            onDestinationSelected: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          )),
+    );
   }
 }

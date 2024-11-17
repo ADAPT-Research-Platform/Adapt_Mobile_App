@@ -4,11 +4,13 @@ class User {
   final String displayName;
   final String email;
   final DateTime createdDate;
+  final String? role; //Always should be 'client'
 
   User({
     required this.userId,
     required this.displayName,
     required this.email,
-    required this.createdDate
+    required this.createdDate,
+    this.role
   });
 }

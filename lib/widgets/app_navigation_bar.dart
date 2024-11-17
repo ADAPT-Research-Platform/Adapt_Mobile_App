@@ -31,11 +31,11 @@ class _AppNavigationBar extends State<AppNavigationBar> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 4),
-      margin: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
       decoration: const BoxDecoration(
           color: Colors.transparent,
-          border:
-              Border(top: BorderSide(color: AppColors.lightGrey, width: 2.5))),
+          border: Border(top: BorderSide(color: AppColors.lightGrey, width: 2.5))
+      ),
       child: NavigationBar(
         key: bottomNavigator,
         onDestinationSelected: (index) {

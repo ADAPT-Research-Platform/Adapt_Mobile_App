@@ -1,15 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/mode.dart';
+import '../models/user.dart';
+import 'firebase_auth_service.dart';
 
 class FirebaseModeService {
+  final FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
 
-  Future<void> saveMode(String userId, int feeling, int motivation) async {
+  Future<void> saveMode(int feeling, int motivation) async {
     try {
+      User user = await _firebaseAuthService.getLoggedInUser() as User;
+
       // Reference to the "mode_track" collection within the user's document
       CollectionReference modeTrackCollection = FirebaseFirestore.instance
           .collection('users')
-          .doc(userId)
+          .doc(user.userId)
           .collection('mode_track');
 
       // Generate a unique modeId and timestamp
@@ -24,17 +29,19 @@ class FirebaseModeService {
 
       // Add the mode document to Firestore
       await modeTrackCollection.doc(modeId).set(modeData);
-      print('Mode saved successfully.');
+      print('Mode saved successfully. Feeling: ${feeling} Motivation: ${motivation}');
     } catch (e) {
       print('Failed to save mode: $e');
     }
   }
 
-  Future<List<Mode>> fetchModeList(String userId) async {
+  Future<List<Mode>> fetchModeList() async {
     try {
+      User user = await _firebaseAuthService.getLoggedInUser() as User;
+
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(userId)
+          .doc(user.userId)
           .collection('mode_track')
           .get();
 

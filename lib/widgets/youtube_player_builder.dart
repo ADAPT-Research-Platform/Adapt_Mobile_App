@@ -1,8 +1,8 @@
 import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class YouTubePlayerBuilder extends MarkdownElementBuilder {
   bool isVideoPlaying = false; // To track if the video is playing

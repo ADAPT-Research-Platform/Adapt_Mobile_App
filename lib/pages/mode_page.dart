@@ -22,9 +22,9 @@ class _ModePageState extends State<ModePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppTitleBar(title: 'Mood'),
+        appBar: const AppTitleBar(title: 'Mood'),
         body: FutureBuilder<List<Mode>>(
-            future: _firebaseModeService.fetchModeList('xZOnZ2mQvTWTObfryho7tbetU1V2'),
+            future: _firebaseModeService.fetchModeList(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
