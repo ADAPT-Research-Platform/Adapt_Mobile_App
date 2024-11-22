@@ -24,7 +24,8 @@ class FirebaseAuthService {
 
     if (document.exists) {
       return app.User(
-        userId: document.id,
+        userId: user.uid,
+        userCode: document.get('user_code'),
         displayName: document.get('display_name'),
         email: user.email!,
         createdDate: user.metadata.creationTime!,
@@ -49,6 +50,15 @@ class FirebaseAuthService {
 
       // Transaction to add additional user data
       await FirebaseFirestore.instance.runTransaction((transaction) async {
+
+        DocumentSnapshot variables = await FirebaseFirestore.instance
+            .collection('global')
+            .doc('variables')
+            .get();
+
+        int lastUserCode = variables.get('last_user_code');
+
+        // Access the document by ID
         DocumentReference userDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
 
         //Check if document already exists (should not happen during sign-up)
@@ -64,6 +74,13 @@ class FirebaseAuthService {
         transaction.set(userDocRef, {
           'display_name': displayName,
           'role': 'client',
+          'user_code': lastUserCode + 1
+        });
+
+        //Update last user code back
+        DocumentReference variablesDocRef = FirebaseFirestore.instance.collection('global').doc('variables');
+        transaction.set(variablesDocRef, {
+          'last_user_code': lastUserCode + 1
         });
 
         print('User data saved successfully');
@@ -124,7 +141,8 @@ class FirebaseAuthService {
         throw FirebaseAuthException(code: 'user-not-found');
       }
 
-      app.User user = await getLoggedInUser() as app.User;
+      app.User user = await getLoggedInUser();
+
       if(user.role != 'client'){
         throw FirebaseAuthException(code: 'invalid-user-type');
       }
