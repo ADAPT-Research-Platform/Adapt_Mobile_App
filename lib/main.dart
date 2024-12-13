@@ -1,5 +1,5 @@
 import 'package:adapt/pages/splash_page.dart';
-import 'package:adapt/utils/navigator_keys.dart';
+import 'package:adapt/utils/app_keys.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 

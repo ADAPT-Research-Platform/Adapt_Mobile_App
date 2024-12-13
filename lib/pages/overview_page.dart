@@ -1,5 +1,6 @@
 import 'package:adapt/widgets/module_grid.dart';
 import 'package:adapt/widgets/star_slider.dart';
+import 'package:adapt/widgets/task_button.dart';
 import 'package:flutter/material.dart';
 
 import '../models/module.dart';
@@ -7,8 +8,9 @@ import '../services/firebase_mode_service.dart';
 import '../services/firebase_module_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
-import '../widgets/app_title_bar.dart';
+import '../widgets/main_title.dart';
 import '../widgets/module_grid.dart';
+import '../widgets/sub_title.dart';
 
 class OverviewPage extends StatefulWidget {
   const OverviewPage({super.key});
@@ -35,7 +37,7 @@ class _OverviewPageState extends State<OverviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const AppTitleBar(title: 'Overview'),
+        appBar: const MainTitle(title: 'Overview'),
         body: FutureBuilder<List<Module>>(
           future: _modulesFuture, // Use the initialized Future here
           builder: (context, snapshot) {
@@ -55,14 +57,7 @@ class _OverviewPageState extends State<OverviewPage> {
                   //mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Modules',
-                      style: TextStyle(
-                        color: AppColors.darkYellow, // Static text color
-                        fontSize: AppFontSizes.medium, // Static font size
-                        fontWeight: FontWeight.bold, // Static font weight
-                      ),
-                    ),
+                    const SubTitle(text: 'Modules'),
                     ModuleGrid(
                       modules: modules,
                       size: 100,
@@ -75,14 +70,7 @@ class _OverviewPageState extends State<OverviewPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Everyday Questions',
-                          style: TextStyle(
-                            color: AppColors.darkYellow, // Static text color
-                            fontSize: AppFontSizes.medium, // Static font size
-                            fontWeight: FontWeight.bold, // Static font weight
-                          ),
-                        ),
+                        const SubTitle(text: 'Everyday Questions'),
                         const SizedBox(height: 10),
                         const Text(
                           'I’m feeling today.',
@@ -123,26 +111,12 @@ class _OverviewPageState extends State<OverviewPage> {
                           },
                         ),
                         const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            _firebaseModeService.saveMode(_selectedFeeling, _selectedMotivation);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: AppColors.white,
-                            backgroundColor: AppColors.primaryYellow,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6.0),
-                            ),
-                            minimumSize: Size(double.infinity, 50),
+                        TaskButton(
+                            text: 'Submit',
+                            onPressed: () {
+                              _firebaseModeService.saveMode(_selectedFeeling, _selectedMotivation);
+                            }
                           ),
-                          child: const Text(
-                            'Submit',
-                            style: TextStyle(
-                              fontSize: AppFontSizes.small,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ]),

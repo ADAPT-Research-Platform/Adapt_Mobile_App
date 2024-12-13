@@ -1,5 +1,5 @@
 import 'package:adapt/models/exercise.dart';
-import 'package:adapt/utils/navigator_keys.dart';
+import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 
 import '../models/module.dart';

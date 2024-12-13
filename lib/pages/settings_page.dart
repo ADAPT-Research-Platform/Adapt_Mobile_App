@@ -1,10 +1,12 @@
-import 'package:adapt/widgets/app_title_bar.dart';
+import 'package:adapt/widgets/main_title.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user.dart';
 import '../services/firebase_auth_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
+import '../widgets/sub_title.dart';
+import '../widgets/task_button.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -56,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTitleBar(title: 'Settings'),
+      appBar: const MainTitle(title: 'Settings'),
       body: FutureBuilder<User>(
         future: _loggedInUser, // Use the initialized Future here
         builder: (context, snapshot) {
@@ -74,16 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: ListView(
               children: [
-                const Center(
-                  child: Text(
-                    'Account',
-                    style: TextStyle(
-                      color: AppColors.darkYellow,
-                      fontSize: AppFontSizes.medium,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                const SubTitle(text: 'Account'),
                 const SizedBox(height: 10),
                 const Text(
                   'User Code',
@@ -156,71 +149,36 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: ElevatedButton.icon(
+                      child: TaskButton(
+                        text: 'Save',
                         onPressed: _saveData,
-                        icon: const Icon(Icons.save, size: 18),
-                        label: const Text(
-                          'Save',
-                          style: TextStyle(
-                            fontSize: AppFontSizes.small,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50), // Smaller height for buttons
-                          foregroundColor: AppColors.white,
-                          backgroundColor: AppColors.primaryYellow,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
+                        icon: Icons.save,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 15),
                     Expanded(
-                      child: ElevatedButton.icon(
+                      child:  TaskButton(
+                        text: 'Delete',
                         onPressed: () {
                           // Delete action
                         },
-                        icon: const Icon(Icons.delete, size: 18),
-                        label: const Text(
-                          'Delete',
-                          style: TextStyle(
-                            fontSize: AppFontSizes.small,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                          foregroundColor: AppColors.white,
-                          backgroundColor: AppColors.darkYellow,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
+                        backgroundColor: AppColors.darkYellow,
+                        icon: Icons.delete,
                       ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 5),
                 const Divider(
                   color: AppColors.lightGrey,
                   thickness: 2.5,
                 ),
-                const Center(
-                  child: Text(
-                    'Appearance',
-                    style: TextStyle(
-                      color: AppColors.darkYellow,
-                      fontSize: AppFontSizes.medium,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                const SubTitle(text: 'Appearance'),
                 _buildRadioOption('Language', ['German', 'English'], _selectedLanguage, (value) {
                   setState(() {
                     _selectedLanguage = value!;
@@ -236,16 +194,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: AppColors.lightGrey,
                   thickness: 2.5,
                 ),
-                const Center(
-                  child: Text(
-                    'Notifications',
-                    style: TextStyle(
-                      color: AppColors.darkYellow,
-                      fontSize: AppFontSizes.medium,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                const SubTitle(text: 'Notifications'),
                 _buildSwitchOption('Mute Notifications', _isMuteNotifications, (value) {
                   setState(() {
                     _isMuteNotifications = value;
@@ -260,28 +209,16 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: AppColors.lightGrey,
                   thickness: 2.5,
                 ),
+                const SizedBox(height: 5),
                 // Logout button at the bottom
-                ElevatedButton.icon(
-                  onPressed: () {
-                    _firebaseAuthService.logout();
-                  },
-                  icon: const Icon(Icons.logout, size: 18),
-                  label: const Text(
-                    'Logout',
-                    style: TextStyle(
-                      fontSize: AppFontSizes.small,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50), // Full-width button
-                    foregroundColor: AppColors.white,
-                    backgroundColor: AppColors.primaryYellow,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
+                TaskButton(
+                    text: 'Logout',
+                    onPressed: () {
+                      _firebaseAuthService.logout();
+                    },
+                  icon: Icons.logout,
                 ),
+                const SizedBox(height: 15),
               ],
             ),
           );

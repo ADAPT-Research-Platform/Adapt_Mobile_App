@@ -1,15 +1,16 @@
 import 'package:adapt/models/exercise.dart';
 import 'package:adapt/services/firebase_exercise_service.dart';
 import 'package:adapt/utils/app_colors.dart';
-import 'package:adapt/widgets/app_title_bar.dart';
+import 'package:adapt/widgets/main_title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../models/comment.dart';
 import '../models/user.dart';
-import '../utils/navigator_keys.dart';
+import '../utils/app_keys.dart';
 import '../utils/string_formatter.dart';
-import '../widgets/app_comment_card.dart';
+import '../widgets/comment_card.dart';
+import '../widgets/task_button.dart';
 import '../widgets/youtube_player_builder.dart';
 
 class ExercisePage extends StatefulWidget {
@@ -23,7 +24,8 @@ class ExercisePage extends StatefulWidget {
 
 class _ExercisePageState extends State<ExercisePage> {
   final ScrollController _scrollController = ScrollController();
-  final FirebaseExerciseService _firebaseExerciseService = FirebaseExerciseService();
+  final FirebaseExerciseService _firebaseExerciseService =
+      FirebaseExerciseService();
 
   double position = 0;
 
@@ -121,17 +123,20 @@ class _ExercisePageState extends State<ExercisePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppTitleBar(
+        appBar: MainTitle(
             title: convertIdToName(widget.exercise.exerciseId),
             leadingIcon: Icons.arrow_back_ios,
             onIconPressed: () {
               moduleNavigator.currentState!.pop(); //Go Backwards
             }),
         body: FutureBuilder<String>(
-          future: _firebaseExerciseService.fetchExerciseFile(widget.exercise.url),
+          future:
+              _firebaseExerciseService.fetchExerciseFile(widget.exercise.url),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+              return const Center(
+                  child:
+                      CircularProgressIndicator(color: AppColors.darkYellow));
             } else if (snapshot.hasError) {
               return const Center(child: Text("Error loading exercise"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -155,76 +160,76 @@ class _ExercisePageState extends State<ExercisePage> {
                         ),
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.arrow_back_ios,
-                              color: AppColors.darkYellow, size: 25),
-                          // Static color
-                          onPressed: () => _scroll(-250),
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: AppColors.white,
-                            backgroundColor: AppColors.primaryYellow,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6.0),
+                    SizedBox(
+                        height: 80, // Set the desired height
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back_ios, color: AppColors.darkYellow, size: 25),
+                              // Static color
+                              onPressed: () => _scroll(-250),
                             ),
-                          ),
-                          onPressed: () {
-                            showModalBottomSheet<void>(
-                              useSafeArea: true,
-                              context: context,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)), // Adjust the top corners
+                            Expanded(
+                              child: TaskButton(
+                                text: 'Answer',
+                                onPressed: () {
+                                  showModalBottomSheet<void>(
+                                    useSafeArea: true,
+                                    context: context,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(12.0)), // Adjust the top corners
+                                    ),
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        // Set a fixed height for the bottom sheet
+                                        height: 600,
+                                        //TODO: Need adjust based on the screen size
+                                        padding: EdgeInsets.all(16.0),
+                                        child: Column(
+                                          children: [
+                                            TextField(
+                                              decoration: InputDecoration(
+                                                labelText: 'Write your answer here...',
+                                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
+                                              ),
+                                            ),
+                                            //SizedBox(height: 10), // Add some space between TextField and ListView
+                                            Expanded(
+                                              // Use Expanded to allow ListView to take remaining space
+                                              child: ListView.separated(
+                                                itemCount: comments.length,
+                                                itemBuilder: (context, index) {
+                                                  return CommentCard(comment: comments[index]);
+                                                },
+                                                separatorBuilder:
+                                                    (context, index) {
+                                                  return const Divider(
+                                                    color: AppColors.lightGrey,
+                                                    thickness: 2.5,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
                               ),
-                              builder: (BuildContext context) {
-                                return Container(
-                                  // Set a fixed height for the bottom sheet
-                                  height: 600, //TODO: Need adjust based on the screen size
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Column(
-                                    children: [
-                                      TextField(
-                                        decoration: InputDecoration(
-                                          labelText: 'Write your answer here...',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(6.0),
-                                          ),
-                                        ),
-                                      ),
-                                      //SizedBox(height: 10), // Add some space between TextField and ListView
-                                      Expanded( // Use Expanded to allow ListView to take remaining space
-                                        child: ListView.separated(
-                                          itemCount: comments.length,
-                                          itemBuilder: (context, index) {
-                                            return CommentCard(comment: comments[index]);
-                                          },
-                                          separatorBuilder: (context, index) {
-                                            return const Divider(
-                                              color: AppColors.lightGrey,
-                                              thickness: 2.5,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          child: const Text('Answer'),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.arrow_forward_ios,
-                              color: AppColors.darkYellow, size: 25),
-                          // Static color
-                          onPressed: () => _scroll(250),
-                        ),
-                      ],
-                    )
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: AppColors.darkYellow, size: 25
+                              ),
+                              // Static color
+                              onPressed: () => _scroll(250),
+                            ),
+                          ],
+                        ))
                   ],
                 ));
           },

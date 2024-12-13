@@ -1,8 +1,9 @@
 import 'package:adapt/pages/settings_page.dart';
+import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/navigator_keys.dart';
-import '../widgets/app_navigation_bar.dart';
+import '../utils/app_keys.dart';
+import '../widgets/bottom_nav_bar.dart';
 import 'contact_page.dart';
 import 'diary_page.dart';
 import 'mode_page.dart';
@@ -33,7 +34,7 @@ class _MainPageState extends State<MainPage> {
               SettingsPage(),
             ],
           ),
-          bottomNavigationBar: AppNavigationBar(
+          bottomNavigationBar: BottomNavBar(
             currentIndex: _currentIndex,
             onDestinationSelected: (index) {
               setState(() {

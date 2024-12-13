@@ -4,10 +4,11 @@ import '../models/module.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
-import '../utils/navigator_keys.dart';
+import '../utils/app_keys.dart';
 import '../utils/string_formatter.dart';
-import '../widgets/app_exercise_card.dart';
-import '../widgets/app_title_bar.dart';
+import '../widgets/exercise_card.dart';
+import '../widgets/main_title.dart';
+import '../widgets/sub_title.dart';
 
 class ModulePage extends StatelessWidget {
   final Module module;
@@ -20,7 +21,7 @@ class ModulePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppTitleBar(
+        appBar: MainTitle(
             title: convertIdToName(module.moduleId),
             leadingIcon: Icons.arrow_back_ios,
             onIconPressed: () {
@@ -30,16 +31,7 @@ class ModulePage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
             children: [
-              Center(
-                child: Text(
-                  module.title,
-                  style: const TextStyle(
-                    color: AppColors.darkYellow, // Static text color
-                    fontSize: AppFontSizes.medium, // Static font size
-                    fontWeight: FontWeight.bold, // Static font weight
-                  ),
-                ),
-              ),
+              SubTitle(text: module.title),
               const SizedBox(height: 8),
               Expanded(
                 child: ListView.builder(

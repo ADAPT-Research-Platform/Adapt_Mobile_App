@@ -5,7 +5,8 @@ import '../services/firebase_auth_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
-import '../utils/navigator_keys.dart';
+import '../utils/app_keys.dart';
+import '../widgets/task_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -87,12 +88,12 @@ class _LoginPageState extends State<LoginPage> {
                           fontWeight: FontWeight.bold, // Static font weight
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       const Text(
                         'Please login to your account.',
                         style: TextStyle(fontSize: AppFontSizes.small),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       TextField(
                         controller: _userEmailController,
                         decoration: InputDecoration(
@@ -118,46 +119,30 @@ class _LoginPageState extends State<LoginPage> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {},
-                          child: Text('Forgot Password?'),
+                          child: const Text('Forgot Password?'),
                         ),
                       ),
                       Row(
                         children: [
                           Checkbox(value: false, onChanged: (value) {}),
-                          Expanded(
+                          const Expanded(
                             child: Text(
                               'I agree to the data protection regulations and would like to continue to participate.',
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _login,
-                        child: Text('Login'),
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: AppColors.white,
-                          backgroundColor: AppColors.primaryYellow,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6.0),
-                          ),
-                          minimumSize: Size(double.infinity, 50),
-                        ),
+                      const SizedBox(height: 20),
+                      TaskButton(
+                          text: 'Login',
+                          onPressed: _login
                       ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: _login_bypass,
-                        child: Text('Login ByPass'),
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: AppColors.white,
-                          backgroundColor: AppColors.primaryYellow,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6.0),
-                          ),
-                          minimumSize: Size(double.infinity, 50),
-                        ),
+                      const SizedBox(height: 10),
+                      TaskButton(
+                          text: 'Login ByPass',
+                          onPressed: _login_bypass
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 
 import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
-import '../utils/navigator_keys.dart';
+import '../utils/app_keys.dart';
+import '../widgets/task_button.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -77,7 +78,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(height: MediaQuery.of(context).size.height/3.2),
-                    Text(
+                    const Text(
                       'Sign Up',
                       style: TextStyle(
                         color: AppColors.darkYellow, // Static text color
@@ -85,12 +86,12 @@ class _SignUpPageState extends State<SignUpPage> {
                         fontWeight: FontWeight.bold, // Static font weight
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       'Please fill your information.',
                       style: TextStyle(fontSize: AppFontSizes.small),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: _displayNameController,
                       decoration: InputDecoration(
@@ -100,7 +101,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: _userEmailController,
                       decoration: InputDecoration(
@@ -110,7 +111,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: _passwordController,
                       obscureText: true,
@@ -121,7 +122,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: _passwordConfirmController,
                       obscureText: true,
@@ -132,7 +133,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Checkbox(
@@ -141,36 +142,28 @@ class _SignUpPageState extends State<SignUpPage> {
                               // Checkbox action
                               value = value;
                             }),
-                        Expanded(
+                        const Expanded(
                           child: Text(
                             'I agree to the data protection regulations and would like to continue to participate.',
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _register,
-                      child: Text('Register'),
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: AppColors.white,
-                        backgroundColor: AppColors.primaryYellow,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6.0),
-                        ),
-                        minimumSize: Size(double.infinity, 50),
-                      ),
+                    const SizedBox(height: 20),
+                    TaskButton(
+                        text: 'Register',
+                        onPressed: _register
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Already have an account?"),
+                        const Text("Already have an account?"),
                         TextButton(
                           onPressed: (){
                             mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
                           },
-                          child: Text('Login'),
+                          child: const Text('Login'),
                         ),
                       ],
                     ),

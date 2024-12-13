@@ -1,5 +1,7 @@
-import 'package:adapt/widgets/app_title_bar.dart';
+import 'package:adapt/widgets/main_title.dart';
+import 'package:adapt/widgets/sub_title.dart';
 import 'package:flutter/material.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '../models/mode.dart';
 import '../services/firebase_mode_service.dart';
@@ -7,6 +9,7 @@ import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/feeling_chart.dart';
 import '../widgets/motivation_chart.dart';
+import '../widgets/task_button.dart';
 
 class ModePage extends StatefulWidget {
   const ModePage({super.key});
@@ -22,7 +25,7 @@ class _ModePageState extends State<ModePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const AppTitleBar(title: 'Mood'),
+        appBar: const MainTitle(title: 'Mood'),
         body: FutureBuilder<List<Mode>>(
             future: _firebaseModeService.fetchModeList(),
             builder: (context, snapshot) {
@@ -38,16 +41,21 @@ class _ModePageState extends State<ModePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Column(
                   children: [
-                    const Center(
-                      child: Text(
-                        'Feeling',
-                        style: TextStyle(
-                          color: AppColors.darkYellow, // Static text color
-                          fontSize: AppFontSizes.medium, // Static font size
-                          fontWeight: FontWeight.bold, // Static font weight
-                        ),
-                      ),
+                    TaskButton(
+                        text: '2024 November',
+                        onPressed: () {
+                          showMonthPicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                          ).then((date) {
+                            if (date != null) {
+                              print(date);
+                            }
+                          });
+                        }
                     ),
+
+                    const SubTitle(text: 'Feeling'),
                     Expanded(
                       child: FeelingChart(modeData: modeData),
                     ),
@@ -56,16 +64,7 @@ class _ModePageState extends State<ModePage> {
                       // Customize the color as needed
                       thickness: 2.5, // Customize the thickness as needed
                     ),
-                    const Center(
-                      child: Text(
-                        'Motivation',
-                        style: TextStyle(
-                          color: AppColors.darkYellow, // Static text color
-                          fontSize: AppFontSizes.medium, // Static font size
-                          fontWeight: FontWeight.bold, // Static font weight
-                        ),
-                      ),
-                    ),
+                    const SubTitle(text: 'Motivation'),
                     Expanded(
                       child: MotivationChart(modeData: modeData),
                     ),

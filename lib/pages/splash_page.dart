@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../utils/app_routes.dart';
-import '../utils/navigator_keys.dart';
+import '../utils/app_keys.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});

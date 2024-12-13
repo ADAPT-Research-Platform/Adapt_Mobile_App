@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+//Navigation State Keys
 final GlobalKey<NavigatorState> mainNavigator = GlobalKey<NavigatorState>(debugLabel: "main");
 
 final GlobalKey<NavigatorState> bottomNavigator = GlobalKey<NavigatorState>(debugLabel: "bottom");
 
 final GlobalKey<NavigatorState> moduleNavigator = GlobalKey<NavigatorState>(debugLabel: "module");
 
-
+//Scaffold State Keys
 final GlobalKey<ScaffoldMessengerState> loginPageScaffold = GlobalKey<ScaffoldMessengerState>(debugLabel: "login");
 
 final GlobalKey<ScaffoldMessengerState> registerPageScaffold = GlobalKey<ScaffoldMessengerState>(debugLabel: "register");

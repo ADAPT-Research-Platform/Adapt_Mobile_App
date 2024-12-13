@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
-import '../widgets/app_title_bar.dart';
+import '../widgets/main_title.dart';
+import '../widgets/sub_title.dart';
 
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isSmallScreen = size.width < 400;
-
     return Scaffold(
-      appBar: AppTitleBar(title: 'Contact'),
+      appBar: const MainTitle(title: 'Contact'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
         child: Column(
@@ -91,16 +89,7 @@ class ContactSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
-        Center(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.darkYellow,
-              fontSize: AppFontSizes.medium,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
+        SubTitle(text: title),
         const SizedBox(height: 8),
         for (var section in sections)
           Padding(

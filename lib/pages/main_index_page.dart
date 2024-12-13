@@ -1,5 +1,5 @@
 import 'package:adapt/pages/settings_page.dart';
-import 'package:adapt/utils/navigator_keys.dart';
+import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/app_routes.dart';

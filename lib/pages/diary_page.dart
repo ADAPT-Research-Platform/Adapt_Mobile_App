@@ -5,8 +5,8 @@ import 'package:table_calendar/table_calendar.dart';
 import '../models/comment.dart';
 import '../models/user.dart';
 import '../utils/app_font_sizes.dart';
-import '../widgets/app_comment_card.dart';
-import '../widgets/app_title_bar.dart';
+import '../widgets/comment_card.dart';
+import '../widgets/main_title.dart';
 
 class DiaryPage extends StatefulWidget {
   const DiaryPage({super.key});
@@ -106,7 +106,7 @@ class _DiaryPage extends State<DiaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppTitleBar(title: 'Diary'),
+      appBar: const MainTitle(title: 'Diary'),
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
