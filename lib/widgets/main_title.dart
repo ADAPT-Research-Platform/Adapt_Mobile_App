@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 
 import '../utils/app_colors.dart';
 
-class AppTitleBar extends StatelessWidget implements PreferredSizeWidget {
+class MainTitle extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final IconData? leadingIcon;
   final VoidCallback? onIconPressed;
 
-  const AppTitleBar({
+  const MainTitle({
     super.key,
     required this.title,
     this.leadingIcon,
@@ -32,6 +32,7 @@ class AppTitleBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0, // Remove shadow
+        scrolledUnderElevation: 0,
         leading: IconButton(
           icon: Icon(leadingIcon, color: AppColors.darkYellow, size: 35), // Static color
           onPressed: onIconPressed,
@@ -46,9 +47,9 @@ class AppTitleBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(2.0), // Adjust the height if needed
+          preferredSize: const Size.fromHeight(2.0), // Adjust the height if needed
           child: Container(
-            padding: EdgeInsets.only(bottom: 8.0), // Padding for the bottom line
+            padding: const EdgeInsets.only(bottom: 8.0), // Padding for the bottom line
           ),
         ),
       ),
@@ -56,5 +57,5 @@ class AppTitleBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(90); // Adjust the height for the bottom line
+  Size get preferredSize => const Size.fromHeight(90); // Adjust the height for the bottom line
 }

@@ -13,6 +13,8 @@ class MotivationChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return LineChart(
       LineChartData(
+        gridData: const FlGridData(show: false),
+        borderData: FlBorderData(show: false),
         lineBarsData: [
           LineChartBarData(
             spots: modeData.map((data) => FlSpot(
@@ -23,7 +25,7 @@ class MotivationChart extends StatelessWidget {
             isCurved: true,
             barWidth: 3,
             color: AppColors.darkYellow,
-            dotData: FlDotData(show: false),
+            dotData: const FlDotData(show: false),
           ),
         ],
         titlesData: FlTitlesData(
@@ -36,27 +38,17 @@ class MotivationChart extends StatelessWidget {
                 final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
                 return Text(
                   '${date.hour}:${date.minute}',
-                  style: TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 10),
                 );
               },
             ),
           ),
-          leftTitles: AxisTitles(
+          leftTitles: const AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               interval: 2,
               reservedSize: 30,
             ),
-          ),
-        ),
-        borderData: FlBorderData(
-          show: true,
-          border: Border.all(color: Colors.grey, width: 1),
-        ),
-        gridData: FlGridData(show: true),
-        lineTouchData: LineTouchData(
-          touchTooltipData: LineTouchTooltipData(
-            //tooltipBgColor: Colors.black54,
           ),
         ),
       ),

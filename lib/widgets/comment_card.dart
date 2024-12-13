@@ -26,7 +26,7 @@ class _CommentCardState extends State<CommentCard> {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(
+                const Icon(
                   Icons.circle,
                   size: 15, // Adjust size as needed
                   color: AppColors.primaryYellow, // Adjust color as needed
@@ -40,7 +40,7 @@ class _CommentCardState extends State<CommentCard> {
                     fontWeight: FontWeight.bold, // Static font size
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 Text(
                   '${widget.comment.timeStamp.day}.${widget.comment.timeStamp.month}.${widget.comment.timeStamp.year}',
                   style: const TextStyle(

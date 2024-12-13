@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../models/module.dart';
 import '../utils/app_routes.dart';
-import '../utils/navigator_keys.dart';
+import '../utils/app_keys.dart';
 import 'hexagon_shape.dart';
 
 class ModuleGrid extends StatelessWidget {

@@ -13,6 +13,8 @@ class FeelingChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return BarChart(
       BarChartData(
+        gridData: const FlGridData(show: false),
+        borderData: FlBorderData(show: false),
         barGroups: modeData.map((data) {
           return BarChartGroupData(
             x: data.timeStamp.millisecondsSinceEpoch,
@@ -20,8 +22,8 @@ class FeelingChart extends StatelessWidget {
               BarChartRodData(
                 toY: data.feeling.toDouble(),
                 color: AppColors.primaryYellow,
-                width: 15,
-                borderRadius: BorderRadius.circular(4),
+                width: 25,
+                borderRadius: BorderRadius.circular(6),
               ),
             ],
           );
@@ -56,27 +58,6 @@ class FeelingChart extends StatelessWidget {
                 );
               },
             ),
-          ),
-        ),
-        borderData: FlBorderData(
-          show: true,
-          border: Border.all(color: Colors.grey, width: 1),
-        ),
-        gridData: FlGridData(
-          show: true,
-          drawHorizontalLine: true,
-          horizontalInterval: 1,
-        ),
-        barTouchData: BarTouchData(
-          touchTooltipData: BarTouchTooltipData(
-            //tooltipBgColor: Colors.black54,
-            getTooltipItem: (group, groupIndex, rod, rodIndex) {
-              final date = DateTime.fromMillisecondsSinceEpoch(group.x.toInt());
-              return BarTooltipItem(
-                '${date.hour}:${date.minute.toString().padLeft(2, '0')}\nFeeling: ${rod.toY.toInt()}',
-                const TextStyle(color: Colors.white),
-              );
-            },
           ),
         ),
       ),
