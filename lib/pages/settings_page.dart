@@ -86,6 +86,23 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
+                  'User Code',
+                  style: TextStyle(
+                    color: AppColors.fontColor,
+                    fontSize: AppFontSizes.small,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: user.userCode.toString(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
                   'Display Name',
                   style: TextStyle(
                     color: AppColors.fontColor,

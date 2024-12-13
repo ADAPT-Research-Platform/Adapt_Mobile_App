@@ -56,7 +56,7 @@ class FirebaseAuthService {
             .doc('variables')
             .get();
 
-        int lastUserCode = variables.get('last_user_code');
+        int lastUserCode = variables.get('client_user_count');
 
         // Access the document by ID
         DocumentReference userDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
@@ -80,7 +80,7 @@ class FirebaseAuthService {
         //Update last user code back
         DocumentReference variablesDocRef = FirebaseFirestore.instance.collection('global').doc('variables');
         transaction.set(variablesDocRef, {
-          'last_user_code': lastUserCode + 1
+          'client_user_count': lastUserCode + 1
         });
 
         print('User data saved successfully');

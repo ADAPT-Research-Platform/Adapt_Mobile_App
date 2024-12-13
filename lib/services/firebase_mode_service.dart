@@ -9,7 +9,7 @@ class FirebaseModeService {
 
   Future<void> saveMode(int feeling, int motivation) async {
     try {
-      User user = await _firebaseAuthService.getLoggedInUser() as User;
+      User user = await _firebaseAuthService.getLoggedInUser();
 
       // Reference to the "mode_track" collection within the user's document
       CollectionReference modeTrackCollection = FirebaseFirestore.instance
@@ -37,12 +37,13 @@ class FirebaseModeService {
 
   Future<List<Mode>> fetchModeList() async {
     try {
-      User user = await _firebaseAuthService.getLoggedInUser() as User;
+      User user = await _firebaseAuthService.getLoggedInUser();
 
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.userId)
           .collection('mode_track')
+          .orderBy('timestamp')
           .get();
 
       return querySnapshot.docs.map((document) {

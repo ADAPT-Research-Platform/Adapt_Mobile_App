@@ -9,6 +9,8 @@ class HexagonShape extends StatelessWidget {
   final double strokeRadius;
   final IconData? icon;
   final Color? iconColor;
+  final double? iconSize;
+  final Text? iconText;
 
   const HexagonShape({
     super.key,
@@ -18,11 +20,15 @@ class HexagonShape extends StatelessWidget {
     this.strokeWidth = 0,
     this.strokeRadius = 0,
     this.icon,
-    this.iconColor
+    this.iconColor,
+    this.iconSize,
+    this.iconText,
   });
 
   @override
   Widget build(BuildContext context) {
+    double iconSize = (this.iconSize != null) ? this.iconSize! : size / 2;
+
     return Container(
       width: size,
       height: size,
@@ -38,12 +44,19 @@ class HexagonShape extends StatelessWidget {
                 strokeAlign: BorderSide.strokeAlignInside
             ),
           )),
-      child: Center(
-        child: Icon(
-          icon,
-          color: iconColor,
-          size: size / 2,
-        ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(
+            icon,
+            color: iconColor,
+            size: iconSize, // Adjust size as needed
+          ),
+          if (iconText != null)
+            Positioned(
+              child: iconText!
+            ),
+        ],
       ),
     );
   }

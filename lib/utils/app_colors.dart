@@ -10,6 +10,7 @@ class AppColors {
 
   //Yellow Colors
   static const Color lightYellow = Color(0xFFFFFACD);    // Light yellow (Lemon chiffon)
+  static const Color paleYellow = Color(0xFFFED572);
   static const Color primaryYellow = Color(0xFFFEC63D);  // Sun Glow
   static const Color darkYellow = Color(0xFFA08030);     // Sun Burst
 }

@@ -8,6 +8,7 @@ import '../services/firebase_module_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/app_title_bar.dart';
+import '../widgets/module_grid.dart';
 
 class OverviewPage extends StatefulWidget {
   const OverviewPage({super.key});
@@ -62,16 +63,9 @@ class _OverviewPageState extends State<OverviewPage> {
                         fontWeight: FontWeight.bold, // Static font weight
                       ),
                     ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.28,
-                      child: ModuleGrid(
-                        modules: modules,
-                        size: 100,
-                        fillColor: AppColors.primaryYellow,
-                        icon: Icons.play_arrow_rounded,
-                        strokeRadius: 5,
-                        iconColor: AppColors.darkYellow,
-                      ),
+                    ModuleGrid(
+                      modules: modules,
+                      size: 100,
                     ),
                     const Divider(
                       color: AppColors.lightGrey,
