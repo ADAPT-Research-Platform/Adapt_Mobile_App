@@ -4,7 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class YouTubePlayerBuilder extends MarkdownElementBuilder {
+class VideoViewerBuilder extends MarkdownElementBuilder {
   bool isVideoPlaying = false; // To track if the video is playing
 
   @override
@@ -20,7 +20,7 @@ class YouTubePlayerBuilder extends MarkdownElementBuilder {
                 isVideoPlaying = true; // Switch to video player when clicked
               });
             },
-            child: isVideoPlaying ? YouTubePlayer(videoId: videoId) : YouTubeThumbnail(videoId: videoId),
+            child: isVideoPlaying ? VideoViewer(videoId: videoId) : VideoThumbnail(videoId: videoId),
           );
         },
       );
@@ -29,10 +29,10 @@ class YouTubePlayerBuilder extends MarkdownElementBuilder {
   }
 }
 
-class YouTubeThumbnail extends StatelessWidget {
+class VideoThumbnail extends StatelessWidget {
   final String videoId;
 
-  const YouTubeThumbnail({super.key, required this.videoId});
+  const VideoThumbnail({super.key, required this.videoId});
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +59,10 @@ class YouTubeThumbnail extends StatelessWidget {
   }
 }
 
-class YouTubePlayer extends StatelessWidget {
+class VideoViewer extends StatelessWidget {
   final String videoId;
 
-  const YouTubePlayer({super.key, required this.videoId});
+  const VideoViewer({super.key, required this.videoId});
 
   @override
   Widget build(BuildContext context) {

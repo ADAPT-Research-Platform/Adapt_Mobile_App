@@ -33,7 +33,7 @@ class _CommentCardState extends State<CommentCard> {
                 ),
                 SizedBox(width: 10), // Add spacing between the dot and username
                 Text(
-                  widget.comment.user.displayName,
+                  widget.comment.user.userName,
                   style: const TextStyle(
                     color: AppColors.fontColor, // Static text color
                     fontSize: AppFontSizes.small,
@@ -56,7 +56,7 @@ class _CommentCardState extends State<CommentCard> {
                   fontSize: AppFontSizes.mini, // Static font size
                 )),
           ),
-          if (widget.comment.replies.isNotEmpty)
+          if (widget.comment.comments.isNotEmpty)
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -66,7 +66,7 @@ class _CommentCardState extends State<CommentCard> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 18.0),
                 child: Text(
-                  _isRepliesVisible ? 'Hide Replies' : '${widget.comment.replies.length} Replies',
+                  _isRepliesVisible ? 'Hide Replies' : '${widget.comment.comments.length} Replies',
                   style: const TextStyle(color: AppColors.darkYellow),
                 ),
               ),
@@ -75,7 +75,7 @@ class _CommentCardState extends State<CommentCard> {
             Padding(
               padding: const EdgeInsets.only(left: 18.0),
               child: Column(
-                children: widget.comment.replies
+                children: widget.comment.comments
                     .map((reply) => CommentCard(comment: reply))
                     .toList(),
               ),
