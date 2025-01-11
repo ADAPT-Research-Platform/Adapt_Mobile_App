@@ -5,13 +5,13 @@ class Comment {
   final User user;
   final DateTime timeStamp;
   final String text;
-  List<Comment> replies;
+  List<Comment> comments;
 
   Comment({
     required this.commentId,
     required this.user,
     required this.timeStamp,
     required this.text,
-    this.replies = const [], // Default value set to an empty list
+    this.comments = const [], // Default value set to an empty list
   });
 }

@@ -1,13 +1,13 @@
-import 'exercise.dart';
+import 'package:adapt/models/chapter.dart';
 
 class Module {
   final String moduleId;
-  final String title;
-  List<Exercise> exercises;
+  final double progress;
+  List<Chapter> chapters;
 
   Module({
     required this.moduleId,
-    required this.title,
-    required this.exercises
+    required this.progress,
+    required this.chapters
   });
 }
