@@ -1,19 +1,14 @@
 import 'package:adapt/pages/splash_page.dart';
 import 'package:adapt/utils/app_keys.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../pages/login_page.dart';
 import '../../pages/main_page.dart';
 import '../../pages/signup_page.dart';
 import '../../utils/app_routes.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
   runApp(const MyApp());
 }
 
