@@ -4,8 +4,8 @@ import 'package:adapt/widgets/task_button.dart';
 import 'package:flutter/material.dart';
 
 import '../models/module.dart';
-import '../services/firebase_mode_service.dart';
-import '../services/firebase_module_service.dart';
+import '../services/mode_service.dart';
+import '../services/module_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/main_title.dart';
@@ -20,8 +20,8 @@ class OverviewPage extends StatefulWidget {
 }
 
 class _OverviewPageState extends State<OverviewPage> {
-  final FirebaseModuleService _firebaseModuleService = FirebaseModuleService();
-  final FirebaseModeService _firebaseModeService = FirebaseModeService();
+  final ModuleService _moduleService = ModuleService();
+  final ModeService _modeService = ModeService();
 
   int _selectedFeeling = 0; // 0 for no selection, 1 for happy, 2 for sad, etc.
   int _selectedMotivation = 5;
@@ -31,7 +31,7 @@ class _OverviewPageState extends State<OverviewPage> {
   @override
   void initState() {
     super.initState();
-    _modulesFuture = _firebaseModuleService.fetchModuleList(); // Initialize the Future
+    _modulesFuture = _moduleService.fetchModuleList(); // Initialize the Future
   }
 
   @override
@@ -114,7 +114,7 @@ class _OverviewPageState extends State<OverviewPage> {
                         TaskButton(
                             text: 'Submit',
                             onPressed: () {
-                              _firebaseModeService.saveMode(_selectedFeeling, _selectedMotivation);
+                              _modeService.saveMode(_selectedFeeling, _selectedMotivation);
                             }
                           ),
                       ],

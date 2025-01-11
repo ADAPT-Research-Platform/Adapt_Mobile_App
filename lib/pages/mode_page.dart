@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '../models/mode.dart';
-import '../services/firebase_mode_service.dart';
+import '../services/mode_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/filter_options.dart';
@@ -20,8 +20,7 @@ class ModePage extends StatefulWidget {
 }
 
 class _ModePageState extends State<ModePage> {
-  final ScrollController _scrollController = ScrollController();
-  final FirebaseModeService _firebaseModeService = FirebaseModeService();
+  final ModeService _modeService = ModeService();
 
   FilterOption selectedOption = FilterOption.thisMonth; // Default option
 
@@ -35,7 +34,7 @@ class _ModePageState extends State<ModePage> {
     return Scaffold(
         appBar: const MainTitle(title: 'Mood'),
         body: FutureBuilder<List<Mode>>(
-            future: _firebaseModeService.fetchModeList(),
+            future: _modeService.fetchModeList(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));

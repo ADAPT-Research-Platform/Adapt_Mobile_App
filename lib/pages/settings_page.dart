@@ -2,7 +2,7 @@ import 'package:adapt/widgets/main_title.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user.dart';
-import '../services/firebase_auth_service.dart';
+import '../services/auth_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/sub_title.dart';
@@ -17,7 +17,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
+  final AuthService _authService = AuthService();
 
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _userEmailController = TextEditingController();
@@ -36,7 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _loggedInUser = _firebaseAuthService.getLoggedInUser(); // Initialize the Future
+    _loggedInUser = _authService.getLoggedInUser(); // Initialize the Future
   }
 
   @override
@@ -88,7 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 TextField(
                   decoration: InputDecoration(
-                    labelText: user.userCode.toString(),
+                    labelText: user.userName.toString(),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(6.0),
                     ),
@@ -106,7 +106,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 TextField(
                   controller: _displayNameController,
                   decoration: InputDecoration(
-                    labelText: user.displayName,
+                    labelText: user.userName,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(6.0),
                     ),
@@ -137,16 +137,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     color: AppColors.fontColor,
                     fontSize: AppFontSizes.small,
                     fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: user.role,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
                   ),
                 ),
                 const SizedBox(height: 15),
@@ -214,7 +204,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 TaskButton(
                     text: 'Logout',
                     onPressed: () {
-                      _firebaseAuthService.logout();
+                      _authService.logout();
                     },
                   icon: Icons.logout,
                 ),

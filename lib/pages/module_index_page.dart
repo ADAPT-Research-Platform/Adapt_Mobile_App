@@ -1,10 +1,10 @@
-import 'package:adapt/models/exercise.dart';
+import 'package:adapt/models/section.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 
 import '../models/module.dart';
 import '../utils/app_routes.dart';
-import 'exercise_page.dart';
+import 'section_page.dart';
 import 'module_page.dart';
 import 'overview_page.dart';
 
@@ -27,7 +27,7 @@ class ModuleIndexPage extends StatelessWidget {
               );
             case Routes.routeExercises:
               return MaterialPageRoute(
-                builder: (context) => ExercisePage(exercise: settings.arguments! as Exercise),
+                builder: (context) => SectionPage(section: settings.arguments! as Section),
               );
             default:
               return MaterialPageRoute(

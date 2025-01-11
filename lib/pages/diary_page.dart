@@ -25,19 +25,17 @@ class _DiaryPage extends State<DiaryPage> {
       commentId: '6',
       user: User(
           userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-          displayName: 'Leonie Krol',
-          email: 'risithgmtech@gmail.com',
-          createdDate: DateTime(2024, 5, 14)),
+          userName: 'Leonie Krol',
+          email: 'risithgmtech@gmail.com'),
       timeStamp: DateTime(2024, 11, 1),
       text: 'How about you today?',
-      replies: [
+      comments: [
         Comment(
             commentId: '7',
             user: User(
                 userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-                displayName: 'Risith Perera',
-                email: 'risithpremier@gmail.com',
-                createdDate: DateTime(2024, 5, 5)),
+                userName: 'Risith Perera',
+                email: 'risithpremier@gmail.com'),
             timeStamp: DateTime(2024, 11, 3),
             text: 'I\'m feeling great!')
       ],
@@ -46,29 +44,26 @@ class _DiaryPage extends State<DiaryPage> {
       commentId: '1',
       user: User(
           userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-          displayName: 'Risith Perera',
-          email: 'risithpremier@gmail.com',
-          createdDate: DateTime(2024, 5, 5)),
+          userName: 'Risith Perera',
+          email: 'risithpremier@gmail.com'),
       timeStamp: DateTime(2024, 10, 19),
       text:
           'Today I did 3 times breathing exercise. Now I feel less fear. Thank you so much.',
-      replies: [
+      comments: [
         Comment(
             commentId: '2',
             user: User(
                 userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-                displayName: 'Leonie Krol',
-                email: 'risithgmtech@gmail.com',
-                createdDate: DateTime(2024, 5, 14)),
+                userName: 'Leonie Krol',
+                email: 'risithgmtech@gmail.com'),
             timeStamp: DateTime(2024, 10, 21),
             text: 'Okay. That\'s Sound Fantastic...!'),
         Comment(
             commentId: '3',
             user: User(
                 userId: 'xxxxxxx',
-                displayName: 'Anna Zarski',
-                email: 'anna@gmail.com',
-                createdDate: DateTime(2024, 5, 20)),
+                userName: 'Anna Zarski',
+                email: 'anna@gmail.com'),
             timeStamp: DateTime(2024, 10, 29),
             text: 'Okay. Glad to hear...!')
       ],
@@ -77,19 +72,17 @@ class _DiaryPage extends State<DiaryPage> {
       commentId: '4',
       user: User(
           userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-          displayName: 'Risith Perera',
-          email: 'risithpremier@gmail.com',
-          createdDate: DateTime(2024, 5, 5)),
+          userName: 'Risith Perera',
+          email: 'risithpremier@gmail.com'),
       timeStamp: DateTime(2024, 10, 1),
       text: 'It is very hard to concentrate breathing. What should I do?',
-      replies: [
+      comments: [
         Comment(
             commentId: '5',
             user: User(
                 userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-                displayName: 'Leonie Krol',
-                email: 'risithgmtech@gmail.com',
-                createdDate: DateTime(2024, 5, 14)),
+                userName: 'Leonie Krol',
+                email: 'risithgmtech@gmail.com'),
             timeStamp: DateTime(2024, 10, 5),
             text: 'You have to jump twice daily.')
       ],

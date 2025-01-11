@@ -1,6 +1,7 @@
-import 'package:adapt/models/exercise.dart';
-import 'package:adapt/services/firebase_exercise_service.dart';
+import 'package:adapt/models/section.dart';
+import 'package:adapt/services/section_service.dart';
 import 'package:adapt/utils/app_colors.dart';
+import 'package:adapt/widgets/image_viewer_builder.dart';
 import 'package:adapt/widgets/main_title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -11,21 +12,21 @@ import '../utils/app_keys.dart';
 import '../utils/string_formatter.dart';
 import '../widgets/comment_card.dart';
 import '../widgets/task_button.dart';
-import '../widgets/youtube_player_builder.dart';
+import '../widgets/video_viewer_builder.dart';
 
-class ExercisePage extends StatefulWidget {
-  final Exercise exercise;
+class SectionPage extends StatefulWidget {
+  final Section section;
 
-  const ExercisePage({super.key, required this.exercise});
+  const SectionPage({super.key, required this.section});
 
   @override
-  _ExercisePageState createState() => _ExercisePageState();
+  _SectionPageState createState() => _SectionPageState();
 }
 
-class _ExercisePageState extends State<ExercisePage> {
+class _SectionPageState extends State<SectionPage> {
   final ScrollController _scrollController = ScrollController();
-  final FirebaseExerciseService _firebaseExerciseService =
-      FirebaseExerciseService();
+  final SectionService _sectionService =
+      SectionService();
 
   double position = 0;
 
@@ -49,19 +50,17 @@ class _ExercisePageState extends State<ExercisePage> {
       commentId: '6',
       user: User(
           userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-          displayName: 'Leonie Krol',
-          email: 'risithgmtech@gmail.com',
-          createdDate: DateTime(2024, 5, 14)),
+          userName: 'Leonie Krol',
+          email: 'risithgmtech@gmail.com'),
       timeStamp: DateTime(2024, 11, 1),
       text: 'How about you today?',
-      replies: [
+      comments: [
         Comment(
             commentId: '7',
             user: User(
                 userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-                displayName: 'Risith Perera',
-                email: 'risithpremier@gmail.com',
-                createdDate: DateTime(2024, 5, 5)),
+                userName: 'Risith Perera',
+                email: 'risithpremier@gmail.com'),
             timeStamp: DateTime(2024, 11, 3),
             text: 'I\'m feeling great!')
       ],
@@ -70,29 +69,26 @@ class _ExercisePageState extends State<ExercisePage> {
       commentId: '1',
       user: User(
           userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-          displayName: 'Risith Perera',
-          email: 'risithpremier@gmail.com',
-          createdDate: DateTime(2024, 5, 5)),
+          userName: 'Risith Perera',
+          email: 'risithpremier@gmail.com'),
       timeStamp: DateTime(2024, 10, 19),
       text:
-          'Today I did 3 times breathing exercise. Now I feel less fear. Thank you so much.',
-      replies: [
+      'Today I did 3 times breathing exercise. Now I feel less fear. Thank you so much.',
+      comments: [
         Comment(
             commentId: '2',
             user: User(
                 userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-                displayName: 'Leonie Krol',
-                email: 'risithgmtech@gmail.com',
-                createdDate: DateTime(2024, 5, 14)),
+                userName: 'Leonie Krol',
+                email: 'risithgmtech@gmail.com'),
             timeStamp: DateTime(2024, 10, 21),
             text: 'Okay. That\'s Sound Fantastic...!'),
         Comment(
             commentId: '3',
             user: User(
                 userId: 'xxxxxxx',
-                displayName: 'Anna Zarski',
-                email: 'anna@gmail.com',
-                createdDate: DateTime(2024, 5, 20)),
+                userName: 'Anna Zarski',
+                email: 'anna@gmail.com'),
             timeStamp: DateTime(2024, 10, 29),
             text: 'Okay. Glad to hear...!')
       ],
@@ -101,19 +97,17 @@ class _ExercisePageState extends State<ExercisePage> {
       commentId: '4',
       user: User(
           userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-          displayName: 'Risith Perera',
-          email: 'risithpremier@gmail.com',
-          createdDate: DateTime(2024, 5, 5)),
+          userName: 'Risith Perera',
+          email: 'risithpremier@gmail.com'),
       timeStamp: DateTime(2024, 10, 1),
       text: 'It is very hard to concentrate breathing. What should I do?',
-      replies: [
+      comments: [
         Comment(
             commentId: '5',
             user: User(
                 userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-                displayName: 'Leonie Krol',
-                email: 'risithgmtech@gmail.com',
-                createdDate: DateTime(2024, 5, 14)),
+                userName: 'Leonie Krol',
+                email: 'risithgmtech@gmail.com'),
             timeStamp: DateTime(2024, 10, 5),
             text: 'You have to jump twice daily.')
       ],
@@ -124,19 +118,17 @@ class _ExercisePageState extends State<ExercisePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: MainTitle(
-            title: convertIdToName(widget.exercise.exerciseId),
+            title: convertIdToName(widget.section.sectionId),
             leadingIcon: Icons.arrow_back_ios,
             onIconPressed: () {
               moduleNavigator.currentState!.pop(); //Go Backwards
             }),
         body: FutureBuilder<String>(
-          future:
-              _firebaseExerciseService.fetchExerciseFile(widget.exercise.url),
+          future: _sectionService.fetchSectionContent('${widget.section.url}/content.md'),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
-                  child:
-                      CircularProgressIndicator(color: AppColors.darkYellow));
+                  child: CircularProgressIndicator(color: AppColors.darkYellow));
             } else if (snapshot.hasError) {
               return const Center(child: Text("Error loading exercise"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -155,7 +147,8 @@ class _ExercisePageState extends State<ExercisePage> {
                         child: MarkdownBody(
                           data: markdownContent,
                           builders: {
-                            'a': YouTubePlayerBuilder(),
+                            'a': VideoViewerBuilder(),
+                            'img': ImageViewerBuilder(widget.section.url),
                           },
                         ),
                       ),

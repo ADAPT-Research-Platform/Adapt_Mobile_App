@@ -1,7 +1,6 @@
-import 'package:adapt/services/firebase_auth_service.dart';
+import 'package:adapt/services/auth_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/hexagon_grid.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/app_font_sizes.dart';
@@ -17,8 +16,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final AuthService _authService = AuthService();
 
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _userEmailController = TextEditingController();
@@ -40,7 +38,7 @@ class _SignUpPageState extends State<SignUpPage> {
     String password = _passwordController.text.trim();
     String passwordConfirm = _passwordConfirmController.text.trim();
 
-    _firebaseAuthService.register(displayName, userEmail, password, passwordConfirm);
+    _authService.register(displayName, userEmail, password, passwordConfirm);
   }
 
   @override

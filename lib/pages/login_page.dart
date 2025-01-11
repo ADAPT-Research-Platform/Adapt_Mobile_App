@@ -1,7 +1,7 @@
 import 'package:adapt/widgets/hexagon_grid.dart';
 import 'package:flutter/material.dart';
 
-import '../services/firebase_auth_service.dart';
+import '../services/auth_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_routes.dart';
@@ -16,7 +16,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
+  final AuthService _authService = AuthService();
 
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -32,15 +32,15 @@ class _LoginPageState extends State<LoginPage> {
     String userEmail = _userEmailController.text.trim();
     String password = _passwordController.text.trim();
 
-    _firebaseAuthService.login(userEmail, password);
+    _authService.login(userEmail, password);
   }
 
   //TODO: Temporary Method Just to ByPass login
   void _login_bypass() async{
-    String userEmail = "risithpremier@gmail.com";
-    String password = "hello123";
+    String userEmail = "risithmarshall@gmail.com";
+    String password = "apple123";
 
-    _firebaseAuthService.login(userEmail, password);
+    _authService.login(userEmail, password);
   }
 
   @override
