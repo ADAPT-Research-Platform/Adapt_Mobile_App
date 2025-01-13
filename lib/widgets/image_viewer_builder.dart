@@ -2,21 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 
-class ImageViewerBuilder extends MarkdownElementBuilder {
-  final String baseUrl;
+import '../utils/app_config.dart';
 
-  ImageViewerBuilder(this.baseUrl);
+class ImageViewerBuilder extends MarkdownElementBuilder {
+  final String sectionFolderPath;
+
+  ImageViewerBuilder(this.sectionFolderPath);
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     // Check if the element is an image
     if (element.attributes['src'] != null) {
-      final imageUrl = element.attributes['src'];
-      final updatedUrl = '$baseUrl/$imageUrl';
+      final imageName = element.attributes['src'];
+      final imageUrl = '${AppConfig.baseUrl}/app/uploads/$sectionFolderPath/$imageName';
 
       // Return an image widget with the updated URL
       return Image.network(
-        updatedUrl,
+        imageUrl,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
           return const Icon(Icons.broken_image);

@@ -5,13 +5,11 @@ import '../models/section.dart';
 import '../utils/app_font_sizes.dart';
 
 class SectionCard extends StatelessWidget {
-  final int sectionIndex;
   final Section section;
   final VoidCallback onPressed;
 
   const SectionCard({
     super.key,
-    required this.sectionIndex,
     required this.section,
     required this.onPressed,
   });
@@ -38,7 +36,7 @@ class SectionCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  section.isExercise ? 'Section ${sectionIndex + 1}: Exercise' : 'Section ${sectionIndex + 1}',
+                  section.sectionName,
                   style: const TextStyle(
                     color: AppColors.fontColor, // Static text color
                     fontSize: AppFontSizes.small,
