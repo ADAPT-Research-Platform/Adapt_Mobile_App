@@ -12,6 +12,6 @@ class Routes {
   static const String routeSettings = 'route_settings';
 
   //Module Routes (Nested)
-  static const String routeModules = 'route_modules';
+  static const String routeChapters = 'route_chapters';
   static const String routeSections = 'route_sections';
 }

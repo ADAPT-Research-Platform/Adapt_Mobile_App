@@ -4,8 +4,8 @@ import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../models/module.dart';
-import '../utils/app_routes.dart';
 import '../utils/app_keys.dart';
+import '../utils/app_routes.dart';
 import 'hexagon_shape.dart';
 
 class ModuleGrid extends StatelessWidget {
@@ -74,7 +74,7 @@ class ModuleGrid extends StatelessWidget {
     return GestureDetector(
         onTap: () {
           if (isIndexAvailable) {
-            moduleNavigator.currentState!.pushNamed(Routes.routeModules, arguments: modules[index]);
+            moduleNavigator.currentState!.pushNamed(Routes.routeChapters, arguments: modules[index]);
           }else{
             print('No Module Available');
           }

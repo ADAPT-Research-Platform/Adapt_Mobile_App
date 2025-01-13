@@ -1,4 +1,3 @@
-import 'package:adapt/models/user.dart';
 
 class Comment {
   final String commentId;

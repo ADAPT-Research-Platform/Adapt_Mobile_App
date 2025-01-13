@@ -9,16 +9,16 @@ import '../widgets/main_title.dart';
 import '../widgets/section_card.dart';
 import '../widgets/sub_title.dart';
 
-class ModulePage extends StatefulWidget {
+class ChapterPage extends StatefulWidget {
   final Module module;
 
-  const ModulePage({super.key, required this.module});
+  const ChapterPage({super.key, required this.module});
 
   @override
-  _ModulePageState createState() => _ModulePageState();
+  _ChapterPageState createState() => _ChapterPageState();
 }
 
-class _ModulePageState extends State<ModulePage> {
+class _ChapterPageState extends State<ChapterPage> {
   String selectedFilter = 'All'; // Default filter
 
   @override

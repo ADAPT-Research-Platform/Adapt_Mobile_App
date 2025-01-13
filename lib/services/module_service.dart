@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:adapt/services/session_manager.dart';
 
 import '../models/chapter.dart';
-import '../models/section.dart';
 import '../models/module.dart';
+import '../models/section.dart';
 import '../utils/app_config.dart';
 
 class ModuleService {

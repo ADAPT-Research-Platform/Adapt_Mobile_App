@@ -1,12 +1,13 @@
+import 'dart:convert';
+
 import 'package:adapt/services/session_manager.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user.dart';
 import '../utils/app_config.dart';
-import '../utils/app_routes.dart';
 import '../utils/app_keys.dart';
-import 'dart:convert';
+import '../utils/app_routes.dart';
 
 class AuthService {
   void register(String userName, String email, String password, String passwordConfirm) async {
