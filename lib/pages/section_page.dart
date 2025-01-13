@@ -1,4 +1,5 @@
 import 'package:adapt/models/section.dart';
+import 'package:adapt/services/comment_service.dart';
 import 'package:adapt/services/section_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/image_viewer_builder.dart';
@@ -7,9 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../models/comment.dart';
-import '../models/user.dart';
+import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
-import '../utils/string_formatter.dart';
 import '../widgets/comment_card.dart';
 import '../widgets/task_button.dart';
 import '../widgets/video_viewer_builder.dart';
@@ -25,8 +25,9 @@ class SectionPage extends StatefulWidget {
 
 class _SectionPageState extends State<SectionPage> {
   final ScrollController _scrollController = ScrollController();
-  final SectionService _sectionService =
-      SectionService();
+  final TextEditingController _commentTextController = TextEditingController();
+  final SectionService _sectionService = SectionService();
+  final CommentService _commentService = CommentService();
 
   double position = 0;
 
@@ -44,87 +45,17 @@ class _SectionPageState extends State<SectionPage> {
     );
   }
 
-  //Fake Data
-  List<Comment> comments = [
-    Comment(
-      commentId: '6',
-      user: User(
-          userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-          userName: 'Leonie Krol',
-          email: 'risithgmtech@gmail.com'),
-      timeStamp: DateTime(2024, 11, 1),
-      text: 'How about you today?',
-      comments: [
-        Comment(
-            commentId: '7',
-            user: User(
-                userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-                userName: 'Risith Perera',
-                email: 'risithpremier@gmail.com'),
-            timeStamp: DateTime(2024, 11, 3),
-            text: 'I\'m feeling great!')
-      ],
-    ),
-    Comment(
-      commentId: '1',
-      user: User(
-          userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-          userName: 'Risith Perera',
-          email: 'risithpremier@gmail.com'),
-      timeStamp: DateTime(2024, 10, 19),
-      text:
-      'Today I did 3 times breathing exercise. Now I feel less fear. Thank you so much.',
-      comments: [
-        Comment(
-            commentId: '2',
-            user: User(
-                userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-                userName: 'Leonie Krol',
-                email: 'risithgmtech@gmail.com'),
-            timeStamp: DateTime(2024, 10, 21),
-            text: 'Okay. That\'s Sound Fantastic...!'),
-        Comment(
-            commentId: '3',
-            user: User(
-                userId: 'xxxxxxx',
-                userName: 'Anna Zarski',
-                email: 'anna@gmail.com'),
-            timeStamp: DateTime(2024, 10, 29),
-            text: 'Okay. Glad to hear...!')
-      ],
-    ),
-    Comment(
-      commentId: '4',
-      user: User(
-          userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-          userName: 'Risith Perera',
-          email: 'risithpremier@gmail.com'),
-      timeStamp: DateTime(2024, 10, 1),
-      text: 'It is very hard to concentrate breathing. What should I do?',
-      comments: [
-        Comment(
-            commentId: '5',
-            user: User(
-                userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-                userName: 'Leonie Krol',
-                email: 'risithgmtech@gmail.com'),
-            timeStamp: DateTime(2024, 10, 5),
-            text: 'You have to jump twice daily.')
-      ],
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: MainTitle(
-            title: convertIdToName(widget.section.sectionId),
+            title: widget.section.sectionName,
             leadingIcon: Icons.arrow_back_ios,
             onIconPressed: () {
               moduleNavigator.currentState!.pop(); //Go Backwards
             }),
         body: FutureBuilder<String>(
-          future: _sectionService.fetchSectionContent('${widget.section.url}/content.md'),
+          future: _sectionService.fetchSectionContent(widget.section.folderPath),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -132,7 +63,7 @@ class _SectionPageState extends State<SectionPage> {
             } else if (snapshot.hasError) {
               return const Center(child: Text("Error loading exercise"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text("No exercise available"));
+              return const Center(child: Text("No content available"));
             }
 
             final markdownContent = snapshot.data!;
@@ -148,7 +79,7 @@ class _SectionPageState extends State<SectionPage> {
                           data: markdownContent,
                           builders: {
                             'a': VideoViewerBuilder(),
-                            'img': ImageViewerBuilder(widget.section.url),
+                            'img': ImageViewerBuilder(widget.section.folderPath),
                           },
                         ),
                       ),
@@ -165,48 +96,103 @@ class _SectionPageState extends State<SectionPage> {
                             ),
                             Expanded(
                               child: TaskButton(
-                                text: 'Answer',
+                                text: 'Comment',
                                 onPressed: () {
-                                  showModalBottomSheet<void>(
+                                  showModalBottomSheet(
                                     useSafeArea: true,
                                     context: context,
+                                    isScrollControlled: true,
                                     shape: const RoundedRectangleBorder(
                                       borderRadius: BorderRadius.vertical(
                                           top: Radius.circular(12.0)), // Adjust the top corners
                                     ),
                                     builder: (BuildContext context) {
-                                      return Container(
-                                        // Set a fixed height for the bottom sheet
-                                        height: 600,
-                                        //TODO: Need adjust based on the screen size
-                                        padding: EdgeInsets.all(16.0),
-                                        child: Column(
-                                          children: [
-                                            TextField(
-                                              decoration: InputDecoration(
-                                                labelText: 'Write your answer here...',
-                                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
-                                              ),
+                                      return FutureBuilder<List<Comment>>(
+                                        future: _commentService.fetchComments(sectionId: widget.section.sectionId),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                            return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+                                          } else if (snapshot.hasError) {
+                                            return const Center(child: Text("Error loading comments"));
+                                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                            return const Center(child: Text("No comments available"));
+                                          }
+
+                                          final List<Comment> comments = snapshot.data!;
+
+                                          return Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                // Title with Close Button
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    const SizedBox(width: 24), // Placeholder to align the title center
+                                                    const Text(
+                                                      'Comments',
+                                                      style: TextStyle(
+                                                        color: AppColors.fontColor,
+                                                        fontSize: AppFontSizes.small,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(Icons.close),
+                                                      onPressed: () {
+                                                        Navigator.pop(context); // Close the bottom sheet
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                                const Divider(
+                                                  color: AppColors.lightGrey,
+                                                  // Customize the color as needed
+                                                  thickness: 2.5, // Customize the thickness as needed
+                                                ),
+                                                Flexible(
+                                                  // Use Expanded to allow ListView to take remaining space
+                                                  child: ListView.separated(
+                                                    shrinkWrap: true,
+                                                    itemCount: comments.length,
+                                                    itemBuilder: (context, index) {
+                                                      return CommentCard(comment: comments[index]);
+                                                    },
+                                                    separatorBuilder: (context, index) {
+                                                      return const Divider(
+                                                        color: AppColors.lightGrey,
+                                                        thickness: 2.5,
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: TextField(
+                                                        controller: _commentTextController, // Add a controller to get the text input
+                                                        maxLines: null, // Makes the TextField multiline
+                                                        decoration: InputDecoration(
+                                                          labelText: 'Write a comment...',
+                                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(Icons.send_rounded, color: AppColors.darkYellow, size: 25),
+                                                      onPressed: () {
+                                                        _commentService.addComment(_commentTextController.text.trim(), widget.section.sectionId);
+                                                        _commentTextController.clear();
+                                                        Navigator.pop(context); // Close the bottom sheet
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
-                                            //SizedBox(height: 10), // Add some space between TextField and ListView
-                                            Expanded(
-                                              // Use Expanded to allow ListView to take remaining space
-                                              child: ListView.separated(
-                                                itemCount: comments.length,
-                                                itemBuilder: (context, index) {
-                                                  return CommentCard(comment: comments[index]);
-                                                },
-                                                separatorBuilder:
-                                                    (context, index) {
-                                                  return const Divider(
-                                                    color: AppColors.lightGrey,
-                                                    thickness: 2.5,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          );
+                                        },
                                       );
                                     },
                                   );

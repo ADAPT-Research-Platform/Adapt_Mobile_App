@@ -1,9 +1,9 @@
+import 'package:adapt/services/comment_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../models/comment.dart';
-import '../models/user.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/comment_card.dart';
 import '../widgets/main_title.dart';
@@ -18,76 +18,7 @@ class DiaryPage extends StatefulWidget {
 class _DiaryPage extends State<DiaryPage> {
   late DateTime _selectedDay;
   late DateTime _focusedDay;
-
-  //Fake Data
-  List<Comment> comments = [
-    Comment(
-      commentId: '6',
-      user: User(
-          userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-          userName: 'Leonie Krol',
-          email: 'risithgmtech@gmail.com'),
-      timeStamp: DateTime(2024, 11, 1),
-      text: 'How about you today?',
-      comments: [
-        Comment(
-            commentId: '7',
-            user: User(
-                userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-                userName: 'Risith Perera',
-                email: 'risithpremier@gmail.com'),
-            timeStamp: DateTime(2024, 11, 3),
-            text: 'I\'m feeling great!')
-      ],
-    ),
-    Comment(
-      commentId: '1',
-      user: User(
-          userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-          userName: 'Risith Perera',
-          email: 'risithpremier@gmail.com'),
-      timeStamp: DateTime(2024, 10, 19),
-      text:
-          'Today I did 3 times breathing exercise. Now I feel less fear. Thank you so much.',
-      comments: [
-        Comment(
-            commentId: '2',
-            user: User(
-                userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-                userName: 'Leonie Krol',
-                email: 'risithgmtech@gmail.com'),
-            timeStamp: DateTime(2024, 10, 21),
-            text: 'Okay. That\'s Sound Fantastic...!'),
-        Comment(
-            commentId: '3',
-            user: User(
-                userId: 'xxxxxxx',
-                userName: 'Anna Zarski',
-                email: 'anna@gmail.com'),
-            timeStamp: DateTime(2024, 10, 29),
-            text: 'Okay. Glad to hear...!')
-      ],
-    ),
-    Comment(
-      commentId: '4',
-      user: User(
-          userId: 'xZOnZ2mQvTWTObfryho7tbetU1V2',
-          userName: 'Risith Perera',
-          email: 'risithpremier@gmail.com'),
-      timeStamp: DateTime(2024, 10, 1),
-      text: 'It is very hard to concentrate breathing. What should I do?',
-      comments: [
-        Comment(
-            commentId: '5',
-            user: User(
-                userId: 'AJc7VO6q5McHHFlFfZVjdlmNE1K3',
-                userName: 'Leonie Krol',
-                email: 'risithgmtech@gmail.com'),
-            timeStamp: DateTime(2024, 10, 5),
-            text: 'You have to jump twice daily.')
-      ],
-    ),
-  ];
+  final CommentService _commentService = CommentService();
 
   @override
   void initState() {
@@ -153,19 +84,34 @@ class _DiaryPage extends State<DiaryPage> {
                 ),
               ),
               const SizedBox(height: 4),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: comments.length,
-                  itemBuilder: (context, index) {
-                    return CommentCard(comment: comments[index]);
-                  },
-                  separatorBuilder: (context, index) {
-                    return const Divider(
-                      color: AppColors.lightGrey, // Customize the color as needed
-                      thickness: 2.5, // Customize the thickness as needed
-                    );
-                  },
-                ),
+              FutureBuilder<List<Comment>>(
+                future: _commentService.fetchComments(date: _selectedDay),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text("Error loading comments"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No comments available"));
+                  }
+
+                  final List<Comment> comments = snapshot.data!;
+
+                  return Expanded(
+                    child: ListView.separated(
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        return CommentCard(comment: comments[index]);
+                      },
+                      separatorBuilder: (context, index) {
+                        return const Divider(
+                          color: AppColors.lightGrey, // Customize the color as needed
+                          thickness: 2.5, // Customize the thickness as needed
+                        );
+                      },
+                    ),
+                  );
+                },
               ),
             ],
           )),

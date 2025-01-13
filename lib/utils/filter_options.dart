@@ -14,30 +14,29 @@ Map<FilterOption, String> filterOptionLabels = {
   FilterOption.lastYear: 'Last Year',
 };
 
-String getDateRangeString(FilterOption filterOption) {
+Map<String, DateTime> getDateRange(FilterOption filterOption) {
   switch (filterOption) {
     case FilterOption.thisMonth:
       final now = DateTime.now();
       final firstDayOfMonth = DateTime(now.year, now.month, 1);
-      final lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
-      return '${firstDayOfMonth.toString().substring(0, 10)} - ${lastDayOfMonth.toString().substring(0, 10)}';
+      return {'start': firstDayOfMonth, 'end': now}; // Returning as Map
     case FilterOption.thisYear:
       final now = DateTime.now();
       final firstDayOfYear = DateTime(now.year, 1, 1);
-      return '${firstDayOfYear.toString().substring(0, 10)} - ${now.toString().substring(0, 10)}';
+      return {'start': firstDayOfYear, 'end': now}; // Returning as Map
     case FilterOption.lastThreeMonths:
       final now = DateTime.now();
       final threeMonthsAgo = now.subtract(const Duration(days: 90));
-      return '${threeMonthsAgo.toString().substring(0, 10)} - ${now.toString().substring(0, 10)}';
+      return {'start': threeMonthsAgo, 'end': now}; // Returning as Map
     case FilterOption.lastSixMonths:
       final now = DateTime.now();
       final sixMonthsAgo = now.subtract(const Duration(days: 180));
-      return '${sixMonthsAgo.toString().substring(0, 10)} - ${now.toString().substring(0, 10)}';
+      return {'start': sixMonthsAgo, 'end': now}; // Returning as Map
     case FilterOption.lastYear:
       final now = DateTime.now();
       final lastYear = now.subtract(const Duration(days: 365));
-      return '${lastYear.toString().substring(0, 10)} - ${now.toString().substring(0, 10)}';
+      return {'start': lastYear, 'end': now}; // Returning as Map
     default:
-      return 'Invalid Option';
+      throw Exception('Invalid Option');
   }
 }

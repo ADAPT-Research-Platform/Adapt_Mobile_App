@@ -1,7 +1,7 @@
+import 'package:adapt/services/session_manager.dart';
 import 'package:adapt/widgets/main_title.dart';
 import 'package:flutter/material.dart';
 
-import '../models/user.dart';
 import '../services/auth_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
@@ -31,14 +31,6 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _isNotificationSoundEnabled = true;
   bool _isMuteNotifications = false;
 
-  late Future<User> _loggedInUser; // Declare the Future
-
-  @override
-  void initState() {
-    super.initState();
-    _loggedInUser = _authService.getLoggedInUser(); // Initialize the Future
-  }
-
   @override
   void dispose() {
     _displayNameController.dispose();
@@ -59,20 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainTitle(title: 'Settings'),
-      body: FutureBuilder<User>(
-        future: _loggedInUser, // Use the initialized Future here
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
-          } else if (snapshot.hasError) {
-            return const Center(child: Text("Error loading modules"));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text("No modules available"));
-          }
-
-          final user = snapshot.data!;
-
-          return  Padding(
+      body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: ListView(
               children: [
@@ -88,7 +67,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 TextField(
                   decoration: InputDecoration(
-                    labelText: user.userName.toString(),
+                    labelText: SessionManager().sessionUser?.userName.toString(),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(6.0),
                     ),
@@ -106,7 +85,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 TextField(
                   controller: _displayNameController,
                   decoration: InputDecoration(
-                    labelText: user.userName,
+                    labelText: SessionManager().sessionUser?.userName,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(6.0),
                     ),
@@ -124,7 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 TextField(
                   controller: _userEmailController,
                   decoration: InputDecoration(
-                    labelText: user.email,
+                    labelText: SessionManager().sessionUser?.email,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(6.0),
                     ),
@@ -211,9 +190,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 15),
               ],
             ),
-          );
-        },
-      )
+          ),
     );
   }
 

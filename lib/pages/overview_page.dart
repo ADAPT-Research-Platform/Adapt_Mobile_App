@@ -9,7 +9,6 @@ import '../services/module_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/main_title.dart';
-import '../widgets/module_grid.dart';
 import '../widgets/sub_title.dart';
 
 class OverviewPage extends StatefulWidget {

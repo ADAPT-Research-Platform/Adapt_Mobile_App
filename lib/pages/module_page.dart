@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../models/module.dart';
 import '../models/section.dart';
 import '../utils/app_colors.dart';
-import '../utils/app_routes.dart';
 import '../utils/app_keys.dart';
-import '../widgets/section_card.dart';
+import '../utils/app_routes.dart';
 import '../widgets/main_title.dart';
+import '../widgets/section_card.dart';
 import '../widgets/sub_title.dart';
 
 class ModulePage extends StatefulWidget {
@@ -117,16 +117,14 @@ class _ModulePageState extends State<ModulePage> {
                         itemBuilder: (context, index) {
                           final section = filteredSectionsMap.values.elementAt(index);
                           final sectionIndex = filteredSectionsMap.keys.elementAt(index);
+                          section.sectionName = section.isExercise ? 'Section ${sectionIndex + 1}: Exercise' : 'Section ${sectionIndex + 1}';
+
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10.0),
                             child: SectionCard(
-                              sectionIndex: sectionIndex,
                               section: section,
                               onPressed: () {
-                                moduleNavigator.currentState!.pushNamed(
-                                  Routes.routeExercises,
-                                  arguments: section,
-                                );
+                                moduleNavigator.currentState!.pushNamed(Routes.routeSections, arguments: section);
                               },
                             ),
                           );

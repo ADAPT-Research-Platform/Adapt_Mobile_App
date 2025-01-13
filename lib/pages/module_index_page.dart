@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../models/module.dart';
 import '../utils/app_routes.dart';
-import 'section_page.dart';
 import 'module_page.dart';
 import 'overview_page.dart';
+import 'section_page.dart';
 
 class ModuleIndexPage extends StatelessWidget {
   const ModuleIndexPage({super.key});
@@ -25,7 +25,7 @@ class ModuleIndexPage extends StatelessWidget {
               return MaterialPageRoute(
                 builder: (context) => ModulePage(module: settings.arguments! as Module),
               );
-            case Routes.routeExercises:
+            case Routes.routeSections:
               return MaterialPageRoute(
                 builder: (context) => SectionPage(section: settings.arguments! as Section),
               );
