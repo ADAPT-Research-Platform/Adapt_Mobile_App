@@ -2,9 +2,13 @@ import 'dart:convert';
 
 import 'package:adapt/services/session_manager.dart';
 
+import '../utils/app_config.dart';
+
 class SectionService {
 
-  Future<String> fetchSectionContent(String url) async {
+  Future<String> fetchSectionContent(String sectionFolderPath) async {
+    final String url = '${AppConfig.baseUrl}/app/uploads/$sectionFolderPath/content.md';
+
     try {
       final response = await SessionManager().client.get(
         Uri.parse(url),

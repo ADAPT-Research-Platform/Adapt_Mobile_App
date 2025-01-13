@@ -32,12 +32,17 @@ class ModeService {
     }
   }
 
-  Future<List<Mode>> fetchModeList() async {
-    const url = '${AppConfig.baseUrl}/api/users/mood';
+  Future<List<Mode>> fetchModeList({DateTime? startDate, DateTime? endDate}) async {
+
+    // Add query parameters
+    final Map<String, String> queryParams = {};
+
+    queryParams['startDate'] = (startDate != null) ? startDate.toIso8601String() : DateTime.now().toIso8601String();
+    queryParams['endDate'] = (endDate != null) ? endDate.toIso8601String() : DateTime.now().toIso8601String();
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse(url),
+        Uri.parse('${AppConfig.baseUrl}/api/users/mood').replace(queryParameters: queryParams),
         headers: SessionManager().getHeaders(),
       );
 
@@ -54,12 +59,19 @@ class ModeService {
     }
   }
 
-  Mode parseMode(Map<String, dynamic> json) {
+  Mode parseMode(String data) {
+    // Split the string using the '|' delimiter
+    final parts = data.split('|');
+
+    // Parse the components
+    final timeStamp = DateTime.parse(parts[0]); // Parse the timestamp
+    final feeling = int.parse(parts[1]); // Parse the feeling
+    final motivation = int.parse(parts[2]); // Parse the motivation
+
     return Mode(
-      modeId: json['id'].toString(),
-      timeStamp: DateTime.parse(json['createdAt']),
-      feeling: json['feeling'],
-      motivation: json['motivation'],
+      timeStamp: timeStamp,
+      feeling: feeling,
+      motivation: motivation,
     );
   }
 }

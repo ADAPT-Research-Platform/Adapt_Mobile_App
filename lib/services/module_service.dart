@@ -55,7 +55,7 @@ class ModuleService {
     return Section(
       sectionId: json['id'].toString(),
       timeStamp: DateTime.parse(json['updatedAt']),
-      url: json['folderUrl'] ?? '',
+      folderPath: json['folderUrl'] ?? '',
       title: json['title'] ?? '',
       isExercise: json['isExercise'] ?? false,
     );

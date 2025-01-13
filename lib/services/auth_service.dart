@@ -9,37 +9,6 @@ import '../utils/app_keys.dart';
 import 'dart:convert';
 
 class AuthService {
-
-  Future<User> getLoggedInUser() async {
-    const url = '${AppConfig.baseUrl}/api/auth/get';
-
-    try {
-      final response = await SessionManager().client.get(
-        Uri.parse(url),
-        headers: SessionManager().getHeaders(),
-      );
-
-      if (response.statusCode == 200) {
-        final dynamic data = jsonDecode(response.body);
-        return parseUser(data);
-      }
-    } catch (e) {
-      print('Error during fetching user data: $e');
-    }
-
-    // Navigate to the login page
-    mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
-    throw Exception("Failed to fetch user data");
-  }
-
-  User parseUser(Map<String, dynamic> json) {
-    return User(
-      userId: json['id'].toString(),
-      userName: json['username'].toString(),
-      email: json['email'].toString(),
-    );
-  }
-
   void register(String userName, String email, String password, String passwordConfirm) async {
     final url = '${AppConfig.baseUrl}/api/users';
 
@@ -98,10 +67,8 @@ class AuthService {
         // Extract the connect.sid cookie
         final cookies = response.headers['set-cookie'];
         if (cookies != null) {
-          // Parse the cookie and save it
-          final connectSid = cookies.split(';').firstWhere((cookie) => cookie.startsWith('connect.sid'));
-          print('Cookie: $connectSid');
-          SessionManager().setSessionCookie(cookies.split(';')[0]); // Extract the cookie value
+          final dynamic data = jsonDecode(response.body);
+          SessionManager().setSessionInfo(user: parseUser(data), cookie: cookies.split(';')[0]); // Extract the cookie value
 
           mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
 
@@ -130,20 +97,25 @@ class AuthService {
       headers: SessionManager().getHeaders(),
     );
 
-    if (response.statusCode == 200) {
-      print(response.body);
-      SessionManager().clearSessionCookie();
+    // Navigate to the login page on any circumstances
+    mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
-      // Navigate to the login page
-      mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+    if (response.statusCode == 200) {
+      SessionManager().clearSessionInfo();
 
       // Add a short delay to wait until the next page is built
       Future.delayed(const Duration(milliseconds: 1000), () {
         _showSnackBar(loginPageScaffold, 'Log out successful');
       });
-    } else {
-      throw Exception('Failed to fetch customer: ${response.body}');
     }
+  }
+
+  User parseUser(Map<String, dynamic> json) {
+    return User(
+      userId: json['id'].toString(),
+      userName: json['username'].toString(),
+      email: json['email'].toString(),
+    );
   }
 
   //Show particular message
