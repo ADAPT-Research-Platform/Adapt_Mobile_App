@@ -36,51 +36,55 @@ class _OverviewPageState extends State<OverviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const MainTitle(title: 'Overview'),
-        body: FutureBuilder<List<Module>>(
-          future: _modulesFuture, // Use the initialized Future here
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
-            } else if (snapshot.hasError) {
-              return const Center(child: Text("Error loading modules"));
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text("No modules available"));
-            }
+      appBar: const MainTitle(title: 'Overview'),
+      body: FutureBuilder<List<Module>>(
+        future: _modulesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.darkYellow),
+            );
+          } else if (snapshot.hasError) {
+            return const Center(child: Text("Error loading modules"));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No modules available"));
+          }
 
-            final modules = snapshot.data!;
+          final modules = snapshot.data!;
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: SingleChildScrollView(
               child: Column(
-                  //mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SubTitle(text: 'Modules'),
-                    ModuleGrid(
-                      modules: modules,
-                      size: 100,
-                    ),
-                    const Divider(
-                      color: AppColors.lightGrey,
-                      // Customize the color as needed
-                      thickness: 2.5, // Customize the thickness as needed
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SubTitle(text: 'Everyday Questions'),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'I’m feeling today.',
-                          style: TextStyle(
-                            color: AppColors.fontColor, // Static text color
-                            fontSize: AppFontSizes.small, // Static font size
-                          ),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SubTitle(text: 'Modules'),
+                  ModuleGrid(
+                    modules: modules,
+                    size: MediaQuery.of(context).size.width /
+                        4, // Adjust dynamically
+                  ),
+                  const Divider(
+                    color: AppColors.lightGrey,
+                    thickness: 2.5,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SubTitle(text: 'Everyday Questions'),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'I’m feeling today.',
+                        style: TextStyle(
+                          color: AppColors.fontColor,
+                          fontSize: AppFontSizes.small,
                         ),
-                        const SizedBox(height: 10),
-                        // Feeling Selector Row
-                        Row(
+                      ),
+                      const SizedBox(height: 10),
+                      // Feeling Selector Row
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             _buildFeelingIcon(
@@ -93,35 +97,40 @@ class _OverviewPageState extends State<OverviewPage> {
                                 Icons.sentiment_neutral, 4, 'Tired'),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'I’m motivated today.',
-                          style: TextStyle(
-                            color: AppColors.fontColor, // Static text color
-                            fontSize: AppFontSizes.small, // Static font size
-                          ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'I’m motivated today.',
+                        style: TextStyle(
+                          color: AppColors.fontColor,
+                          fontSize: AppFontSizes.small,
                         ),
-                        StarSlider(
-                          sliderLength: 5, //How many stars
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedMotivation = value;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        TaskButton(
-                            text: 'Submit',
-                            onPressed: () {
-                              _modeService.saveMode(_selectedFeeling, _selectedMotivation);
-                            }
-                          ),
-                      ],
-                    ),
-                  ]),
-            );
-          },
-        ));
+                      ),
+                      StarSlider(
+                        sliderLength: 5,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedMotivation = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      TaskButton(
+                        text: 'Submit',
+                        onPressed: () {
+                          _modeService.saveMode(
+                              _selectedFeeling, _selectedMotivation);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildFeelingIcon(IconData icon, int feelingValue, String label) {
