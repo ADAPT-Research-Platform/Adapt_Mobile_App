@@ -21,7 +21,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfirmController = TextEditingController();
+  final TextEditingController _passwordConfirmController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -42,31 +43,35 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final bool isSmallScreen =
+        size.height < 600; // Adjust cutoff for small screens
+
     return ScaffoldMessenger(
-        key: registerPageScaffold,
-        child:  Scaffold(
-          body: Stack(
-            // clipBehavior: Clip.hardEdge,
-            // fit: StackFit.loose,
+      key: registerPageScaffold,
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Stack(
             children: [
-              Positioned.fill(
+              const Positioned.fill(
                 left: -45,
-                top: -MediaQuery.of(context).size.height / 4,
-                child: const HexagonGrid(
-                    rows: 6,
-                    cols: 4,
-                    size: 175,
-                    fillColor: AppColors.primaryYellow,
-                    strokeColor: Colors.white,
-                    strokeWidth: 6),
+                top: -160,
+                child: HexagonGrid(
+                  rows: 6,
+                  cols: 4,
+                  size: 175,
+                  fillColor: AppColors.primaryYellow,
+                  strokeColor: Colors.white,
+                  strokeWidth: 6,
+                ),
               ),
               Positioned.fill(
-                top: -MediaQuery.of(context).size.height / 1.3,
-                //bottom: MediaQuery.of(context).size.height/2,
+                top: -size.height / 1.5,
                 child: Image.asset(
                   'assets/images/hands_icon.png',
-                  width: MediaQuery.of(context).size.width, // Stretch to full screen width
+                  width: size.width + 100, // Stretch to full screen width
                   fit: BoxFit.fitWidth, // Maintains the aspect ratio
                 ),
               ),
@@ -75,13 +80,13 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height/3.2),
+                    SizedBox(height: size.height / (isSmallScreen ? 4 : 3)),
                     const Text(
                       'Sign Up',
                       style: TextStyle(
-                        color: AppColors.darkYellow, // Static text color
-                        fontSize: AppFontSizes.large, // Static font size
-                        fontWeight: FontWeight.bold, // Static font weight
+                        color: AppColors.darkYellow,
+                        fontSize: AppFontSizes.large,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -89,7 +94,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       'Please fill your information.',
                       style: TextStyle(fontSize: AppFontSizes.small),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     TextField(
                       controller: _displayNameController,
                       decoration: InputDecoration(
@@ -135,11 +140,9 @@ class _SignUpPageState extends State<SignUpPage> {
                     Row(
                       children: [
                         Checkbox(
-                            value: false,
-                            onChanged: (value) {
-                              // Checkbox action
-                              value = value;
-                            }),
+                          value: false,
+                          onChanged: (value) {},
+                        ),
                         const Expanded(
                           child: Text(
                             'I agree to the data protection regulations and would like to continue to participate.',
@@ -149,8 +152,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 20),
                     TaskButton(
-                        text: 'Register',
-                        onPressed: _register
+                      text: 'Register',
+                      onPressed: _register,
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -158,20 +161,22 @@ class _SignUpPageState extends State<SignUpPage> {
                       children: [
                         const Text("Already have an account?"),
                         TextButton(
-                          onPressed: (){
-                            mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+                          onPressed: () {
+                            mainNavigator.currentState!
+                                .pushReplacementNamed(Routes.routeLogin);
                           },
                           child: const Text('Login'),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 50),
+                    const SizedBox(height: 20),
                   ],
                 ),
-              )
+              ),
             ],
           ),
-        )
+        ),
+      ),
     );
   }
 }
