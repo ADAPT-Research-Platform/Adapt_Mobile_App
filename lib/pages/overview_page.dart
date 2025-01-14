@@ -4,6 +4,7 @@ import 'package:adapt/widgets/task_button.dart';
 import 'package:flutter/material.dart';
 
 import '../models/module.dart';
+import '../services/NotificationService.dart';
 import '../services/mode_service.dart';
 import '../services/module_service.dart';
 import '../utils/app_colors.dart';
@@ -120,6 +121,15 @@ class _OverviewPageState extends State<OverviewPage> {
                         onPressed: () {
                           _modeService.saveMode(
                               _selectedFeeling, _selectedMotivation);
+
+                          // Schedule a notification for the next day
+                          DateTime scheduledDate = DateTime.now().add( const Duration(days: 1));
+                          NotificationService.scheduleNotification(
+                            0,
+                            "Time to log your Mood and Motivation",
+                            "Don't forget to log your mood and motivation for today!",
+                            scheduledDate,
+                          );
                         },
                       ),
                     ],
