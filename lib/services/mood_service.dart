@@ -13,9 +13,7 @@ class MoodService {
     try {
       final response = await SessionManager().client.post(
         Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: SessionManager().getHeaders(),
         body: jsonEncode({
           'feeling': feeling,
           'motivation': motivation,

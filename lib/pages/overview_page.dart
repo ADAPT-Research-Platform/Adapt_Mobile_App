@@ -108,7 +108,7 @@ class _OverviewPageState extends State<OverviewPage> {
                         ),
                       ),
                       StarSlider(
-                        sliderLength: 5,
+                        sliderLength: 10,
                         onChanged: (value) {
                           setState(() {
                             _selectedMotivation = value;
