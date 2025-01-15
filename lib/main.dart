@@ -1,5 +1,5 @@
 import 'package:adapt/pages/splash_page.dart';
-import 'package:adapt/services/NotificationService.dart';
+import 'package:adapt/services/notification_service.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:timezone/data/latest.dart' as tz;
