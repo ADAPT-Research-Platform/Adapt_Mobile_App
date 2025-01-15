@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:adapt/models/section.dart';
 import 'package:adapt/services/comment_service.dart';
 import 'package:adapt/services/section_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/image_viewer_builder.dart';
 import 'package:adapt/widgets/main_title.dart';
+import 'package:adapt/widgets/question_viewer_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -29,6 +32,10 @@ class _SectionPageState extends State<SectionPage> {
   final SectionService _sectionService = SectionService();
   final CommentService _commentService = CommentService();
 
+  final Map<String, TextEditingController> _controllers = {};
+  final Map<String, String> _questions = {};
+  final Map<String, String> _answers = {};
+
   double position = 0;
 
   void _scroll(double offset) {
@@ -45,6 +52,22 @@ class _SectionPageState extends State<SectionPage> {
     );
   }
 
+  void _submitAnswers() {
+    final Map<String, String> answers = {};
+    for (var key in _questions.keys) {
+      answers[key] = _controllers[key]?.text ?? "";
+    }
+    print("Submitted Answers: ${jsonEncode(answers)}");
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,8 +81,7 @@ class _SectionPageState extends State<SectionPage> {
           future: _sectionService.fetchSectionContent(widget.section.folderPath),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                  child: CircularProgressIndicator(color: AppColors.darkYellow));
+              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
             } else if (snapshot.hasError) {
               return const Center(child: Text("Error loading exercise"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -74,12 +96,15 @@ class _SectionPageState extends State<SectionPage> {
                   children: [
                     Expanded(
                       child: SingleChildScrollView(
-                        controller: _scrollController,
+                        //controller: _scrollController,
                         child: MarkdownBody(
                           data: markdownContent,
-                          builders: {
+                          blockSyntaxes: const [QuestionSyntax()],
+                          selectable: false,
+                          builders: <String, MarkdownElementBuilder>{
                             'a': VideoViewerBuilder(),
                             'img': ImageViewerBuilder(widget.section.folderPath),
+                            'question': QuestionViewerBuilder(_questions, _answers, _controllers),
                           },
                         ),
                       ),
@@ -87,7 +112,7 @@ class _SectionPageState extends State<SectionPage> {
                     SizedBox(
                         height: 80, // Set the desired height
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             IconButton(
                               icon: const Icon(Icons.arrow_back_ios, color: AppColors.darkYellow, size: 25),
@@ -199,6 +224,15 @@ class _SectionPageState extends State<SectionPage> {
                                 },
                               ),
                             ),
+                            if(widget.section.isExercise)
+                              const SizedBox(width: 10,),
+                            if(widget.section.isExercise)
+                              Expanded(
+                                child: TaskButton(
+                                  text: 'Submit',
+                                  onPressed: _submitAnswers,
+                                )
+                              ),
                             IconButton(
                               icon: const Icon(
                                   Icons.arrow_forward_ios,
