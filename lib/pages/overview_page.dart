@@ -3,7 +3,6 @@ import 'package:adapt/widgets/star_slider.dart';
 import 'package:adapt/widgets/task_button.dart';
 import 'package:flutter/material.dart';
 
-import '../models/module.dart';
 import '../services/notification_service.dart';
 import '../services/mood_service.dart';
 import '../services/module_service.dart';
@@ -26,32 +25,22 @@ class _OverviewPageState extends State<OverviewPage> {
   int _selectedFeeling = 0; // 0 for no selection, 1 for happy, 2 for sad, etc.
   int _selectedMotivation = 5;
 
-  late Future<List<Module>> _modulesFuture; // Declare the Future
-
-  @override
-  void initState() {
-    super.initState();
-    _modulesFuture = _moduleService.fetchModuleList(); // Initialize the Future
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainTitle(title: 'Overview'),
-      body: FutureBuilder<List<Module>>(
-        future: _modulesFuture,
+      body: FutureBuilder<List<String>>(
+        future: _moduleService.fetchModuleIdList(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.darkYellow),
-            );
+            return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
           } else if (snapshot.hasError) {
-            return const Center(child: Text("Error loading modules"));
+            return const Center(child: Text("Error loading data"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No modules available"));
+            return const Center(child: Text("No data available"));
           }
 
-          final modules = snapshot.data!;
+          final moduleIdList = snapshot.data!;
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -61,9 +50,8 @@ class _OverviewPageState extends State<OverviewPage> {
                 children: [
                   const SubTitle(text: 'Modules'),
                   ModuleGrid(
-                    modules: modules,
-                    size: MediaQuery.of(context).size.width /
-                        4, // Adjust dynamically
+                    moduleIdList: moduleIdList,
+                    size: MediaQuery.of(context).size.width / 4, // Adjust dynamically
                   ),
                   const Divider(
                     color: AppColors.lightGrey,

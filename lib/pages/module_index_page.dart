@@ -23,7 +23,7 @@ class ModuleIndexPage extends StatelessWidget {
               );
             case Routes.routeChapters:
               return MaterialPageRoute(
-                builder: (context) => ChapterPage(module: settings.arguments! as Module),
+                builder: (context) => ChapterPage(moduleId: settings.arguments! as String),
               );
             case Routes.routeSections:
               return MaterialPageRoute(

@@ -5,6 +5,7 @@ class Section {
   final String title;
   final bool isExercise;
   final double progress;
+  final int numOfComments;
   String sectionName = "Unknown"; //Need to figure out this
 
   Section({
@@ -13,6 +14,7 @@ class Section {
     required this.folderPath,
     required this.title,
     required this.progress,
+    required this.numOfComments,
     required this.isExercise
   });
 }

@@ -3,13 +3,12 @@ import 'dart:math';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import '../models/module.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
 import 'hexagon_shape.dart';
 
 class ModuleGrid extends StatelessWidget {
-  final List<Module> modules;
+  final List<String> moduleIdList;
   final double size;
   final Color fillColor;
   final Color strokeColor;
@@ -20,7 +19,7 @@ class ModuleGrid extends StatelessWidget {
 
   const ModuleGrid({
     super.key,
-    required this.modules,
+    required this.moduleIdList,
     required this.size,
     this.fillColor = AppColors.primaryYellow,
     this.strokeColor = AppColors.darkYellow,
@@ -69,12 +68,12 @@ class ModuleGrid extends StatelessWidget {
   }
 
   Widget _buildHexagonButton(int index) {
-    bool isIndexAvailable = index >=0 && index < modules.length;
+    bool isIndexAvailable = index >=0 && index < moduleIdList.length;
 
     return GestureDetector(
         onTap: () {
           if (isIndexAvailable) {
-            moduleNavigator.currentState!.pushNamed(Routes.routeChapters, arguments: modules[index]);
+            moduleNavigator.currentState!.pushNamed(Routes.routeChapters, arguments: moduleIdList[index]);
           }else{
             print('No Module Available');
           }
