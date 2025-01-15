@@ -26,7 +26,7 @@ class MainIndexPage extends StatelessWidget {
               return MaterialPageRoute(
                 builder: (context) => DiaryPage(),
               );
-            case Routes.routeMode:
+            case Routes.routeMood:
               return MaterialPageRoute(
                 builder: (context) => ModePage(),
               );

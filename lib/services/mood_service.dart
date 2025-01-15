@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:adapt/services/session_manager.dart';
 
-import '../models/mode.dart';
+import '../models/mood.dart';
 import '../utils/app_config.dart';
 
-class ModeService {
+class MoodService {
 
   void saveMode(int feeling, int motivation) async {
     const url = '${AppConfig.baseUrl}/api/users/mood';
@@ -32,7 +32,7 @@ class ModeService {
     }
   }
 
-  Future<List<Mode>> fetchModeList({DateTime? startDate, DateTime? endDate}) async {
+  Future<List<Mood>> fetchModeList({DateTime? startDate, DateTime? endDate}) async {
 
     // Add query parameters
     final Map<String, String> queryParams = {};
@@ -48,7 +48,7 @@ class ModeService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        return data.map<Mode>((item) => parseMode(item)).toList();
+        return data.map<Mood>((item) => parseMode(item)).toList();
       } else {
         print('Failed to fetch mood list: ${response.statusCode}, ${response.body}');
         return [];
@@ -59,7 +59,7 @@ class ModeService {
     }
   }
 
-  Mode parseMode(String data) {
+  Mood parseMode(String data) {
     // Split the string using the '|' delimiter
     final parts = data.split('|');
 
@@ -68,7 +68,7 @@ class ModeService {
     final feeling = int.parse(parts[1]); // Parse the feeling
     final motivation = int.parse(parts[2]); // Parse the motivation
 
-    return Mode(
+    return Mood(
       timeStamp: timeStamp,
       feeling: feeling,
       motivation: motivation,

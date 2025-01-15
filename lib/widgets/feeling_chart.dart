@@ -2,10 +2,10 @@ import 'package:adapt/utils/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../models/mode.dart';
+import '../models/mood.dart';
 
 class FeelingChart extends StatelessWidget {
-  final List<Mode> modeData;
+  final List<Mood> modeData;
 
   const FeelingChart({super.key, required this.modeData});
 
