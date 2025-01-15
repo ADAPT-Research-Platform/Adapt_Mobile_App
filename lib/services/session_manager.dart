@@ -28,7 +28,7 @@ class SessionManager {
     if (sessionCookie != null) {
       return {
         'Content-Type': 'application/json',
-        'Cookie': sessionCookie!,
+          'Cookie': sessionCookie!,
       };
     }
     return {

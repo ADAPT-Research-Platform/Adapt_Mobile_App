@@ -76,6 +76,7 @@ class AuthService {
               user: parseUser(data),
               cookie: sessionCookie); // Extract the cookie value
           await CookieService().saveCookie(sessionCookie);
+          await CookieService().saveUser(parseUser(data));
 
           mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
 
@@ -115,6 +116,29 @@ class AuthService {
       Future.delayed(const Duration(milliseconds: 1000), () {
         _showSnackBar(loginPageScaffold, 'Log out successful');
       });
+    }
+  }
+
+  // Call the get user API
+  Future<User?> getUser() async {
+    const url = '${AppConfig.baseUrl}/api/users/me';
+
+    try {
+      final response = await SessionManager().client.get(
+        Uri.parse(url),
+        headers: SessionManager().getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final dynamic data = jsonDecode(response.body);
+        return parseUser(data);
+      } else {
+        print('Failed to fetch user: ${response.statusCode}, ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error during fetching user: $e');
+      return null;
     }
   }
 
