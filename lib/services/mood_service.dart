@@ -8,7 +8,7 @@ import '../utils/app_config.dart';
 class MoodService {
 
   void saveMode(int feeling, int motivation) async {
-    const url = '${AppConfig.baseUrl}/api/mood';
+    const url = '${AppConfig.baseUrl}/api/moods';
 
     try {
       final response = await SessionManager().client.post(
@@ -46,7 +46,7 @@ class MoodService {
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/api/mood').replace(queryParameters: queryParams),
+        Uri.parse('${AppConfig.baseUrl}/api/moods').replace(queryParameters: queryParams),
         headers: SessionManager().getHeaders(),
       );
 
