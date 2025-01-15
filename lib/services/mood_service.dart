@@ -8,7 +8,7 @@ import '../utils/app_config.dart';
 class MoodService {
 
   void saveMode(int feeling, int motivation) async {
-    const url = '${AppConfig.baseUrl}/api/users/mood';
+    const url = '${AppConfig.baseUrl}/api/mood';
 
     try {
       final response = await SessionManager().client.post(
@@ -22,13 +22,17 @@ class MoodService {
         }),
       );
 
-      if (response.statusCode == 201) {
-        print('Mood saved successfully.');
+      if (response.statusCode == 200) {
+        print('Mood data updated successfully!');
+      }else if (response.statusCode == 201) {
+        print('Mood data added successfully!');
+      } else if (response.statusCode == 400) {
+        print('Bad Request: ${response.body}');
       } else {
-        print('Failed to save mood: ${response.statusCode}, ${response.body}');
+        print('Mood data adding failed: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
-      print('Error during saving mood: $e');
+      print('Error during saving Mood data: $e');
     }
   }
 
@@ -42,7 +46,7 @@ class MoodService {
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/api/users/mood').replace(queryParameters: queryParams),
+        Uri.parse('${AppConfig.baseUrl}/api/mood').replace(queryParameters: queryParams),
         headers: SessionManager().getHeaders(),
       );
 

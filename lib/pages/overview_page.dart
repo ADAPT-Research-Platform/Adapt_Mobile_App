@@ -119,8 +119,7 @@ class _OverviewPageState extends State<OverviewPage> {
                       TaskButton(
                         text: 'Submit',
                         onPressed: () {
-                          _modeService.saveMode(
-                              _selectedFeeling, _selectedMotivation);
+                          _modeService.saveMode(_selectedFeeling, _selectedMotivation);
 
                           // Schedule a notification for the next day
                           DateTime scheduledDate = DateTime.now().add( const Duration(days: 1));

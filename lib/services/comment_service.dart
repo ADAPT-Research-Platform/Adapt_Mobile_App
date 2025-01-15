@@ -18,23 +18,24 @@ class CommentService {
         }),
       );
 
-      if (response.statusCode == 201) {
-        print('Comment added successful!');
+      if (response.statusCode == 200) {
+        print('Comment updated successfully!');
+      }else if (response.statusCode == 201) {
+        print('Comment added successfully!');
       } else if (response.statusCode == 400) {
         print('Bad Request: ${response.body}');
-        // Handle validation errors from the server response
       } else {
         print('Comment adding failed: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
-      print('Error during commenting: $e');
+      print('Error during adding/updating Comment: $e');
     }
   }
 
   void addReply(String text, String parentCommentId) async {
     try {
       final response = await SessionManager().client.post(
-        Uri.parse('${AppConfig.baseUrl}/api/comments'),
+        Uri.parse('${AppConfig.baseUrl}/api/comments/reply'),
         headers: SessionManager().getHeaders(),
         body: jsonEncode({
           'text': text,
@@ -42,16 +43,17 @@ class CommentService {
         }),
       );
 
-      if (response.statusCode == 201) {
-        print('Reply added successful!');
+      if (response.statusCode == 200) {
+        print('Reply updated successfully!');
+      }else if (response.statusCode == 201) {
+        print('Reply added successfully!');
       } else if (response.statusCode == 400) {
         print('Bad Request: ${response.body}');
-        // Handle validation errors from the server response
       } else {
         print('Reply adding failed: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
-      print('Error during replying: $e');
+      print('Error during adding/updating Reply: $e');
     }
   }
 
