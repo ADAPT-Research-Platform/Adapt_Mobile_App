@@ -8,9 +8,11 @@ import '../models/user.dart';
 import '../utils/app_config.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
+import 'CookieService.dart';
 
 class AuthService {
-  void register(String userName, String email, String password, String passwordConfirm) async {
+  void register(String userName, String email, String password,
+      String passwordConfirm) async {
     final url = '${AppConfig.baseUrl}/api/users';
 
     // Validate passwords
@@ -21,14 +23,14 @@ class AuthService {
 
     try {
       final response = await SessionManager().client.post(
-        Uri.parse(url),
-        headers: SessionManager().getHeaders(),
-        body: jsonEncode({
-          'username': userName,
-          'email': email,
-          'password': password,
-        }),
-      );
+            Uri.parse(url),
+            headers: SessionManager().getHeaders(),
+            body: jsonEncode({
+              'username': userName,
+              'email': email,
+              'password': password,
+            }),
+          );
 
       if (response.statusCode == 201) {
         print('Registration successful!');
@@ -56,20 +58,24 @@ class AuthService {
 
     try {
       final response = await SessionManager().client.post(
-        Uri.parse(url),
-        headers: SessionManager().getHeaders(),
-        body: jsonEncode({
-          'login': email,
-          'password': password,
-        }),
-      );
+            Uri.parse(url),
+            headers: SessionManager().getHeaders(),
+            body: jsonEncode({
+              'login': email,
+              'password': password,
+            }),
+          );
 
       if (response.statusCode == 200) {
         // Extract the connect.sid cookie
         final cookies = response.headers['set-cookie'];
         if (cookies != null) {
           final dynamic data = jsonDecode(response.body);
-          SessionManager().setSessionInfo(user: parseUser(data), cookie: cookies.split(';')[0]); // Extract the cookie value
+          final sessionCookie = cookies.split(';')[0];
+          SessionManager().setSessionInfo(
+              user: parseUser(data),
+              cookie: sessionCookie); // Extract the cookie value
+          await CookieService().saveCookie(sessionCookie);
 
           mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
 
@@ -94,15 +100,16 @@ class AuthService {
     const url = '${AppConfig.baseUrl}/api/auth/logout';
 
     final response = await SessionManager().client.post(
-      Uri.parse(url),
-      headers: SessionManager().getHeaders(),
-    );
+          Uri.parse(url),
+          headers: SessionManager().getHeaders(),
+        );
 
     // Navigate to the login page on any circumstances
     mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
     if (response.statusCode == 200) {
       SessionManager().clearSessionInfo();
+      await CookieService().deleteCookie();
 
       // Add a short delay to wait until the next page is built
       Future.delayed(const Duration(milliseconds: 1000), () {
@@ -120,7 +127,8 @@ class AuthService {
   }
 
   //Show particular message
-  void _showSnackBar(GlobalKey<ScaffoldMessengerState> scaffold, String message) {
+  void _showSnackBar(
+      GlobalKey<ScaffoldMessengerState> scaffold, String message) {
     print(message);
     // Show a success message
     if (scaffold.currentState != null) {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../services/CookieService.dart';
+import '../services/session_manager.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
 
@@ -17,10 +19,25 @@ class _SplashPageState extends State<SplashPage>
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+    _checkLoginStatus();
+  }
 
-    Future.delayed(const Duration(seconds: 2), () {
+  /// Check login status and navigate accordingly
+  Future<void> _checkLoginStatus() async {
+    final isLoggedIn = await CookieService().hasCookie();
+
+    // Delay for splash screen visibility
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Navigate to the appropriate page
+    if (isLoggedIn) {
+      // Set cookie value to session manager
+      SessionManager()
+          .setSessionInfo(cookie: await CookieService().getCookie());
+      mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
+    } else {
       mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
-    });
+    }
   }
 
   @override

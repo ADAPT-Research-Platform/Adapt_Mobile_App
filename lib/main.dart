@@ -1,3 +1,4 @@
+import 'package:adapt/pages/overview_page.dart';
 import 'package:adapt/pages/splash_page.dart';
 import 'package:adapt/services/NotificationService.dart';
 import 'package:adapt/utils/app_keys.dart';
@@ -40,12 +41,15 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(
                 builder: (context) => const SignUpPage(),
               );
+            case Routes.routeOverview:
+              return MaterialPageRoute(
+                builder: (context) => const OverviewPage(),
+              );
             default:
               return MaterialPageRoute(
                 builder: (context) => const SplashPage(),
               );
           }
-        }
-    );
+        });
   }
 }
