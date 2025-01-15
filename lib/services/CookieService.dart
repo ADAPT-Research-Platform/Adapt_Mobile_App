@@ -1,7 +1,9 @@
+import 'package:adapt/services/session_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 
-import '../models/user.dart'; // For JSON encoding and decoding
+import '../models/user.dart';
+import '../utils/app_config.dart'; // For JSON encoding and decoding
 
 class CookieService {
   // Singleton instance for centralized access
@@ -58,5 +60,35 @@ class CookieService {
   Future<bool> hasUser() async {
     final user = await getUser();
     return user != null;
+  }
+
+  /// Verifies the cookie with the backend
+  Future<bool> verifyCookieWithBackend() async {
+    final cookie = await _secureStorage.read(key: 'session_cookie');
+
+    if (cookie == null || cookie.isEmpty) {
+      print('No cookie found or cookie is empty');
+      return false;
+    }
+
+    try {
+      final response = await SessionManager().client.get(
+        Uri.parse('${AppConfig.baseUrl}/api/auth/verify-cookie'),
+        headers: {
+          'Cookie': cookie.split('=')[1],
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Cookie is valid');
+        return true;
+      } else {
+        print('Cookie verification failed: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error verifying cookie with backend: $e');
+      return false;
+    }
   }
 }
