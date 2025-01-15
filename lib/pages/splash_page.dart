@@ -25,15 +25,16 @@ class _SplashPageState extends State<SplashPage>
   /// Check login status and navigate accordingly
   Future<void> _checkLoginStatus() async {
     final isLoggedIn = await CookieService().hasCookie();
+    final user = await CookieService().getUser();
 
     // Delay for splash screen visibility
     await Future.delayed(const Duration(seconds: 2));
 
     // Navigate to the appropriate page
-    if (isLoggedIn) {
+    if (isLoggedIn && user != null) {
       // Set cookie value to session manager
       SessionManager()
-          .setSessionInfo(cookie: await CookieService().getCookie());
+          .setSessionInfo(cookie: await CookieService().getCookie(), user: user);
       mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
     } else {
       mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);

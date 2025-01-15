@@ -83,21 +83,18 @@ class _OverviewPageState extends State<OverviewPage> {
                       ),
                       const SizedBox(height: 10),
                       // Feeling Selector Row
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildFeelingIcon(
-                                Icons.sentiment_satisfied_alt, 1, 'Happy'),
-                            _buildFeelingIcon(
-                                Icons.sentiment_dissatisfied, 2, 'Sad'),
-                            _buildFeelingIcon(
-                                Icons.sentiment_very_dissatisfied, 3, 'Angry'),
-                            _buildFeelingIcon(
-                                Icons.sentiment_neutral, 4, 'Tired'),
-                          ],
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildFeelingIcon(
+                              Icons.sentiment_satisfied_alt, 1, 'Happy'),
+                          _buildFeelingIcon(
+                              Icons.sentiment_dissatisfied, 2, 'Sad'),
+                          _buildFeelingIcon(
+                              Icons.sentiment_very_dissatisfied, 3, 'Angry'),
+                          _buildFeelingIcon(
+                              Icons.sentiment_neutral, 4, 'Tired'),
+                        ],
                       ),
                       const SizedBox(height: 20),
                       const Text(
@@ -108,7 +105,7 @@ class _OverviewPageState extends State<OverviewPage> {
                         ),
                       ),
                       StarSlider(
-                        sliderLength: 10,
+                        sliderLength: 5,
                         onChanged: (value) {
                           setState(() {
                             _selectedMotivation = value;

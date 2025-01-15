@@ -8,4 +8,22 @@ class User {
     required this.userName,
     required this.email,
   });
+
+  // Convert a User object to a JSON map
+  Map<String, String> toJson() {
+    return {
+      'userId': userId,
+      'userName': userName,
+      'email': email,
+    };
+  }
+
+  // Create a User object from a JSON map
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      userId: json['userId'],
+      userName: json['userName'],
+      email: json['email'],
+    );
+  }
 }
