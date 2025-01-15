@@ -7,7 +7,7 @@ class Routes {
   //Navigation Bar Routes (Nested)
   static const String routeOverview = 'route_overview';
   static const String routeDiary = 'route_diary';
-  static const String routeMode = 'route_mode';
+  static const String routeMood = 'route_mood';
   static const String routeContact = 'route_contact';
   static const String routeSettings = 'route_settings';
 

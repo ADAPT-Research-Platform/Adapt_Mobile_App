@@ -2,8 +2,8 @@ import 'package:adapt/widgets/main_title.dart';
 import 'package:adapt/widgets/sub_title.dart';
 import 'package:flutter/material.dart';
 
-import '../models/mode.dart';
-import '../services/mode_service.dart';
+import '../models/mood.dart';
+import '../services/mood_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/filter_options.dart';
@@ -18,7 +18,7 @@ class ModePage extends StatefulWidget {
 }
 
 class _ModePageState extends State<ModePage> {
-  final ModeService _modeService = ModeService();
+  final MoodService _modeService = MoodService();
 
   FilterOption? selectedOption; // Default option
   DateTime? startDate;
@@ -161,7 +161,7 @@ class _ModePageState extends State<ModePage> {
 
                 // Use a SingleChildScrollView here to allow children to expand within constraints
                 Expanded(
-                    child: FutureBuilder<List<Mode>>(
+                    child: FutureBuilder<List<Mood>>(
                       future: _modeService.fetchModeList(startDate: startDate, endDate: endDate),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {

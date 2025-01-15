@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../models/module.dart';
 import '../services/NotificationService.dart';
-import '../services/mode_service.dart';
+import '../services/mood_service.dart';
 import '../services/module_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
@@ -21,7 +21,7 @@ class OverviewPage extends StatefulWidget {
 
 class _OverviewPageState extends State<OverviewPage> {
   final ModuleService _moduleService = ModuleService();
-  final ModeService _modeService = ModeService();
+  final MoodService _modeService = MoodService();
 
   int _selectedFeeling = 0; // 0 for no selection, 1 for happy, 2 for sad, etc.
   int _selectedMotivation = 5;
