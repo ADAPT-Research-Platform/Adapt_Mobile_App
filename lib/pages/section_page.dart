@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:adapt/models/section.dart';
 import 'package:adapt/services/comment_service.dart';
@@ -34,32 +35,67 @@ class _SectionPageState extends State<SectionPage> {
 
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, String> _questions = {};
-  late final Map<String, String> _answers;
+  final Map<String, String> _answers = {};
 
-  double position = 0;
-
-  void _scroll(double offset) {
-    position = position + offset;
-
-    if (position < 0) {
-      position = 0;
-    } else if (position > _scrollController.position.maxScrollExtent) {
-      position = _scrollController.position.maxScrollExtent;
-    }
-
-    _scrollController.jumpTo(
-      position,
-    );
-  }
+  double maxScrollPixels = 0.0;
 
   void _submitAnswers() {
-    final Map<String, String> answers = {};
     for (var key in _questions.keys) {
-      answers[key] = _controllers[key]?.text ?? "";
+      _answers[key] = _controllers[key]?.text ?? "";
     }
 
-    _sectionService.addAnswer(widget.section.sectionId, answers);
-    print("Submitted Answers: ${jsonEncode(answers)}");
+    _sectionService.addAnswer(widget.section.sectionId, _answers);
+    print("Submitted Answers: ${jsonEncode(_answers)}");
+  }
+
+  void _updateMaxScrollPixels() {
+    //Memorize how much max he scrolled
+    double currentScroll = _scrollController.position.pixels;
+    maxScrollPixels = max(maxScrollPixels, currentScroll);
+  }
+
+  void _updateSectionProgress() {
+    // For exercises use different strategy. Percentage means how many questions have answered
+    if(widget.section.isExercise){
+      // Count total number of questions
+      int totalQuestions = _questions.length;
+
+      // Count the number of valid answers (non-null and non-empty)
+      int validAnswers = _answers.values.where((answer) => answer.isNotEmpty).length;
+
+      double exerciseProgress = (validAnswers / totalQuestions) * 100;
+      _sectionService.updateProgress(widget.section.sectionId, exerciseProgress);
+      return ;
+    }
+
+    // For reading section use different strategy. How much the user maximum scrolled so far
+    if (!_scrollController.hasClients) {
+      return;
+    }
+
+    final double maxScrollExtent = _scrollController.position.maxScrollExtent;
+    final double viewportHeight = _scrollController.position.viewportDimension;
+
+    // Total scrollable height includes the visible portion (viewportHeight)
+    final double totalContentHeight = maxScrollExtent + viewportHeight;
+
+    // Calculate percentage based on visible + scrolled content
+    final double visibleScrolledContent = maxScrollPixels + viewportHeight;
+    final double percentage = (visibleScrolledContent / totalContentHeight) * 100;
+
+    // Clamp percentage between 0 and 100
+    double readingProgress = percentage.clamp(0, 100);
+    if(readingProgress > widget.section.progress){
+      _sectionService.updateProgress(widget.section.sectionId, readingProgress);
+    }
+    return ;
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_updateMaxScrollPixels);
   }
 
   @override
@@ -67,6 +103,8 @@ class _SectionPageState extends State<SectionPage> {
     for (var controller in _controllers.values) {
       controller.dispose();
     }
+    _scrollController.dispose();
+    _commentTextController.dispose();
     super.dispose();
   }
 
@@ -77,6 +115,7 @@ class _SectionPageState extends State<SectionPage> {
             title: widget.section.sectionName,
             leadingIcon: Icons.arrow_back_ios,
             onIconPressed: () {
+              _updateSectionProgress();
               moduleNavigator.currentState!.pop(); //Go Backwards
             }),
         body: FutureBuilder<List<dynamic>>(
@@ -95,24 +134,31 @@ class _SectionPageState extends State<SectionPage> {
 
             // Extract data
             final String markdownContent = snapshot.data![0];
-            _answers = snapshot.data![1];
+            _answers.addAll(snapshot.data![1]);
 
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Column(
                   children: [
                     Expanded(
-                      child: SingleChildScrollView(
-                        //controller: _scrollController,
-                        child: MarkdownBody(
-                          data: markdownContent,
-                          blockSyntaxes: const [QuestionSyntax()],
-                          selectable: false,
-                          builders: <String, MarkdownElementBuilder>{
-                            'a': VideoViewerBuilder(),
-                            'img': ImageViewerBuilder(widget.section.folderPath),
-                            'question': QuestionViewerBuilder(_questions, _answers, _controllers),
-                          },
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        radius: const Radius.circular(10.0),
+                        thickness: 5,
+                        thumbVisibility: true,
+                        //trackVisibility: true,
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          child: MarkdownBody(
+                            data: markdownContent,
+                            blockSyntaxes: const [QuestionSyntax()],
+                            selectable: false,
+                            builders: <String, MarkdownElementBuilder>{
+                              'a': VideoViewerBuilder(),
+                              'img': ImageViewerBuilder(widget.section.folderPath),
+                              'question': QuestionViewerBuilder(_questions, _answers, _controllers),
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -121,11 +167,6 @@ class _SectionPageState extends State<SectionPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            IconButton(
-                              icon: const Icon(Icons.arrow_back_ios, color: AppColors.darkYellow, size: 25),
-                              // Static color
-                              onPressed: () => _scroll(-250),
-                            ),
                             Expanded(
                               child: TaskButton(
                                 text: 'Comment',
@@ -139,92 +180,93 @@ class _SectionPageState extends State<SectionPage> {
                                           top: Radius.circular(12.0)), // Adjust the top corners
                                     ),
                                     builder: (BuildContext context) {
-                                      return FutureBuilder<List<Comment>>(
-                                        future: _commentService.fetchComments(sectionId: widget.section.sectionId),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
-                                          } else if (snapshot.hasError) {
-                                            return const Center(child: Text("Error loading comments"));
-                                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                            return const Center(child: Text("No comments available"));
-                                          }
+                                      final maxHeight = 2 * MediaQuery.of(context).size.height / 3;
 
-                                          final List<Comment> comments = snapshot.data!;
-
-                                          return Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                        constraints: BoxConstraints(maxHeight: maxHeight), // Set minimum height
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                // Title with Close Button
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    const SizedBox(width: 24), // Placeholder to align the title center
-                                                    const Text(
-                                                      'Comments',
-                                                      style: TextStyle(
-                                                        color: AppColors.fontColor,
-                                                        fontSize: AppFontSizes.small,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      icon: const Icon(Icons.close),
-                                                      onPressed: () {
-                                                        Navigator.pop(context); // Close the bottom sheet
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(
-                                                  color: AppColors.lightGrey,
-                                                  // Customize the color as needed
-                                                  thickness: 2.5, // Customize the thickness as needed
-                                                ),
-                                                Flexible(
-                                                  // Use Expanded to allow ListView to take remaining space
-                                                  child: ListView.separated(
-                                                    shrinkWrap: true,
-                                                    itemCount: comments.length,
-                                                    itemBuilder: (context, index) {
-                                                      return CommentCard(comment: comments[index]);
-                                                    },
-                                                    separatorBuilder: (context, index) {
-                                                      return const Divider(
-                                                        color: AppColors.lightGrey,
-                                                        thickness: 2.5,
-                                                      );
-                                                    },
+                                                const SizedBox(width: 24), // Placeholder to align the title center
+                                                const Text(
+                                                  'Comments',
+                                                  style: TextStyle(
+                                                    color: AppColors.fontColor,
+                                                    fontSize: AppFontSizes.small,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: TextField(
-                                                        controller: _commentTextController, // Add a controller to get the text input
-                                                        maxLines: null, // Makes the TextField multiline
-                                                        decoration: InputDecoration(
-                                                          labelText: 'Write a comment...',
-                                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      icon: const Icon(Icons.send_rounded, color: AppColors.darkYellow, size: 25),
-                                                      onPressed: () {
-                                                        _commentService.addComment(_commentTextController.text.trim(), widget.section.sectionId);
-                                                        _commentTextController.clear();
-                                                        Navigator.pop(context); // Close the bottom sheet
-                                                      },
-                                                    ),
-                                                  ],
+                                                IconButton(
+                                                  icon: const Icon(Icons.close),
+                                                  onPressed: () {
+                                                    Navigator.pop(context); // Close the bottom sheet
+                                                  },
                                                 ),
                                               ],
                                             ),
-                                          );
-                                        },
+                                            const Divider(
+                                              color: AppColors.lightGrey,
+                                              // Customize the color as needed
+                                              thickness: 2.5, // Customize the thickness as needed
+                                            ),
+                                            Expanded( // Use Expanded here
+                                              child: FutureBuilder<List<Comment>>(
+                                                  future: _commentService.fetchComments(sectionId: widget.section.sectionId),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                                      return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+                                                    } else if (snapshot.hasError) {
+                                                      return const Center(child: Text("Error loading comments"));
+                                                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                                      return const Center(child: Text("No comments available"));
+                                                    }
+
+                                                    final List<Comment> comments = snapshot.data!;
+
+                                                    return ListView.separated(
+                                                          shrinkWrap: true,
+                                                          itemCount: comments.length,
+                                                          itemBuilder: (context, index) {
+                                                            return CommentCard(comment: comments[index]);
+                                                          },
+                                                          separatorBuilder: (context, index) {
+                                                            return const Divider(
+                                                              color: AppColors.lightGrey,
+                                                              thickness: 2.5,
+                                                            );
+                                                          },
+                                                    );
+                                                  },
+                                            ),
+                                        ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller: _commentTextController, // Add a controller to get the text input
+                                                    maxLines: null, // Makes the TextField multiline
+                                                    decoration: InputDecoration(
+                                                      labelText: 'Write a comment...',
+                                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
+                                                    ),
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(Icons.send_rounded, color: AppColors.darkYellow, size: 25),
+                                                  onPressed: () {
+                                                    _commentService.addComment(_commentTextController.text.trim(), widget.section.sectionId);
+                                                    _commentTextController.clear();
+                                                    Navigator.pop(context); // Close the bottom sheet
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       );
                                     },
                                   );
@@ -239,15 +281,7 @@ class _SectionPageState extends State<SectionPage> {
                                   text: 'Submit',
                                   onPressed: _submitAnswers,
                                 )
-                              ),
-                            IconButton(
-                              icon: const Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: AppColors.darkYellow, size: 25
-                              ),
-                              // Static color
-                              onPressed: () => _scroll(250),
-                            ),
+                              )
                           ],
                         ))
                   ],

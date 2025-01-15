@@ -105,6 +105,7 @@ class _ChapterPageState extends State<ChapterPage> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 8),
                       // Chapter Title
                       SubTitle(text: 'Chapter ${chapterIndex + 1}' ),
                       const SizedBox(height: 8),
@@ -130,7 +131,39 @@ class _ChapterPageState extends State<ChapterPage> {
                           );
                         },
                       ),
-
+                      // Progress and Answers Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.access_time_filled, color: AppColors.darkYellow),
+                              const SizedBox(width: 4),
+                              Text(
+                                "${chapter.progress.round()}% Progress",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.fontColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(width: 8),
+                          const Row(
+                            children: [
+                              Icon(Icons.list_alt_outlined, color: AppColors.darkYellow),
+                              SizedBox(width: 4),
+                              Text(
+                                "0 Comments",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.fontColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                       // Divider after each chapter
                       const Divider(
                         color: AppColors.lightGrey,

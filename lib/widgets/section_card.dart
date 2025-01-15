@@ -44,7 +44,7 @@ class SectionCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "${DateTime.now().difference(section.timeStamp).inDays} Days Ago",
+                  timeAgo(section.timeStamp),
                   style: const TextStyle(
                     fontSize: AppFontSizes.mini,
                     color: AppColors.fontColor,
@@ -53,7 +53,6 @@ class SectionCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-
             Text(
               section.title,
               style: const TextStyle(
@@ -65,5 +64,19 @@ class SectionCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String timeAgo(DateTime timestamp) {
+    final duration = DateTime.now().difference(timestamp);
+
+    if (duration.inDays >= 1) {
+      return "${duration.inDays} Days Ago";
+    } else if (duration.inHours >= 1) {
+      return "${duration.inHours} Hrs Ago";
+    } else if (duration.inMinutes >= 1) {
+      return "${duration.inMinutes} Min Ago";
+    } else {
+      return "${duration.inSeconds} Sec Ago";
+    }
   }
 }

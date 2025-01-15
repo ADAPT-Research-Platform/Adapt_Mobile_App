@@ -92,4 +92,31 @@ class SectionService {
       rethrow; // Optionally rethrow to let the caller handle it
     }
   }
+
+  void updateProgress(String sectionId, double progress) async {
+    const url = '${AppConfig.baseUrl}/api/progress';
+
+    try {
+      final response = await SessionManager().client.post(
+        Uri.parse(url),
+        headers: SessionManager().getHeaders(),
+        body: jsonEncode({
+          'sectionId': sectionId,
+          'progress': progress,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Progress updated successfully! Section: $sectionId Progress: $progress');
+      }else if (response.statusCode == 201) {
+        print('Progress added successfully! Section: $sectionId Progress: $progress');
+      } else if (response.statusCode == 400) {
+        print('Bad Request: ${response.body}');
+      } else {
+        print('Progress updating failed: ${response.statusCode}, ${response.body}');
+      }
+    } catch (e) {
+      print('Error during updating Progress: $e');
+    }
+  }
 }
