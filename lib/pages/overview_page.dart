@@ -4,7 +4,7 @@ import 'package:adapt/widgets/task_button.dart';
 import 'package:flutter/material.dart';
 
 import '../models/module.dart';
-import '../services/NotificationService.dart';
+import '../services/notification_service.dart';
 import '../services/mood_service.dart';
 import '../services/module_service.dart';
 import '../utils/app_colors.dart';

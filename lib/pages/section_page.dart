@@ -34,7 +34,7 @@ class _SectionPageState extends State<SectionPage> {
 
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, String> _questions = {};
-  final Map<String, String> _answers = {};
+  late final Map<String, String> _answers;
 
   double position = 0;
 
@@ -57,6 +57,8 @@ class _SectionPageState extends State<SectionPage> {
     for (var key in _questions.keys) {
       answers[key] = _controllers[key]?.text ?? "";
     }
+
+    _sectionService.addAnswer(widget.section.sectionId, answers);
     print("Submitted Answers: ${jsonEncode(answers)}");
   }
 
@@ -77,8 +79,11 @@ class _SectionPageState extends State<SectionPage> {
             onIconPressed: () {
               moduleNavigator.currentState!.pop(); //Go Backwards
             }),
-        body: FutureBuilder<String>(
-          future: _sectionService.fetchSectionContent(widget.section.folderPath),
+        body: FutureBuilder<List<dynamic>>(
+          future: Future.wait([
+            _sectionService.fetchSectionContent(widget.section.folderPath),
+            _sectionService.fetchAnswer(widget.section.sectionId),
+          ]),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
@@ -88,7 +93,9 @@ class _SectionPageState extends State<SectionPage> {
               return const Center(child: Text("No content available"));
             }
 
-            final markdownContent = snapshot.data!;
+            // Extract data
+            final String markdownContent = snapshot.data![0];
+            _answers = snapshot.data![1];
 
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
