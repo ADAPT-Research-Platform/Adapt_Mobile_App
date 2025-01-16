@@ -10,7 +10,7 @@ class CommentService {
   void addComment(String text, String sectionId) async {
     try {
       final response = await SessionManager().client.post(
-        Uri.parse('${AppConfig.baseUrl}/api/comments'),
+        Uri.parse('${AppConfig.baseUrl}/comments'),
         headers: SessionManager().getHeaders(),
         body: jsonEncode({
           'text': text,
@@ -35,7 +35,7 @@ class CommentService {
   void addReply(String text, String parentCommentId) async {
     try {
       final response = await SessionManager().client.post(
-        Uri.parse('${AppConfig.baseUrl}/api/comments/reply'),
+        Uri.parse('${AppConfig.baseUrl}/comments/reply'),
         headers: SessionManager().getHeaders(),
         body: jsonEncode({
           'text': text,
@@ -70,7 +70,7 @@ class CommentService {
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/api/comments').replace(queryParameters: queryParams),
+        Uri.parse('${AppConfig.baseUrl}/comments').replace(queryParameters: queryParams),
         headers: SessionManager().getHeaders(),
       );
 

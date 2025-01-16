@@ -11,10 +11,7 @@ import '../utils/app_routes.dart';
 import 'CookieService.dart';
 
 class AuthService {
-  void register(String userName, String email, String password,
-      String passwordConfirm) async {
-    final url = '${AppConfig.baseUrl}/api/users';
-
+  void register(String userName, String email, String password, String passwordConfirm) async {
     // Validate passwords
     if (password != passwordConfirm) {
       print('Passwords do not match.');
@@ -23,7 +20,7 @@ class AuthService {
 
     try {
       final response = await SessionManager().client.post(
-            Uri.parse(url),
+            Uri.parse('${AppConfig.baseUrl}/users'),
             headers: SessionManager().getHeaders(),
             body: jsonEncode({
               'username': userName,
@@ -54,11 +51,9 @@ class AuthService {
   }
 
   void login(String email, String password) async {
-    const url = '${AppConfig.baseUrl}/api/auth/login';
-
     try {
       final response = await SessionManager().client.post(
-            Uri.parse(url),
+            Uri.parse('${AppConfig.baseUrl}/auth/login'),
             headers: SessionManager().getHeaders(),
             body: jsonEncode({
               'login': email,
@@ -98,10 +93,8 @@ class AuthService {
   }
 
   void logout() async {
-    const url = '${AppConfig.baseUrl}/api/auth/logout';
-
     final response = await SessionManager().client.post(
-          Uri.parse(url),
+          Uri.parse('${AppConfig.baseUrl}/auth/logout'),
           headers: SessionManager().getHeaders(),
         );
 
@@ -121,11 +114,9 @@ class AuthService {
 
   // Call the get user API
   Future<User?> getUser() async {
-    const url = '${AppConfig.baseUrl}/api/users/me';
-
     try {
       final response = await SessionManager().client.get(
-        Uri.parse(url),
+        Uri.parse('${AppConfig.baseUrl}/users/me'),
         headers: SessionManager().getHeaders(),
       );
 

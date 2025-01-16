@@ -14,7 +14,7 @@ class ModuleService {
   Future<List<String>> fetchModuleIdList() async {
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/api/modules/ids'),
+        Uri.parse('${AppConfig.baseUrl}/modules/ids'),
         headers: SessionManager().getHeaders(),
       );
 
@@ -39,7 +39,7 @@ class ModuleService {
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/api/modules').replace(queryParameters: queryParams),
+        Uri.parse('${AppConfig.baseUrl}/modules').replace(queryParameters: queryParams),
         headers: SessionManager().getHeaders(),
       );
 

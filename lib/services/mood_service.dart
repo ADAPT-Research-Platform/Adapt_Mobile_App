@@ -8,11 +8,9 @@ import '../utils/app_config.dart';
 class MoodService {
 
   void saveMode(int feeling, int motivation) async {
-    const url = '${AppConfig.baseUrl}/api/moods';
-
     try {
       final response = await SessionManager().client.post(
-        Uri.parse(url),
+        Uri.parse('${AppConfig.baseUrl}/moods'),
         headers: SessionManager().getHeaders(),
         body: jsonEncode({
           'feeling': feeling,
@@ -44,7 +42,7 @@ class MoodService {
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/api/moods').replace(queryParameters: queryParams),
+        Uri.parse('${AppConfig.baseUrl}/moods').replace(queryParameters: queryParams),
         headers: SessionManager().getHeaders(),
       );
 

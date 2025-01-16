@@ -73,7 +73,7 @@ class CookieService {
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/api/auth/verify-cookie'),
+        Uri.parse('${AppConfig.baseUrl}/auth/verify-cookie'),
         headers: {
           'Cookie': cookie.split('=')[1],
         },

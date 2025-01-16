@@ -7,7 +7,7 @@ import '../utils/app_config.dart';
 class SectionService {
 
   Future<String> fetchSectionContent(String sectionFolderPath) async {
-    final String url = '${AppConfig.baseUrl}/app/uploads/$sectionFolderPath/content.md';
+    final String url = '${AppConfig.baseUrl}/uploads/$sectionFolderPath/content.md';
 
     try {
       final response = await SessionManager().client.get(
@@ -30,7 +30,7 @@ class SectionService {
   void addAnswer(String sectionId, Map<String, String> answers) async {
     try {
       final response = await SessionManager().client.post(
-        Uri.parse('${AppConfig.baseUrl}/api/answers'),
+        Uri.parse('${AppConfig.baseUrl}/answers'),
         headers: SessionManager().getHeaders(),
         body: jsonEncode({
           'sectionId': sectionId,
@@ -59,7 +59,7 @@ class SectionService {
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/api/answers').replace(queryParameters: queryParams),
+        Uri.parse('${AppConfig.baseUrl}/answers').replace(queryParameters: queryParams),
         headers: SessionManager().getHeaders(),
       );
 
@@ -94,7 +94,7 @@ class SectionService {
   }
 
   void updateProgress(String sectionId, double progress) async {
-    const url = '${AppConfig.baseUrl}/api/progress';
+    const url = '${AppConfig.baseUrl}/progress';
 
     try {
       final response = await SessionManager().client.post(
