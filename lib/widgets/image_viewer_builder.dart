@@ -14,7 +14,7 @@ class ImageViewerBuilder extends MarkdownElementBuilder {
     // Check if the element is an image
     if (element.attributes['src'] != null) {
       final imageName = element.attributes['src'];
-      final imageUrl = '${AppConfig.baseUrl}/uploads/$sectionFolderPath/$imageName';
+      final imageUrl = 'http://${AppConfig.serverIp}:${AppConfig.port}/app/uploads/$sectionFolderPath/$imageName';
 
       // Return an image widget with the updated URL
       return Image.network(

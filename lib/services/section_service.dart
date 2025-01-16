@@ -7,7 +7,7 @@ import '../utils/app_config.dart';
 class SectionService {
 
   Future<String> fetchSectionContent(String sectionFolderPath) async {
-    final String url = '${AppConfig.baseUrl}/uploads/$sectionFolderPath/content.md';
+    final String url = 'http://${AppConfig.serverIp}:${AppConfig.port}/app/uploads/$sectionFolderPath/content.md';
 
     try {
       final response = await SessionManager().client.get(

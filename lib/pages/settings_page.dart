@@ -19,9 +19,9 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final AuthService _authService = AuthService();
 
-  final TextEditingController _displayNameController = TextEditingController();
-  final TextEditingController _userEmailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
 
   // State variables for the appearance section
   String _selectedLanguage = 'German'; // Default selected language
@@ -33,18 +33,18 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   void dispose() {
-    _displayNameController.dispose();
-    _userEmailController.dispose();
-    _passwordController.dispose();
+    _userNameController.dispose();
+    _oldPasswordController.dispose();
+    _newPasswordController.dispose();
     super.dispose();
   }
 
   void _saveData() async {
-    String displayName = _displayNameController.text.trim();
-    String userEmail = _userEmailController.text.trim();
-    String password = _passwordController.text.trim();
+    String userName = _userNameController.text.trim();
+    String oldPassword = _oldPasswordController.text.trim();
+    String newPassword = _newPasswordController.text.trim();
 
-    print('Account Data: $displayName, $userEmail, $password');
+    print('Account Data: $userName, $oldPassword, $newPassword');
   }
 
   @override
@@ -58,7 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SubTitle(text: 'Account'),
                 const SizedBox(height: 10),
                 const Text(
-                  'User Code',
+                  'User Name',
                   style: TextStyle(
                     color: AppColors.fontColor,
                     fontSize: AppFontSizes.small,
@@ -66,24 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 TextField(
-                  decoration: InputDecoration(
-                    labelText: SessionManager().sessionUser?.userName.toString(),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Display Name',
-                  style: TextStyle(
-                    color: AppColors.fontColor,
-                    fontSize: AppFontSizes.small,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextField(
-                  controller: _displayNameController,
+                  controller: _userNameController,
                   decoration: InputDecoration(
                     labelText: SessionManager().sessionUser?.userName,
                     border: OutlineInputBorder(
@@ -101,7 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 TextField(
-                  controller: _userEmailController,
+                  enabled: false,
                   decoration: InputDecoration(
                     labelText: SessionManager().sessionUser?.email,
                     border: OutlineInputBorder(
@@ -111,11 +94,37 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Password',
+                  'Old Password',
                   style: TextStyle(
                     color: AppColors.fontColor,
                     fontSize: AppFontSizes.small,
                     fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextField(
+                  controller: _oldPasswordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                  ),
+                ),
+                const Text(
+                  'New Password',
+                  style: TextStyle(
+                    color: AppColors.fontColor,
+                    fontSize: AppFontSizes.small,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextField(
+                  controller: _newPasswordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 15),
@@ -124,9 +133,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Expanded(
                       child: TaskButton(
-                        text: 'Save',
+                        text: 'Update',
                         onPressed: _saveData,
-                        icon: Icons.save_rounded,
+                        icon: Icons.update_rounded,
                       ),
                     ),
                     const SizedBox(width: 15),

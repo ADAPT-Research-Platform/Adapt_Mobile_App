@@ -98,7 +98,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     TextField(
                       controller: _displayNameController,
                       decoration: InputDecoration(
-                        labelText: 'Display Name',
+                        labelText: 'User Name',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6.0),
                         ),

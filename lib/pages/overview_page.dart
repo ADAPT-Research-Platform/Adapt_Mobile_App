@@ -25,12 +25,20 @@ class _OverviewPageState extends State<OverviewPage> {
   int _selectedFeeling = 0; // 0 for no selection, 1 for happy, 2 for sad, etc.
   int _selectedMotivation = 5;
 
+  late Future<List<String>> _modulesIdFuture; // Declare the Future
+
+  @override
+  void initState() {
+    super.initState();
+    _modulesIdFuture = _moduleService.fetchModuleIdList(); // Initialize the Future
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const MainTitle(title: 'Overview'),
       body: FutureBuilder<List<String>>(
-        future: _moduleService.fetchModuleIdList(),
+        future: _modulesIdFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));

@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                       TextField(
                         controller: _userEmailController,
                         decoration: InputDecoration(
-                          labelText: 'Email Address',
+                          labelText: 'Username or Email',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
@@ -146,12 +146,12 @@ class _LoginPageState extends State<LoginPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Don't have an account? "),
+                          const Text("Don't have an account? "),
                           TextButton(
                             onPressed: (){
                               mainNavigator.currentState!.pushReplacementNamed(Routes.routeSignUp);
                             },
-                            child: Text('Register'),
+                            child: const Text('Register'),
                           ),
                         ],
                       ),
