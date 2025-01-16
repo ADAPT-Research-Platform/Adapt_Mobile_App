@@ -1,9 +1,8 @@
 import 'package:adapt/pages/overview_page.dart';
 import 'package:adapt/pages/splash_page.dart';
-import 'package:adapt/services/notification_service.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter/services.dart';
 
 import '../../pages/login_page.dart';
 import '../../pages/main_page.dart';
@@ -12,9 +11,13 @@ import '../../utils/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService.init();
-  tz.initializeTimeZones();
-  runApp(const MyApp());
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown, // Optional if you want only `portraitUp`
+  ]).then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
