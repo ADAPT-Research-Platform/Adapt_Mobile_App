@@ -53,7 +53,7 @@ class VideoThumbnail extends StatelessWidget {
             ),
           ),
         ),
-        const Icon(Icons.play_circle_outline, size: 60, color: AppColors.white),
+        const Icon(Icons.play_circle_outline_rounded, size: 60, color: AppColors.white),
       ],
     );
   }

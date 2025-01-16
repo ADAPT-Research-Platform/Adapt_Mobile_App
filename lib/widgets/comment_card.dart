@@ -114,7 +114,7 @@ class _CommentCardState extends State<CommentCard> {
                                         ),
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.close),
+                                        icon: const Icon(Icons.close_rounded),
                                         onPressed: () {
                                           Navigator.pop(context); // Close the bottom sheet
                                         },

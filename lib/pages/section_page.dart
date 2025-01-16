@@ -113,7 +113,7 @@ class _SectionPageState extends State<SectionPage> {
     return Scaffold(
         appBar: MainTitle(
             title: widget.section.sectionName,
-            leadingIcon: Icons.arrow_back_ios,
+            leadingIcon: Icons.arrow_back_ios_rounded,
             onIconPressed: () {
               _updateSectionProgress();
               moduleNavigator.currentState!.pop(); //Go Backwards
@@ -170,6 +170,7 @@ class _SectionPageState extends State<SectionPage> {
                             Expanded(
                               child: TaskButton(
                                 text: 'Comment',
+                                icon: Icons.comment_rounded,
                                 onPressed: () {
                                   showModalBottomSheet(
                                     useSafeArea: true,
@@ -201,7 +202,7 @@ class _SectionPageState extends State<SectionPage> {
                                                   ),
                                                 ),
                                                 IconButton(
-                                                  icon: const Icon(Icons.close),
+                                                  icon: const Icon(Icons.close_rounded),
                                                   onPressed: () {
                                                     Navigator.pop(context); // Close the bottom sheet
                                                   },
@@ -280,6 +281,8 @@ class _SectionPageState extends State<SectionPage> {
                                 child: TaskButton(
                                   text: 'Submit',
                                   onPressed: _submitAnswers,
+                                  backgroundColor: AppColors.darkYellow,
+                                  icon: Icons.question_answer_rounded,
                                 )
                               )
                           ],

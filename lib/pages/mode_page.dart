@@ -62,7 +62,7 @@ class _ModePageState extends State<ModePage> {
                         fontSize: AppFontSizes.small
                     )),
                     IconButton(
-                      icon: const Icon(Icons.access_time, color: AppColors.darkYellow, size: 35), // Static color
+                      icon: const Icon(Icons.access_time_filled_rounded, color: AppColors.darkYellow, size: 35), // Static color
                         onPressed: () {
                           showModalBottomSheet(
                             useSafeArea: true,
@@ -92,7 +92,7 @@ class _ModePageState extends State<ModePage> {
                                               ),
                                             ),
                                             IconButton(
-                                              icon: const Icon(Icons.close),
+                                              icon: const Icon(Icons.close_rounded),
                                               onPressed: () {
                                                 Navigator.pop(context); // Close the bottom sheet
                                               },

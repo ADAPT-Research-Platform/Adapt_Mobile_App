@@ -126,7 +126,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: TaskButton(
                         text: 'Save',
                         onPressed: _saveData,
-                        icon: Icons.save,
+                        icon: Icons.save_rounded,
                       ),
                     ),
                     const SizedBox(width: 15),
@@ -137,7 +137,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           // Delete action
                         },
                         backgroundColor: AppColors.darkYellow,
-                        icon: Icons.delete,
+                        icon: Icons.delete_rounded,
                       ),
                     ),
                   ],
@@ -185,7 +185,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     onPressed: () {
                       _authService.logout();
                     },
-                  icon: Icons.logout,
+                  icon: Icons.logout_rounded,
                 ),
                 const SizedBox(height: 15),
               ],

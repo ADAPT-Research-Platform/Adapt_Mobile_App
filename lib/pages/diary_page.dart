@@ -61,8 +61,8 @@ class _DiaryPage extends State<DiaryPage> {
                     formatButtonVisible: false, // Hide the "2 weeks" button
                     titleCentered: true, // Center the header text
                     headerPadding: EdgeInsets.symmetric(vertical: 0.0),
-                    leftChevronIcon: Icon(Icons.chevron_left, color: AppColors.darkYellow, size: 32),
-                    rightChevronIcon: Icon(Icons.chevron_right, color: AppColors.darkYellow, size: 32),
+                    leftChevronIcon: Icon(Icons.arrow_back_ios_rounded, color: AppColors.darkYellow, size: 32),
+                    rightChevronIcon: Icon(Icons.arrow_forward_ios_rounded, color: AppColors.darkYellow, size: 32),
                     titleTextStyle: TextStyle(
                       color: AppColors.darkYellow, // Static text color
                       fontSize: AppFontSizes.medium, // Static font size

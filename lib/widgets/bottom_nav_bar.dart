@@ -44,23 +44,23 @@ class _AppNavigationBar extends State<BottomNavBar> {
         selectedIndex: currentPageIndex,
         destinations: <Widget>[
           NavigationDestination(
-            selectedIcon: _buildHexagonButton(Icons.home, true),
-            icon: _buildHexagonButton(Icons.home, false),
+            selectedIcon: _buildHexagonButton(Icons.home_rounded, true),
+            icon: _buildHexagonButton(Icons.home_rounded, false),
             label: 'Overview',
           ),
           NavigationDestination(
-            selectedIcon: _buildHexagonButton(Icons.book, true),
-            icon: _buildHexagonButton(Icons.book, false),
+            selectedIcon: _buildHexagonButton(Icons.book_rounded, true),
+            icon: _buildHexagonButton(Icons.book_rounded, false),
             label: 'Diary',
           ),
           NavigationDestination(
-            selectedIcon: _buildHexagonButton(Icons.area_chart_rounded, true),
-            icon: _buildHexagonButton(Icons.area_chart_rounded, false),
+            selectedIcon: _buildHexagonButton(Icons.emoji_emotions, true),
+            icon: _buildHexagonButton(Icons.emoji_emotions, false),
             label: 'Mood',
           ),
           NavigationDestination(
-            selectedIcon: _buildHexagonButton(Icons.contacts, true),
-            icon: _buildHexagonButton(Icons.contacts, false),
+            selectedIcon: _buildHexagonButton(Icons.account_box_rounded, true),
+            icon: _buildHexagonButton(Icons.account_box_rounded, false),
             label: 'Contacts',
           ),
           NavigationDestination(

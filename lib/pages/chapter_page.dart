@@ -28,7 +28,7 @@ class _ChapterPageState extends State<ChapterPage> {
     return Scaffold(
       appBar: MainTitle(
         title: 'Module ${widget.moduleId}',
-        leadingIcon: Icons.arrow_back_ios,
+        leadingIcon: Icons.arrow_back_ios_rounded,
         onIconPressed: () {
           moduleNavigator.currentState!.pop(); // Go Backwards
         },
@@ -152,7 +152,7 @@ class _ChapterPageState extends State<ChapterPage> {
                                 children: [
                                   Row(
                                     children: [
-                                      const Icon(Icons.access_time_filled, color: AppColors.darkYellow),
+                                      const Icon(Icons.access_time_filled_rounded, color: AppColors.darkYellow),
                                       const SizedBox(width: 4),
                                       Text(
                                         "${chapter.progress.round()}% Progress",
@@ -166,7 +166,7 @@ class _ChapterPageState extends State<ChapterPage> {
                                   const SizedBox(width: 8),
                                   Row(
                                     children: [
-                                      const Icon(Icons.list_alt_outlined, color: AppColors.darkYellow),
+                                      const Icon(Icons.list_alt_rounded, color: AppColors.darkYellow),
                                       const SizedBox(width: 4),
                                       Text(
                                         "${chapter.numOfComments} Comments",
