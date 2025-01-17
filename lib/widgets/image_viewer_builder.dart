@@ -21,6 +21,7 @@ class ImageViewerBuilder extends MarkdownElementBuilder {
         imageUrl,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
+          print('Image loading error: $error URL: $imageUrl');
           return const Icon(Icons.broken_image_rounded);
         },
       );

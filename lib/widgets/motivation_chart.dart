@@ -25,7 +25,7 @@ class MotivationChart extends StatelessWidget {
               data.motivation.toDouble(),
             )).toList(),
             isCurved: true,
-            barWidth: 3,
+            barWidth: 2,
             color: AppColors.primaryYellow,
             dotData: const FlDotData(show: false),
           ),

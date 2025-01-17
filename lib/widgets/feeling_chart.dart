@@ -58,7 +58,7 @@ class FeelingChart extends StatelessWidget {
               BarChartRodData(
                 toY: data.feeling.toDouble(),
                 color: AppColors.primaryYellow,
-                width: 5,
+                width: 2,
                 borderRadius: BorderRadius.circular(6),
               ),
             ],
