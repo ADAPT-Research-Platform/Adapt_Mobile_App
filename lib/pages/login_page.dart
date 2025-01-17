@@ -122,16 +122,6 @@ class _LoginPageState extends State<LoginPage> {
                           child: const Text('Forgot Password?'),
                         ),
                       ),
-                      Row(
-                        children: [
-                          Checkbox(value: false, onChanged: (value) {}),
-                          const Expanded(
-                            child: Text(
-                              'I agree to the data protection regulations and would like to continue to participate.',
-                            ),
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 20),
                       TaskButton(
                           text: 'Login',

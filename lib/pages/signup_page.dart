@@ -1,6 +1,7 @@
 import 'package:adapt/services/auth_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/hexagon_grid.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../utils/app_font_sizes.dart';
@@ -17,12 +18,12 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final AuthService _authService = AuthService();
+  bool _isChecked = false;
 
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfirmController =
-      TextEditingController();
+  final TextEditingController _passwordConfirmController = TextEditingController();
 
   @override
   void dispose() {
@@ -140,12 +141,31 @@ class _SignUpPageState extends State<SignUpPage> {
                     Row(
                       children: [
                         Checkbox(
-                          value: false,
-                          onChanged: (value) {},
+                          value: _isChecked,
+                          onChanged: (value) {
+                            setState(() {
+                              _isChecked = value!;
+                            });
+                          },
                         ),
-                        const Expanded(
-                          child: Text(
-                            'I agree to the data protection regulations and would like to continue to participate.',
+                        Expanded(
+                          child: Text.rich(
+                            TextSpan(
+                              text: 'I agree to the data protection regulations and would like to continue to participate. ',
+                              children: [
+                                TextSpan(
+                                  text: 'Here.',
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      mainNavigator.currentState!.pushNamed(Routes.routeConsent);
+                                    },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -153,7 +173,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(height: 20),
                     TaskButton(
                       text: 'Register',
-                      onPressed: _register,
+                      onPressed: _isChecked ? _register : null,
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -162,8 +182,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         const Text("Already have an account?"),
                         TextButton(
                           onPressed: () {
-                            mainNavigator.currentState!
-                                .pushReplacementNamed(Routes.routeLogin);
+                            mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
                           },
                           child: const Text('Login'),
                         ),
