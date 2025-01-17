@@ -46,7 +46,8 @@ class AuthService {
           print('No cookies found in the response.');
         }
       } else {
-        print('Login failed: ${response.statusCode}');
+        print('Login failed: ${response.statusCode}: ${response.body}');
+        SnackBarShower.info(loginPageScaffold, 'Login successful');
       }
     } catch (e) {
       print('Error during login: $e');

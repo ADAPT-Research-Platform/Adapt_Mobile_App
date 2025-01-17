@@ -62,7 +62,7 @@ class UserService {
     }
   }
 
-  void updateUser(String userName, String currentPassword, String newPassword) async {
+  void updateUser(String userName, String currentPassword, String newPassword, String confirmNewPassword) async {
     if(currentPassword.isEmpty){
       SnackBarShower.warn(signupPageScaffold, 'Current password cannot be empty!');
       return;
@@ -75,6 +75,12 @@ class UserService {
 
     if(userName == SessionManager().sessionUser!.userName && newPassword.isEmpty){
       SnackBarShower.warn(signupPageScaffold, 'Nothing to update!');
+      return;
+    }
+
+    // Validate passwords
+    if (newPassword != confirmNewPassword) {
+      SnackBarShower.warn(signupPageScaffold, 'New Passwords don\'t match!');
       return;
     }
 
