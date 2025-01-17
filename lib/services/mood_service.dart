@@ -11,6 +11,11 @@ class MoodService {
   static const int maxMotivation = 10;
 
   void saveMode(Feeling feeling, int motivation) async {
+    if(motivation < 0 || motivation > maxMotivation){
+      print('Invalid motivation value');
+      return;
+    }
+
     try {
       final response = await SessionManager().client.post(
         Uri.parse('${AppConfig.baseUrl}/moods'),
@@ -52,7 +57,7 @@ class MoodService {
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         print("Mode Data Loaded");
-        return data.map<Mood>((item) => parseMode(item)).toList();
+        return data.map<Mood>((item) => Mood.parse(item)).toList();
       } else {
         print('Failed to fetch mood list: ${response.statusCode}, ${response.body}');
         return [];
@@ -61,21 +66,5 @@ class MoodService {
       print('Error during fetching mood list: $e');
       return [];
     }
-  }
-
-  Mood parseMode(String data) {
-    // Split the string using the '|' delimiter
-    final parts = data.split('|');
-
-    // Parse the components
-    final timeStamp = DateTime.parse(parts[0]); // Parse the timestamp
-    final feeling = int.parse(parts[1]); // Parse the feeling
-    final motivation = int.parse(parts[2]); // Parse the motivation
-
-    return Mood(
-      timeStamp: timeStamp,
-      feeling: feeling,
-      motivation: motivation,
-    );
   }
 }

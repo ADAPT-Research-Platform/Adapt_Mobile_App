@@ -10,6 +10,6 @@ final GlobalKey<NavigatorState> moduleNavigator = GlobalKey<NavigatorState>(debu
 //Scaffold State Keys
 final GlobalKey<ScaffoldMessengerState> loginPageScaffold = GlobalKey<ScaffoldMessengerState>(debugLabel: "login");
 
-final GlobalKey<ScaffoldMessengerState> registerPageScaffold = GlobalKey<ScaffoldMessengerState>(debugLabel: "register");
+final GlobalKey<ScaffoldMessengerState> signupPageScaffold = GlobalKey<ScaffoldMessengerState>(debugLabel: "register");
 
 final GlobalKey<ScaffoldMessengerState> mainPageScaffold = GlobalKey<ScaffoldMessengerState>(debugLabel: "main");

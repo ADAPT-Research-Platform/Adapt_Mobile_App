@@ -8,6 +8,7 @@ import '../utils/app_config.dart';
 class CommentService {
 
   void addComment(String text, String sectionId) async {
+
     try {
       final response = await SessionManager().client.post(
         Uri.parse('${AppConfig.baseUrl}/comments'),
@@ -76,7 +77,7 @@ class CommentService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => parseComment(json)).toList();
+        return data.map((json) => Comment.parse(json)).toList();
       } else {
         // Log and throw exception for failed response
         final errorMessage = "Failed to fetch comments: "
@@ -90,17 +91,5 @@ class CommentService {
       print("Error fetching comments: $e\n$stackTrace");
       rethrow; // Optionally rethrow to let the caller handle it
     }
-  }
-
-  Comment parseComment(Map<String, dynamic> json) {
-    return Comment(
-      commentId: json['id'].toString(),
-      commentUserName: json['commentUserName'],
-      timeStamp: DateTime.parse(json['createdAt']),
-      text: json['text'] ?? '',
-      comments: (json['replies'] as List<dynamic>)
-          .map((chapterJson) => parseComment(chapterJson))
-          .toList(),
-    );
   }
 }

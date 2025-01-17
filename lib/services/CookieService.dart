@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:adapt/services/session_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:convert';
 
 import '../models/user.dart';
 import '../utils/app_config.dart'; // For JSON encoding and decoding
@@ -46,7 +47,7 @@ class CookieService {
     final userJson = await _secureStorage.read(key: 'user_details');
     if (userJson != null) {
       final Map<String, dynamic> userMap = jsonDecode(userJson);
-      return User.fromJson(userMap);
+      return User.parse(userMap);
     }
     return null;
   }

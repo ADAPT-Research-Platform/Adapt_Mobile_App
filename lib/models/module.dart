@@ -10,4 +10,22 @@ class Module {
     required this.progress,
     required this.chapters
   });
+
+  factory Module.parse(Map<String, dynamic> json) {
+    List<Chapter> chapters = (json['chapters'] as List<dynamic>)
+        .map((chapterJson) => Chapter.parse(chapterJson))
+        .toList();
+
+    // Calculate the average progress of the module based on its chapters' progress
+    double moduleProgress = 0.0;
+    if (chapters.isNotEmpty) {
+      moduleProgress = chapters.fold(0.0, (sum, chapter) => sum + chapter.progress) / chapters.length;
+    }
+
+    return Module(
+      moduleId: json['id'].toString(),
+      progress: moduleProgress,
+      chapters: chapters,
+    );
+  }
 }

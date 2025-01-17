@@ -17,4 +17,16 @@ class Section {
     required this.numOfComments,
     required this.isExercise
   });
+
+  factory Section.parse(Map<String, dynamic> json) {
+    return Section(
+      sectionId: json['id'].toString(),
+      timeStamp: DateTime.parse(json['updatedAt']),
+      folderPath: json['folderUrl'] ?? '',
+      title: json['title'] ?? '',
+      progress: (json['progress'] as num).toDouble(),
+      numOfComments: (json['numOfComments'] as num).toInt(),
+      isExercise: json['isExercise'] ?? false,
+    );
+  }
 }
