@@ -12,9 +12,9 @@ class User {
   // Create a User object from a JSON map
   factory User.parse(Map<String, dynamic> json) {
     return User(
-      userId: json['userId'],
-      userName: json['userName'],
-      email: json['email'],
+      userId: json['id'].toString(),
+      userName: json['username'].toString(),
+      email: json['email'].toString(),
     );
   }
 
