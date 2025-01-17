@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:adapt/pages/consent_page.dart';
 import 'package:adapt/pages/overview_page.dart';
 import 'package:adapt/pages/splash_page.dart';
 import 'package:adapt/utils/app_keys.dart';
@@ -16,6 +19,7 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown, // Optional if you want only `portraitUp`
   ]).then((_) {
+    HttpOverrides.global = MyHttpOverrides(); // TODO: Remove this later
     runApp(const MyApp());
   });
 }
@@ -44,9 +48,9 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(
                 builder: (context) => const SignUpPage(),
               );
-            case Routes.routeOverview:
+            case Routes.routeConsent:
               return MaterialPageRoute(
-                builder: (context) => const OverviewPage(),
+                builder: (context) => const ConsentPage(),
               );
             default:
               return MaterialPageRoute(
@@ -54,5 +58,15 @@ class MyApp extends StatelessWidget {
               );
           }
         });
+  }
+}
+
+// TODO: This is only for testing purposes. Need Remove this
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
