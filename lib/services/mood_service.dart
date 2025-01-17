@@ -2,18 +2,21 @@ import 'dart:convert';
 
 import 'package:adapt/services/session_manager.dart';
 
+import '../enums/feeling.dart';
 import '../models/mood.dart';
 import '../utils/app_config.dart';
 
 class MoodService {
 
-  void saveMode(int feeling, int motivation) async {
+  static const int maxMotivation = 10;
+
+  void saveMode(Feeling feeling, int motivation) async {
     try {
       final response = await SessionManager().client.post(
         Uri.parse('${AppConfig.baseUrl}/moods'),
         headers: SessionManager().getHeaders(),
         body: jsonEncode({
-          'feeling': feeling,
+          'feeling': feeling.index,
           'motivation': motivation,
         }),
       );
@@ -48,6 +51,7 @@ class MoodService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
+        print("Mode Data Loaded");
         return data.map<Mood>((item) => parseMode(item)).toList();
       } else {
         print('Failed to fetch mood list: ${response.statusCode}, ${response.body}');

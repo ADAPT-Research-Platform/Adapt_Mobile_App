@@ -3,6 +3,7 @@ import 'package:adapt/widgets/star_slider.dart';
 import 'package:adapt/widgets/task_button.dart';
 import 'package:flutter/material.dart';
 
+import '../enums/feeling.dart';
 import '../services/notification_service.dart';
 import '../services/mood_service.dart';
 import '../services/module_service.dart';
@@ -24,8 +25,8 @@ class _OverviewPageState extends State<OverviewPage> {
   final ModuleService _moduleService = ModuleService();
   final MoodService _modeService = MoodService();
 
-  int _selectedFeeling = 0; // 0 for no selection, 1 for happy, 2 for sad, etc.
-  int _selectedMotivation = 5;
+  Feeling _selectedFeeling = Feeling.none;
+  int _selectedMotivation = 0;
 
   late Future<List<String>> _modulesIdFuture; // Declare the Future
 
@@ -57,6 +58,7 @@ class _OverviewPageState extends State<OverviewPage> {
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   const SubTitle(text: 'Modules'),
                   ModuleGrid(
@@ -67,6 +69,7 @@ class _OverviewPageState extends State<OverviewPage> {
                     color: AppColors.lightGrey,
                     thickness: 2.5,
                   ),
+                  //Expanded(child: Container()),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -84,14 +87,10 @@ class _OverviewPageState extends State<OverviewPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildFeelingIcon(
-                              Icons.sentiment_satisfied_alt, 1, 'Happy'),
-                          _buildFeelingIcon(
-                              Icons.sentiment_dissatisfied, 2, 'Sad'),
-                          _buildFeelingIcon(
-                              Icons.sentiment_very_dissatisfied, 3, 'Angry'),
-                          _buildFeelingIcon(
-                              Icons.sentiment_neutral, 4, 'Tired'),
+                          _buildFeelingIcon(Icons.sentiment_satisfied_alt, Feeling.happy),
+                          _buildFeelingIcon(Icons.sentiment_dissatisfied, Feeling.sad),
+                          _buildFeelingIcon(Icons.sentiment_very_dissatisfied, Feeling.angry),
+                          _buildFeelingIcon(Icons.sentiment_neutral, Feeling.tired),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -103,7 +102,7 @@ class _OverviewPageState extends State<OverviewPage> {
                         ),
                       ),
                       StarSlider(
-                        sliderLength: 5,
+                        sliderLength: MoodService.maxMotivation,
                         onChanged: (value) {
                           setState(() {
                             _selectedMotivation = value;
@@ -138,28 +137,24 @@ class _OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  Widget _buildFeelingIcon(IconData icon, int feelingValue, String label) {
+  Widget _buildFeelingIcon(IconData icon, Feeling feeling) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedFeeling = feelingValue;
+          _selectedFeeling = feeling;
         });
       },
       child: Column(
         children: [
           Icon(
             icon,
-            color: _selectedFeeling == feelingValue
-                ? AppColors.primaryYellow
-                : AppColors.darkGrey,
+            color: _selectedFeeling == feeling ? AppColors.primaryYellow : AppColors.darkGrey,
             size: 40,
           ),
           Text(
-            label,
+            feeling.value,
             style: TextStyle(
-              color: _selectedFeeling == feelingValue
-                  ? AppColors.darkYellow
-                  : AppColors.darkGrey,
+              color: _selectedFeeling == feeling ? AppColors.darkYellow : AppColors.darkGrey,
             ),
           ),
         ],

@@ -19,23 +19,33 @@ Map<String, DateTime> getDateRange(FilterOption filterOption) {
     case FilterOption.thisMonth:
       final now = DateTime.now();
       final firstDayOfMonth = DateTime(now.year, now.month, 1);
-      return {'start': firstDayOfMonth, 'end': now}; // Returning as Map
+      final firstDayOfNextMonth = DateTime(now.year, now.month + 1, 1);
+      final lastDayOfMonth = firstDayOfNextMonth.subtract(const Duration(days: 1));
+      return {'start': firstDayOfMonth, 'end': lastDayOfMonth};
     case FilterOption.thisYear:
       final now = DateTime.now();
       final firstDayOfYear = DateTime(now.year, 1, 1);
-      return {'start': firstDayOfYear, 'end': now}; // Returning as Map
+      final firstDayOfNextYear = DateTime(now.year + 1, 1, 1);
+      final lastDayOfMonth = firstDayOfNextYear.subtract(const Duration(days: 1));
+      return {'start': firstDayOfYear, 'end': lastDayOfMonth};
     case FilterOption.lastThreeMonths:
       final now = DateTime.now();
       final threeMonthsAgo = now.subtract(const Duration(days: 90));
-      return {'start': threeMonthsAgo, 'end': now}; // Returning as Map
+      final startDate = DateTime(threeMonthsAgo.year, threeMonthsAgo.month, threeMonthsAgo.day); // Strip time part
+      final today = DateTime(now.year, now.month, now.day); // Strip time part
+      return {'start': startDate, 'end': today};
     case FilterOption.lastSixMonths:
       final now = DateTime.now();
       final sixMonthsAgo = now.subtract(const Duration(days: 180));
-      return {'start': sixMonthsAgo, 'end': now}; // Returning as Map
+      final startDate = DateTime(sixMonthsAgo.year, sixMonthsAgo.month, sixMonthsAgo.day); // Strip time part
+      final today = DateTime(now.year, now.month, now.day); // Strip time part
+      return {'start': startDate, 'end': today};
     case FilterOption.lastYear:
       final now = DateTime.now();
       final lastYear = now.subtract(const Duration(days: 365));
-      return {'start': lastYear, 'end': now}; // Returning as Map
+      final startDate = DateTime(lastYear.year, lastYear.month, lastYear.day); // Strip time part
+      final today = DateTime(now.year, now.month, now.day); // Strip time part
+      return {'start': startDate, 'end': today};
     default:
       throw Exception('Invalid Option');
   }

@@ -6,7 +6,7 @@ import '../models/mood.dart';
 import '../services/mood_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
-import '../utils/filter_options.dart';
+import '../enums/filter_options.dart';
 import '../widgets/feeling_chart.dart';
 import '../widgets/motivation_chart.dart';
 
@@ -196,7 +196,7 @@ class _ModePageState extends State<ModePage> {
                           children: [
                             const SubTitle(text: 'Feeling'),
                             Expanded(
-                              child: FeelingChart(modeData: modeData),
+                              child: FeelingChart(modeData: modeData, startDate: startDate!, endDate: endDate!),
                             ),
                             const Divider(
                               color: AppColors.lightGrey,
