@@ -1,4 +1,5 @@
 import 'package:adapt/services/session_manager.dart';
+import 'package:adapt/services/user_service.dart';
 import 'package:adapt/widgets/main_title.dart';
 import 'package:flutter/material.dart';
 
@@ -18,9 +19,10 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
 
   final TextEditingController _userNameController = TextEditingController();
-  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
 
   // State variables for the appearance section
@@ -34,17 +36,23 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void dispose() {
     _userNameController.dispose();
-    _oldPasswordController.dispose();
+    _currentPasswordController.dispose();
     _newPasswordController.dispose();
     super.dispose();
   }
 
-  void _saveData() async {
+  void _updateUser() async {
     String userName = _userNameController.text.trim();
-    String oldPassword = _oldPasswordController.text.trim();
+    String currentPassword = _currentPasswordController.text.trim();
     String newPassword = _newPasswordController.text.trim();
 
-    print('Account Data: $userName, $oldPassword, $newPassword');
+    _userService.updateUser(userName, currentPassword, newPassword);
+  }
+
+  void _deleteUser() async {
+    String currentPassword = _currentPasswordController.text.trim();
+
+    _userService.deleteUser(currentPassword);
   }
 
   @override
@@ -94,7 +102,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Old Password',
+                  'Current Password',
                   style: TextStyle(
                     color: AppColors.fontColor,
                     fontSize: AppFontSizes.small,
@@ -102,7 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 TextField(
-                  controller: _oldPasswordController,
+                  controller: _currentPasswordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
@@ -110,6 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
                 const Text(
                   'New Password',
                   style: TextStyle(
@@ -134,7 +143,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Expanded(
                       child: TaskButton(
                         text: 'Update',
-                        onPressed: _saveData,
+                        onPressed: _updateUser,
                         icon: Icons.update_rounded,
                       ),
                     ),
@@ -142,9 +151,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Expanded(
                       child:  TaskButton(
                         text: 'Delete',
-                        onPressed: () {
-                          // Delete action
-                        },
+                        onPressed: _deleteUser,
                         backgroundColor: AppColors.darkYellow,
                         icon: Icons.delete_rounded,
                       ),

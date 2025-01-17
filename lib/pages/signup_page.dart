@@ -1,4 +1,5 @@
 import 'package:adapt/services/auth_service.dart';
+import 'package:adapt/services/user_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/hexagon_grid.dart';
 import 'package:flutter/gestures.dart';
@@ -17,7 +18,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
   bool _isChecked = false;
 
   final TextEditingController _displayNameController = TextEditingController();
@@ -40,7 +41,7 @@ class _SignUpPageState extends State<SignUpPage> {
     String password = _passwordController.text.trim();
     String passwordConfirm = _passwordConfirmController.text.trim();
 
-    _authService.register(displayName, userEmail, password, passwordConfirm);
+    _userService.addUser(displayName, userEmail, password, passwordConfirm);
   }
 
   @override
@@ -51,7 +52,7 @@ class _SignUpPageState extends State<SignUpPage> {
         size.height < 600; // Adjust cutoff for small screens
 
     return ScaffoldMessenger(
-      key: registerPageScaffold,
+      key: signupPageScaffold,
       child: Scaffold(
         body: SingleChildScrollView(
           child: Stack(
