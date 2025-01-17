@@ -17,6 +17,15 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
+  bool shouldReloadModePage = false;
+
+  // The function to reload ModePage
+  void reloadModePage() {
+    setState(() {
+      shouldReloadModePage = true; // Flag that we need to reload ModePage
+      //_currentIndex = 1; // Switch to the ModePage
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +34,12 @@ class _MainPageState extends State<MainPage> {
       child: Scaffold(
           body: IndexedStack(
             index: _currentIndex,
-            children: const [
-              ModuleIndexPage(),
-              DiaryPage(),
-              ModePage(),
-              ContactPage(),
-              SettingsPage(),
+            children: [
+              ModuleIndexPage(reloadModePage: reloadModePage),
+              const DiaryPage(),
+              ModePage(shouldReload: shouldReloadModePage),
+              const ContactPage(),
+              const SettingsPage(),
             ],
           ),
           bottomNavigationBar: BottomNavBar(

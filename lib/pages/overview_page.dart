@@ -12,7 +12,9 @@ import '../widgets/main_title.dart';
 import '../widgets/sub_title.dart';
 
 class OverviewPage extends StatefulWidget {
-  const OverviewPage({super.key});
+  final VoidCallback reloadModePage;
+
+  OverviewPage({super.key, required this.reloadModePage});
 
   @override
   _OverviewPageState createState() => _OverviewPageState();
@@ -114,6 +116,7 @@ class _OverviewPageState extends State<OverviewPage> {
                         onPressed: () {
                           _modeService.saveMode(_selectedFeeling, _selectedMotivation);
 
+                          widget.reloadModePage();
                           // Schedule a notification for the next day
                           DateTime scheduledDate = DateTime.now().add( const Duration(days: 1));
                           NotificationService.scheduleNotification(

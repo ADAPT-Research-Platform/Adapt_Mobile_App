@@ -2,14 +2,15 @@ import 'package:adapt/models/section.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 
-import '../models/module.dart';
 import '../utils/app_routes.dart';
 import 'chapter_page.dart';
 import 'overview_page.dart';
 import 'section_page.dart';
 
 class ModuleIndexPage extends StatelessWidget {
-  const ModuleIndexPage({super.key});
+  final VoidCallback reloadModePage;
+
+  const ModuleIndexPage({super.key, required this.reloadModePage});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class ModuleIndexPage extends StatelessWidget {
           switch (settings.name) {
             case Routes.routeOverview:
               return MaterialPageRoute(
-                builder: (context) => const OverviewPage(),
+                builder: (context) => OverviewPage(reloadModePage: reloadModePage),
               );
             case Routes.routeChapters:
               return MaterialPageRoute(
@@ -31,7 +32,7 @@ class ModuleIndexPage extends StatelessWidget {
               );
             default:
               return MaterialPageRoute(
-                builder: (context) => const OverviewPage(),
+                builder: (context) => OverviewPage(reloadModePage: reloadModePage),
               );
           }
         });

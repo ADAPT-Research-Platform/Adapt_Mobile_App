@@ -11,7 +11,9 @@ import '../widgets/feeling_chart.dart';
 import '../widgets/motivation_chart.dart';
 
 class ModePage extends StatefulWidget {
-  const ModePage({super.key});
+  bool shouldReload;
+
+  ModePage({required this.shouldReload});
 
   @override
   _ModePageState createState() => _ModePageState();
@@ -20,7 +22,7 @@ class ModePage extends StatefulWidget {
 class _ModePageState extends State<ModePage> {
   final MoodService _modeService = MoodService();
 
-  FilterOption? selectedOption; // Default option
+  static FilterOption? selectedOption; // Default option
   DateTime? startDate;
   DateTime? endDate;
 
@@ -35,6 +37,20 @@ class _ModePageState extends State<ModePage> {
   void initState() {
     super.initState();
     updateDateRange(FilterOption.thisMonth);
+  }
+
+  bool shouldReloadData = false;
+
+  @override
+  void didUpdateWidget(covariant ModePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check if the flag changed to true, meaning it should reload
+    if (widget.shouldReload && !shouldReloadData) {
+      setState(() {
+        print('Mood Page state changed!!');
+        shouldReloadData = true;
+      });
+    }
   }
 
   @override
@@ -165,9 +181,7 @@ class _ModePageState extends State<ModePage> {
                       future: _modeService.fetchModeList(startDate: startDate, endDate: endDate),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(color: AppColors.darkYellow),
-                          );
+                          return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
                         } else if (snapshot.hasError) {
                           return const Center(child: Text("Error loading mood data"));
                         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -175,6 +189,8 @@ class _ModePageState extends State<ModePage> {
                         }
 
                         final modeData = snapshot.data!;
+                        //shouldReloadData = false;
+                        widget.shouldReload = false;
 
                         return Column(
                           children: [
