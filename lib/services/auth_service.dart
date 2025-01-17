@@ -21,6 +21,8 @@ class AuthService {
             }),
           );
 
+      print('Login Response: ${response.body}');
+
       if (response.statusCode == 200) {
         // Extract the connect.sid cookie
         final cookies = response.headers['set-cookie'];
@@ -44,10 +46,11 @@ class AuthService {
           });
         } else {
           print('No cookies found in the response.');
+          SnackBarShower.error(loginPageScaffold, 'No cookies found!');
         }
       } else {
-        print('Login failed: ${response.statusCode}: ${response.body}');
-        SnackBarShower.info(loginPageScaffold, 'Login successful');
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       print('Error during login: $e');
@@ -62,6 +65,7 @@ class AuthService {
           headers: SessionManager().getHeaders(),
         );
 
+    print('Logout Response: ${response.body}');
     // Navigate to the login page on any circumstances
     mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
@@ -72,6 +76,12 @@ class AuthService {
       // Add a short delay to wait until the next page is built
       Future.delayed(const Duration(milliseconds: 1000), () {
         SnackBarShower.info(loginPageScaffold, 'Log out successful');
+      });
+    } else {
+      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+
+      Future.delayed(const Duration(milliseconds: 1000), (){
+        SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
       });
     }
   }

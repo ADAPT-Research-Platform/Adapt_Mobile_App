@@ -3,11 +3,14 @@ import '../utils/app_colors.dart';
 
 class SnackBarShower {
   static void _showSnackBar(GlobalKey<ScaffoldMessengerState> scaffold, String message, Color backgroundColor) {
-    print(message);
     // Ensure scaffold is mounted
     if (scaffold.currentState != null) {
       scaffold.currentState!.showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: backgroundColor),
+        SnackBar(
+            content: Text(message),
+            duration: const Duration(milliseconds: 2000),
+            backgroundColor: backgroundColor
+        ),
       );
     }
   }

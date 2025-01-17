@@ -93,6 +93,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   onChanged: (value) {
                     setState(() {
                       _changePassword = value!;
+
+                      if(!_changePassword){
+                        _currentPasswordController.clear();
+                        _newPasswordController.clear();
+                        _confirmNewPasswordController.clear();
+                      }
                     });
                   },
                 ),

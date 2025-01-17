@@ -63,25 +63,28 @@ class UserService {
   }
 
   void updateUser(String userName, String currentPassword, String newPassword, String confirmNewPassword) async {
-    if(currentPassword.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'Current password cannot be empty!');
-      return;
-    }
-
     if(userName.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'User name cannot be empty!');
+      SnackBarShower.warn(mainPageScaffold, 'User name cannot be empty!');
       return;
     }
 
     if(userName == SessionManager().sessionUser!.userName && newPassword.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'Nothing to update!');
+      SnackBarShower.warn(mainPageScaffold, 'Nothing to update!');
       return;
     }
 
-    // Validate passwords
-    if (newPassword != confirmNewPassword) {
-      SnackBarShower.warn(signupPageScaffold, 'New Passwords don\'t match!');
-      return;
+    if(newPassword.isNotEmpty){ //Which means user has given a new password
+
+      if(currentPassword.isEmpty){
+        SnackBarShower.warn(mainPageScaffold, 'Current password should be provided!');
+        return;
+      }
+
+      // Validate passwords
+      if (newPassword != confirmNewPassword) {
+        SnackBarShower.warn(mainPageScaffold, 'Confirm New Passwords don\'t match!');
+        return;
+      }
     }
 
     try {
@@ -95,10 +98,13 @@ class UserService {
         }),
       );
 
+      print(response.body);
       if (response.statusCode == 200) {
         SnackBarShower.info(mainPageScaffold, 'User Update Successful!');
+        SessionManager().sessionUser?.userName = userName;
       } else {
-        print('User Update Failed: ${response.statusCode}, ${response.body}');
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       print('Error during registration: $e');

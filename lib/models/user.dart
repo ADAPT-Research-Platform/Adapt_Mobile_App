@@ -1,6 +1,6 @@
 class User {
   final String userId;
-  final String userName;
+  String userName;
   final String email;
 
   User({
