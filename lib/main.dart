@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:adapt/pages/consent_page.dart';
 import 'package:adapt/pages/overview_page.dart';
 import 'package:adapt/pages/splash_page.dart';
+import 'package:adapt/services/notification_service.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 import '../../pages/login_page.dart';
 import '../../pages/main_page.dart';
@@ -14,6 +16,9 @@ import '../../utils/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationService.init();
+  tz.initializeTimeZones();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

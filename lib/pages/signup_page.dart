@@ -143,6 +143,12 @@ class _SignUpPageState extends State<SignUpPage> {
                       children: [
                         Checkbox(
                           value: _isChecked,
+                          fillColor: WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return AppColors.darkYellow;
+                            }
+                            return null;
+                          }),
                           onChanged: (value) {
                             setState(() {
                               _isChecked = value!;

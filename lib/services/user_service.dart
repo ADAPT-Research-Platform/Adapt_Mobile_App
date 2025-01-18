@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:adapt/services/auth_service.dart';
 import 'package:adapt/services/session_manager.dart';
 
 import '../utils/app_config.dart';
@@ -44,18 +43,20 @@ class UserService {
             }),
           );
 
+      print(response.body);
       if (response.statusCode == 201) {
         mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
         // Add a short delay to wait until the next page is built
         Future.delayed(const Duration(milliseconds: 1000), () {
-          SnackBarShower.info(loginPageScaffold, 'Registration Successful. Please Login!');
+          SnackBarShower.info(loginPageScaffold, 'Registration Successful. Please Verify Email!');
         });
       } else if (response.statusCode == 400) {
         print('Bad Request: ${response.body}');
         // Handle validation errors from the server response
       } else {
-        SnackBarShower.error(loginPageScaffold, 'Signup Failed! ${response.body}');
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        SnackBarShower.error(signupPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       print('Error during registration: $e');
@@ -99,12 +100,13 @@ class UserService {
       );
 
       print(response.body);
-      if (response.statusCode == 200) {
-        SnackBarShower.info(mainPageScaffold, 'User Update Successful!');
+      if (response.statusCode == 200) { //200 or 201 based on the request
         SessionManager().sessionUser?.userName = userName;
+
+        SnackBarShower.info(mainPageScaffold, 'User Update Successful!');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
+        SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       print('Error during registration: $e');
@@ -129,6 +131,7 @@ class UserService {
       // Navigate to the login page on any circumstances
       mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
+      print(response.body);
       if (response.statusCode == 200) {
         SessionManager().clearSessionInfo();
         await CookieService().deleteCookie();
@@ -138,7 +141,10 @@ class UserService {
           SnackBarShower.info(loginPageScaffold, 'User delete successful!');
         });
       } else {
-        print('Registration failed: ${response.statusCode}, ${response.body}');
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+          SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
+        });
       }
     } catch (e) {
       print('Error during registration: $e');

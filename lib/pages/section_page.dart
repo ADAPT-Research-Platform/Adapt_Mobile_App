@@ -121,7 +121,8 @@ class _SectionPageState extends State<SectionPage> {
         body: FutureBuilder<List<dynamic>>(
           future: Future.wait([
             _sectionService.fetchSectionContent(widget.section.folderPath),
-            _sectionService.fetchAnswer(widget.section.sectionId),
+            if (widget.section.isExercise)
+              _sectionService.fetchAnswer(widget.section.sectionId),
           ]),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -134,7 +135,10 @@ class _SectionPageState extends State<SectionPage> {
 
             // Extract data
             final String markdownContent = snapshot.data![0];
-            _answers.addAll(snapshot.data![1]);
+
+            if (widget.section.isExercise) {
+              _answers.addAll(snapshot.data![1]);
+            }
 
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -274,17 +278,17 @@ class _SectionPageState extends State<SectionPage> {
                                 },
                               ),
                             ),
-                            if(widget.section.isExercise)
+                            if (widget.section.isExercise) ...[
                               const SizedBox(width: 10,),
-                            if(widget.section.isExercise)
                               Expanded(
-                                child: TaskButton(
-                                  text: 'Submit',
-                                  onPressed: _submitAnswers,
-                                  backgroundColor: AppColors.darkYellow,
-                                  icon: Icons.question_answer_rounded,
-                                )
+                                  child: TaskButton(
+                                    text: 'Submit',
+                                    onPressed: _submitAnswers,
+                                    backgroundColor: AppColors.darkYellow,
+                                    icon: Icons.question_answer_rounded,
+                                  )
                               )
+                            ]
                           ],
                         ))
                   ],

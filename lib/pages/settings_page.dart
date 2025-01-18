@@ -71,9 +71,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Settings'),
-      ),
+      appBar: const MainTitle(title: 'Settings'),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ListView(
@@ -90,6 +88,12 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 Checkbox(
                   value: _changePassword,
+                  fillColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return AppColors.darkYellow;
+                    }
+                    return null;
+                  }),
                   onChanged: (value) {
                     setState(() {
                       _changePassword = value!;
