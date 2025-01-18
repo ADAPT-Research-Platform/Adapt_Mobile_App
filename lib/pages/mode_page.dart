@@ -1,12 +1,13 @@
 import 'package:adapt/widgets/main_title.dart';
 import 'package:adapt/widgets/sub_title.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
+import '../enums/filter_options.dart';
 import '../models/mood.dart';
 import '../services/mood_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
-import '../enums/filter_options.dart';
 import '../widgets/feeling_chart.dart';
 import '../widgets/motivation_chart.dart';
 
@@ -20,6 +21,8 @@ class ModePage extends StatefulWidget {
 }
 
 class _ModePageState extends State<ModePage> {
+  final log = Logger('ModePage');
+
   final MoodService _modeService = MoodService();
 
   static FilterOption? selectedOption; // Default option
@@ -47,7 +50,7 @@ class _ModePageState extends State<ModePage> {
     // Check if the flag changed to true, meaning it should reload
     if (widget.shouldReload && !shouldReloadData) {
       setState(() {
-        print('Mood Page state changed!!');
+        log.info('Mood Page state changed!!');
         shouldReloadData = true;
       });
     }

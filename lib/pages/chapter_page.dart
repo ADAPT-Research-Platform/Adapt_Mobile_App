@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../models/module.dart';
 import '../models/section.dart';
@@ -20,6 +21,8 @@ class ChapterPage extends StatefulWidget {
 }
 
 class _ChapterPageState extends State<ChapterPage> {
+  final log = Logger('ChapterPage');
+
   final ModuleService _moduleService = ModuleService();
   String selectedFilter = 'All'; // Default filter
 

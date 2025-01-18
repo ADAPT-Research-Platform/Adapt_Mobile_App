@@ -1,11 +1,14 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:logging/logging.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
+  static final log = Logger('NotificationService');
+
   static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   static Future<void> onDidReceiveNotification(NotificationResponse notificationResponse) async {
-    print("Notification receive");
+    log.info("Notification receive");
   }
 
   static Future<void> init() async {

@@ -1,9 +1,9 @@
-import 'package:adapt/services/auth_service.dart';
 import 'package:adapt/services/user_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/hexagon_grid.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
@@ -18,6 +18,8 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final log = Logger('SignUpPage');
+
   final UserService _userService = UserService();
   bool _isChecked = false;
 

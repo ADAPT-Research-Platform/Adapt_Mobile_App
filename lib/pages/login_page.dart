@@ -1,5 +1,6 @@
 import 'package:adapt/widgets/hexagon_grid.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../services/auth_service.dart';
 import '../utils/app_colors.dart';
@@ -16,6 +17,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final log = Logger('LoginPage');
+
   final AuthService _authService = AuthService();
 
   final TextEditingController _userEmailController = TextEditingController();

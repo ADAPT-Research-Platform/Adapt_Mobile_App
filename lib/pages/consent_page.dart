@@ -1,5 +1,6 @@
 import 'package:adapt/utils/app_config.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../utils/app_keys.dart';
@@ -13,6 +14,7 @@ class ConsentPage extends StatefulWidget {
 }
 
 class _ConsentPageState extends State<ConsentPage> {
+  final log = Logger('ConsentPage');
   late final WebViewController _controller;
 
   @override
@@ -24,13 +26,13 @@ class _ConsentPageState extends State<ConsentPage> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) {
-            print('Page started loading: $url');
+            log.info('Page started loading: $url');
           },
           onPageFinished: (url) {
-            print('Page finished loading: $url');
+            log.info('Page finished loading: $url');
           },
           onWebResourceError: (error) {
-            print('Error loading page: $error');
+            log.severe('Error loading page: $error');
           },
         ),
       )

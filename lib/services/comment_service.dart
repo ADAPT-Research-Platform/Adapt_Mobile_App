@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:adapt/services/session_manager.dart';
+import 'package:logging/logging.dart';
 
 import '../models/comment.dart';
 import '../utils/app_config.dart';
 
 class CommentService {
+  final log = Logger('CommentService');
 
   void addComment(String text, String sectionId) async {
 
@@ -20,16 +22,16 @@ class CommentService {
       );
 
       if (response.statusCode == 200) {
-        print('Comment updated successfully!');
+        log.info('Comment updated successfully!');
       }else if (response.statusCode == 201) {
-        print('Comment added successfully!');
+        log.info('Comment added successfully!');
       } else if (response.statusCode == 400) {
-        print('Bad Request: ${response.body}');
+        log.severe('Bad Request: ${response.body}');
       } else {
-        print('Comment adding failed: ${response.statusCode}, ${response.body}');
+        log.severe('Comment adding failed: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
-      print('Error during adding/updating Comment: $e');
+      log.severe('Error during adding/updating Comment: $e');
     }
   }
 
@@ -45,16 +47,16 @@ class CommentService {
       );
 
       if (response.statusCode == 200) {
-        print('Reply updated successfully!');
+        log.info('Reply updated successfully!');
       }else if (response.statusCode == 201) {
-        print('Reply added successfully!');
+        log.info('Reply added successfully!');
       } else if (response.statusCode == 400) {
-        print('Bad Request: ${response.body}');
+        log.severe('Bad Request: ${response.body}');
       } else {
-        print('Reply adding failed: ${response.statusCode}, ${response.body}');
+        log.severe('Reply adding failed: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
-      print('Error during adding/updating Reply: $e');
+      log.severe('Error during adding/updating Reply: $e');
     }
   }
 
@@ -83,12 +85,12 @@ class CommentService {
         final errorMessage = "Failed to fetch comments: "
             "Status Code: ${response.statusCode}, "
             "Response: ${response.body}";
-        print(errorMessage);
+        log.severe(errorMessage);
         throw Exception(errorMessage);
       }
     } catch (e, stackTrace) {
       // Log the error with stack trace for debugging
-      print("Error fetching comments: $e\n$stackTrace");
+      log.severe("Error fetching comments: $e\n$stackTrace");
       rethrow; // Optionally rethrow to let the caller handle it
     }
   }

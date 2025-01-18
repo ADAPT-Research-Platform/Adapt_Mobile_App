@@ -1,5 +1,6 @@
 import 'package:adapt/pages/settings_page.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../utils/app_keys.dart';
 import '../widgets/bottom_nav_bar.dart';
@@ -16,6 +17,8 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final log = Logger('MainPage');
+
   int _currentIndex = 0;
   bool shouldReloadModePage = false;
 
@@ -38,7 +41,7 @@ class _MainPageState extends State<MainPage> {
               ModuleIndexPage(reloadModePage: reloadModePage),
               const DiaryPage(),
               ModePage(shouldReload: shouldReloadModePage),
-              const ContactPage(),
+              ContactPage(),
               const SettingsPage(),
             ],
           ),

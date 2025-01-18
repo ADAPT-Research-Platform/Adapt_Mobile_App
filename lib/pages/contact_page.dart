@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
@@ -6,7 +7,9 @@ import '../widgets/main_title.dart';
 import '../widgets/sub_title.dart';
 
 class ContactPage extends StatelessWidget {
-  const ContactPage({super.key});
+  final log = Logger('ContactPage');
+
+  ContactPage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:adapt/services/session_manager.dart';
 import 'package:adapt/widgets/snack_bar_shower.dart';
+import 'package:logging/logging.dart';
 
 import '../models/user.dart';
 import '../utils/app_config.dart';
@@ -10,7 +11,19 @@ import '../utils/app_routes.dart';
 import 'CookieService.dart';
 
 class AuthService {
+  final log = Logger('AuthService');
+
   void login(String email, String password) async {
+    if(email.isEmpty){
+      SnackBarShower.warn(signupPageScaffold, 'Email not provided!');
+      return;
+    }
+
+    if(password.isEmpty){
+      SnackBarShower.warn(signupPageScaffold, 'Password not provided!');
+      return;
+    }
+
     try {
       final response = await SessionManager().client.post(
             Uri.parse('${AppConfig.baseUrl}/auth/login'),
@@ -21,7 +34,7 @@ class AuthService {
             }),
           );
 
-      print('Login Response: ${response.body}');
+      log.info('Login Response: ${response.body}');
 
       if (response.statusCode == 200) {
         // Extract the connect.sid cookie
@@ -45,7 +58,7 @@ class AuthService {
             SnackBarShower.info(mainPageScaffold, 'Login successful');
           });
         } else {
-          print('No cookies found in the response.');
+          log.severe('No cookies found in the response.');
           SnackBarShower.error(loginPageScaffold, 'No cookies found!');
         }
       } else {
@@ -53,7 +66,7 @@ class AuthService {
         SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
-      print('Error during login: $e');
+      log.severe('Error during login: $e');
     }
 
     return null;
@@ -65,7 +78,7 @@ class AuthService {
           headers: SessionManager().getHeaders(),
         );
 
-    print('Logout Response: ${response.body}');
+    log.info('Logout Response: ${response.body}');
     // Navigate to the login page on any circumstances
     mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 

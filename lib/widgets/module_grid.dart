@@ -2,12 +2,15 @@ import 'dart:math';
 
 import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
 import 'hexagon_shape.dart';
 
 class ModuleGrid extends StatelessWidget {
+  final log = Logger('ModuleGrid');
+
   final List<String> moduleIdList;
   final double size;
   final Color fillColor;
@@ -17,7 +20,7 @@ class ModuleGrid extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
 
-  const ModuleGrid({
+  ModuleGrid({
     super.key,
     required this.moduleIdList,
     required this.size,
@@ -75,7 +78,7 @@ class ModuleGrid extends StatelessWidget {
           if (isIndexAvailable) {
             moduleNavigator.currentState!.pushNamed(Routes.routeChapters, arguments: moduleIdList[index]);
           }else{
-            print('No Module Available');
+            log.warning('No Module Available');
           }
         },
         child: HexagonShape(

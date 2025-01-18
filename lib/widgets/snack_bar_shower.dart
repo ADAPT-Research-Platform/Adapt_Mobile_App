@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../utils/app_colors.dart';
 
 class SnackBarShower {
+
   static void _showSnackBar(GlobalKey<ScaffoldMessengerState> scaffold, String message, Color backgroundColor) {
     // Ensure scaffold is mounted
     if (scaffold.currentState != null) {

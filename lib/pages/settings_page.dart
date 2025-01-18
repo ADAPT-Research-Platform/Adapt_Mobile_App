@@ -2,6 +2,7 @@ import 'package:adapt/services/session_manager.dart';
 import 'package:adapt/services/user_service.dart';
 import 'package:adapt/widgets/main_title.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../services/auth_service.dart';
 import '../utils/app_colors.dart';
@@ -18,6 +19,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final log = Logger('SettingsPage');
+
   final AuthService _authService = AuthService();
   final UserService _userService = UserService();
 

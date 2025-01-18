@@ -1,5 +1,6 @@
 import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../models/comment.dart';
 import '../services/comment_service.dart';
@@ -15,6 +16,8 @@ class CommentCard extends StatefulWidget {
 }
 
 class _CommentCardState extends State<CommentCard> {
+  final log = Logger('CommentCard');
+
   final TextEditingController _commentTextController = TextEditingController();
   final CommentService _commentService = CommentService();
 
@@ -85,7 +88,7 @@ class _CommentCardState extends State<CommentCard> {
                       .map((reply) => CommentCard(comment: reply)),
                     GestureDetector(
                       onTap: () {
-                        print("Replied to ${widget.comment.commentId}..");
+                        log.info("Replied to ${widget.comment.commentId}..");
                         showModalBottomSheet(
                           useSafeArea: true,
                           context: context,

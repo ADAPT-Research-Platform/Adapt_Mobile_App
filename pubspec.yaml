@@ -43,6 +43,7 @@ dependencies:
   timezone: ^0.9.3
   flutter_secure_storage: ^9.2.4
   webview_flutter: ^4.8.0 # Use the latest version
+  logging: ^1.3.0
 
 
 dev_dependencies:

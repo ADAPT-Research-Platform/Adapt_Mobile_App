@@ -1,8 +1,11 @@
 import 'package:http/http.dart' as http;
+import 'package:logging/logging.dart';
 
 import '../models/user.dart';
 
 class SessionManager {
+  final log = Logger('SessionManager');
+
   static final SessionManager _instance = SessionManager._internal();
   factory SessionManager() => _instance;
 

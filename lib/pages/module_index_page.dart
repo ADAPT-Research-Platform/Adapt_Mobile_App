@@ -1,6 +1,7 @@
 import 'package:adapt/models/section.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../utils/app_routes.dart';
 import 'chapter_page.dart';
@@ -8,9 +9,11 @@ import 'overview_page.dart';
 import 'section_page.dart';
 
 class ModuleIndexPage extends StatelessWidget {
+  final log = Logger('ModuleIndexPage');
+
   final VoidCallback reloadModePage;
 
-  const ModuleIndexPage({super.key, required this.reloadModePage});
+  ModuleIndexPage({super.key, required this.reloadModePage});
 
   @override
   Widget build(BuildContext context) {

@@ -7,6 +7,7 @@ import 'package:adapt/services/notification_service.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import '../../pages/login_page.dart';
@@ -16,6 +17,13 @@ import '../../utils/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Configure the logger
+  Logger.root.level = Level.ALL; // Set the global logging level
+  Logger.root.onRecord.listen((LogRecord record) {
+    // Customize the log output
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
 
   await NotificationService.init();
   tz.initializeTimeZones();
@@ -71,7 +79,6 @@ class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }

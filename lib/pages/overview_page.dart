@@ -2,11 +2,12 @@ import 'package:adapt/widgets/module_grid.dart';
 import 'package:adapt/widgets/star_slider.dart';
 import 'package:adapt/widgets/task_button.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import '../enums/feeling.dart';
-import '../services/notification_service.dart';
-import '../services/mood_service.dart';
 import '../services/module_service.dart';
+import '../services/mood_service.dart';
+import '../services/notification_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/main_title.dart';
@@ -22,6 +23,8 @@ class OverviewPage extends StatefulWidget {
 }
 
 class _OverviewPageState extends State<OverviewPage> {
+  final log = Logger('OverviewPage');
+
   final ModuleService _moduleService = ModuleService();
   final MoodService _modeService = MoodService();
 

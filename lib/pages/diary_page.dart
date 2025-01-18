@@ -1,6 +1,7 @@
 import 'package:adapt/services/comment_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../models/comment.dart';
@@ -16,6 +17,8 @@ class DiaryPage extends StatefulWidget {
 }
 
 class _DiaryPage extends State<DiaryPage> {
+  final log = Logger('DiaryPage');
+
   late DateTime _selectedDay;
   late DateTime _focusedDay;
   final CommentService _commentService = CommentService();
@@ -54,7 +57,7 @@ class _DiaryPage extends State<DiaryPage> {
                     setState(() {
                       _selectedDay = selectedDay;
                       _focusedDay = focusedDay;
-                      print("Selected date: $selectedDay");
+                      log.info("Selected date: $selectedDay");
                     });
                   },
                   headerStyle: const HeaderStyle(

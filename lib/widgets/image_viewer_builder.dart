@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
 
 import '../utils/app_config.dart';
 
 class ImageViewerBuilder extends MarkdownElementBuilder {
+  static final log = Logger('ImageViewerBuilder');
+
   final String sectionFolderPath;
 
   ImageViewerBuilder(this.sectionFolderPath);
@@ -21,7 +24,7 @@ class ImageViewerBuilder extends MarkdownElementBuilder {
         imageUrl,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          print('Image loading error: $error URL: $imageUrl');
+          log.severe('Image loading error: $error URL: $imageUrl');
           return const Icon(Icons.broken_image_rounded);
         },
       );

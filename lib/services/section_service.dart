@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:adapt/services/session_manager.dart';
+import 'package:logging/logging.dart';
 
 import '../utils/app_config.dart';
 
 class SectionService {
+  final log = Logger('SectionService');
 
   Future<String> fetchSectionContent(String sectionFolderPath) async {
     final String url = '${AppConfig.baseUrl}/uploads/$sectionFolderPath/content.md';
@@ -18,11 +20,11 @@ class SectionService {
       if (response.statusCode == 200) {
         return utf8.decode(response.bodyBytes, allowMalformed: true);
       } else {
-        print("Failed to load markdown content: ${response.statusCode}, ${response.body}");
+        log.severe("Failed to load markdown content: ${response.statusCode}, ${response.body}");
         throw Exception("Failed to load markdown content");
       }
     } catch (e) {
-      print("Error fetching markdown content: $e");
+      log.severe("Error fetching markdown content: $e");
       return "";
     }
   }
@@ -39,16 +41,16 @@ class SectionService {
       );
 
       if (response.statusCode == 200) {
-        print('Answer updated successfully!');
+        log.info('Answer updated successfully!');
       }else if (response.statusCode == 201) {
-        print('Answer added successfully!');
+        log.info('Answer added successfully!');
       } else if (response.statusCode == 400) {
-        print('Bad Request: ${response.body}');
+        log.severe('Bad Request: ${response.body}');
       } else {
-        print('Answer adding failed: ${response.statusCode}, ${response.body}');
+        log.severe('Answer adding failed: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
-      print('Error during answering: $e');
+      log.severe('Error during answering: $e');
     }
   }
 
@@ -76,19 +78,19 @@ class SectionService {
           throw Exception('Invalid "text" field format');
         }
       }else if (response.statusCode == 404) {
-        print("No Answers Found");
+        log.severe("No Answers Found");
         return {};
       } else {
         // Log and throw exception for failed response
         final errorMessage = "Failed to fetch answers: "
             "Status Code: ${response.statusCode}, "
             "Response: ${response.body}";
-        print(errorMessage);
+        log.severe(errorMessage);
         throw Exception(errorMessage);
       }
     } catch (e, stackTrace) {
       // Log the error with stack trace for debugging
-      print("Error fetching answers: $e\n$stackTrace");
+      log.severe("Error fetching answers: $e\n$stackTrace");
       rethrow; // Optionally rethrow to let the caller handle it
     }
   }
@@ -107,16 +109,16 @@ class SectionService {
       );
 
       if (response.statusCode == 200) {
-        print('Progress updated successfully! Section: $sectionId Progress: $progress');
+        log.info('Progress updated successfully! Section: $sectionId Progress: $progress');
       }else if (response.statusCode == 201) {
-        print('Progress added successfully! Section: $sectionId Progress: $progress');
+        log.info('Progress added successfully! Section: $sectionId Progress: $progress');
       } else if (response.statusCode == 400) {
-        print('Bad Request: ${response.body}');
+        log.severe('Bad Request: ${response.body}');
       } else {
-        print('Progress updating failed: ${response.statusCode}, ${response.body}');
+        log.severe('Progress updating failed: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
-      print('Error during updating Progress: $e');
+      log.severe('Error during updating Progress: $e');
     }
   }
 }

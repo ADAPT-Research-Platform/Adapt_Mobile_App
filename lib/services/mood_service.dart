@@ -1,18 +1,20 @@
 import 'dart:convert';
 
 import 'package:adapt/services/session_manager.dart';
+import 'package:logging/logging.dart';
 
 import '../enums/feeling.dart';
 import '../models/mood.dart';
 import '../utils/app_config.dart';
 
 class MoodService {
+  final log = Logger('MoodService');
 
   static const int maxMotivation = 10;
 
   void saveMode(Feeling feeling, int motivation) async {
     if(motivation < 0 || motivation > maxMotivation){
-      print('Invalid motivation value');
+      log.info('Invalid motivation value');
       return;
     }
 
@@ -27,16 +29,16 @@ class MoodService {
       );
 
       if (response.statusCode == 200) {
-        print('Mood data updated successfully!');
+        log.info('Mood data updated successfully!');
       }else if (response.statusCode == 201) {
-        print('Mood data added successfully!');
+        log.info('Mood data added successfully!');
       } else if (response.statusCode == 400) {
-        print('Bad Request: ${response.body}');
+        log.warning('Bad Request: ${response.body}');
       } else {
-        print('Mood data adding failed: ${response.statusCode}, ${response.body}');
+        log.severe('Mood data adding failed: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
-      print('Error during saving Mood data: $e');
+      log.severe('Error during saving Mood data: $e');
     }
   }
 
@@ -56,14 +58,14 @@ class MoodService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        print("Mode Data Loaded");
+        log.info("Mode Data Loaded");
         return data.map<Mood>((item) => Mood.parse(item)).toList();
       } else {
-        print('Failed to fetch mood list: ${response.statusCode}, ${response.body}');
+        log.severe('Failed to fetch mood list: ${response.statusCode}, ${response.body}');
         return [];
       }
     } catch (e) {
-      print('Error during fetching mood list: $e');
+      log.severe('Error during fetching mood list: $e');
       return [];
     }
   }

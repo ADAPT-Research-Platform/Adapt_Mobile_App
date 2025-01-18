@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:adapt/services/session_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:logging/logging.dart';
 
 import '../models/user.dart';
 import '../utils/app_config.dart'; // For JSON encoding and decoding
 
 class CookieService {
+  final log = Logger('CookieService');
+
   // Singleton instance for centralized access
   static final CookieService _instance = CookieService._internal();
   factory CookieService() => _instance;
@@ -68,7 +71,7 @@ class CookieService {
     final cookie = await _secureStorage.read(key: 'session_cookie');
 
     if (cookie == null || cookie.isEmpty) {
-      print('No cookie found or cookie is empty');
+      log.warning('No cookie found or cookie is empty');
       return false;
     }
 
@@ -81,14 +84,14 @@ class CookieService {
       );
 
       if (response.statusCode == 200) {
-        print('Cookie is valid');
+        log.info('Cookie is valid');
         return true;
       } else {
-        print('Cookie verification failed: ${response.body}');
+        log.warning('Cookie verification failed: ${response.body}');
         return false;
       }
     } catch (e) {
-      print('Error verifying cookie with backend: $e');
+      log.severe('Error verifying cookie with backend: $e');
       return false;
     }
   }

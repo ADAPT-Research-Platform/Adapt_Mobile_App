@@ -10,6 +10,7 @@ import 'package:adapt/widgets/main_title.dart';
 import 'package:adapt/widgets/question_viewer_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:logging/logging.dart';
 
 import '../models/comment.dart';
 import '../utils/app_font_sizes.dart';
@@ -28,6 +29,8 @@ class SectionPage extends StatefulWidget {
 }
 
 class _SectionPageState extends State<SectionPage> {
+  final log = Logger('SectionPage');
+
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _commentTextController = TextEditingController();
   final SectionService _sectionService = SectionService();
@@ -45,7 +48,7 @@ class _SectionPageState extends State<SectionPage> {
     }
 
     _sectionService.addAnswer(widget.section.sectionId, _answers);
-    print("Submitted Answers: ${jsonEncode(_answers)}");
+    log.info("Submitted Answers: ${jsonEncode(_answers)}");
   }
 
   void _updateMaxScrollPixels() {
@@ -155,7 +158,7 @@ class _SectionPageState extends State<SectionPage> {
                           controller: _scrollController,
                           child: MarkdownBody(
                             data: markdownContent,
-                            blockSyntaxes: const [QuestionSyntax()],
+                            blockSyntaxes: [QuestionSyntax()],
                             selectable: false,
                             builders: <String, MarkdownElementBuilder>{
                               'a': VideoViewerBuilder(),

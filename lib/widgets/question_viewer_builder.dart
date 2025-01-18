@@ -2,12 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
 
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 
 class QuestionViewerBuilder extends MarkdownElementBuilder {
+  final log = Logger('QuestionViewerBuilder');
+
   final Map<String, String> questions;
   final Map<String, String> currentAnswers;
   final Map<String, TextEditingController> controllers;
@@ -61,10 +64,10 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
           );
         }
       } catch (e) {
-        print("Error parsing JSON: $e");
+        log.severe("Error parsing JSON: $e");
       }
     }else{
-      print("Question JSON Content Not Valid: $content");
+      log.severe("Question JSON Content Not Valid: $content");
     }
 
     // Return the default text if it's not JSON
@@ -73,7 +76,8 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
 }
 
 class QuestionSyntax extends md.BlockSyntax {
-  const QuestionSyntax();
+  final log = Logger('QuestionSyntax');
+  QuestionSyntax();
 
   @override
   RegExp get pattern => RegExp(r'^\[question\](\{".+?":\s*".*?"\})$', dotAll: true);
@@ -93,7 +97,7 @@ class QuestionSyntax extends md.BlockSyntax {
 
       return el;
     }else{
-      print("Question Pattern Not Matched: $match");
+      log.warning("Question Pattern Not Matched: $match");
     }
     return null;
   }
