@@ -19,6 +19,7 @@ class TaskButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: icon != null ? Icon(icon, size: 18) : null,
@@ -29,7 +30,7 @@ class TaskButton extends StatelessWidget {
         ),
       ),
       style: ElevatedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 50), // Full-width button
+        minimumSize: Size(screenWidth / 2, 50), // Full-width button
         foregroundColor: AppColors.white,
         backgroundColor: backgroundColor,
         shape: RoundedRectangleBorder(

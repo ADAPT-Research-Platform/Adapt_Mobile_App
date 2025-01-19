@@ -144,7 +144,7 @@ class _OverviewPageState extends State<OverviewPage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedFeeling = feeling;
+          _selectedFeeling = _selectedFeeling == feeling ? Feeling.none : feeling;
         });
       },
       child: Column(
