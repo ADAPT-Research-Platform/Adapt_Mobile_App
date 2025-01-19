@@ -1,16 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:adapt/services/session_manager.dart';
 import 'package:logging/logging.dart';
 
 import '../models/module.dart';
 import '../utils/app_config.dart';
-import 'auth_service.dart';
 
 class ModuleService {
   final log = Logger('ModuleService');
-
-  final AuthService _authService = AuthService();
 
   Future<List<String>> fetchModuleIdList() async {
     try {
@@ -23,17 +21,21 @@ class ModuleService {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map<String>((item) => item).toList();
       } else {
-        log.severe("Failed to fetch module id list: ${response.statusCode}, ${response.body}");
-        _authService.logout();
-        throw Exception("Failed to fetch module id list");
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        log.severe('Error in Get Module Id List', jsonResponse['message']);
+        throw HttpException(jsonResponse['message']);
       }
     } catch (e) {
-      log.severe("Error fetching module id list: $e");
-      return [];
+      log.severe('Error in Get Module Id List', e);
+      rethrow;
     }
   }
 
   Future<Module> fetchModuleById(String moduleId) async {
+    if(moduleId.isEmpty){
+      throw Exception('Invalid Module Id');
+    }
+
     // Add query parameters
     final Map<String, String> queryParams = {};
     queryParams['moduleId'] = moduleId;
@@ -48,12 +50,12 @@ class ModuleService {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return Module.parse(data);
       } else {
-        log.severe("Failed to fetch module: ${response.statusCode}, ${response.body}");
-        _authService.logout();
-        throw Exception("Failed to fetch module");
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        log.severe('Error in Get Module By Id', jsonResponse['message']);
+        throw HttpException(jsonResponse['message']);
       }
     } catch (e) {
-      log.severe("Error fetching module: $e");
+      log.severe('Error in Get Module By Id', e);
       rethrow;
     }
   }

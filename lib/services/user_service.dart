@@ -46,23 +46,20 @@ class UserService {
             }),
           );
 
-      log.info(response.body);
+      log.info('User Add Response: ${response.body}');
       if (response.statusCode == 201) {
         mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
-        // Add a short delay to wait until the next page is built
         Future.delayed(const Duration(milliseconds: 1000), () {
-          SnackBarShower.info(loginPageScaffold, 'Registration Successful. Please Verify Email!');
+          SnackBarShower.info(loginPageScaffold, 'Signup Successful! Verify Email.');
         });
-      } else if (response.statusCode == 400) {
-        log.severe('Bad Request: ${response.body}');
-        // Handle validation errors from the server response
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(signupPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
-      log.severe('Error during registration: $e');
+      log.severe('Error in User Adding', e);
+      SnackBarShower.error(signupPageScaffold, 'Internal App Error!');
     }
   }
 
@@ -102,8 +99,8 @@ class UserService {
         }),
       );
 
-      log.info(response.body);
-      if (response.statusCode == 200) { //200 or 201 based on the request
+      log.info('User Update Response: ${response.body}');
+      if (response.statusCode == 200) {
         SessionManager().sessionUser?.userName = userName;
         SnackBarShower.info(mainPageScaffold, 'User Update Successful!');
       } else {
@@ -111,13 +108,14 @@ class UserService {
         SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
-      log.severe('Error during registration: $e');
+      log.severe('Error in User Update', e);
+      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
     }
   }
 
   void deleteUser(String currentPassword) async {
     if(currentPassword.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'Current password cannot be empty!');
+      SnackBarShower.warn(signupPageScaffold, 'Password not provided!');
       return;
     }
 
@@ -133,14 +131,13 @@ class UserService {
       // Navigate to the login page on any circumstances
       mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
-      log.info(response.body);
+      log.info('User Delete Response: ${response.body}');
       if (response.statusCode == 200) {
         SessionManager().clearSessionInfo();
         await CookieService().deleteCookie();
 
-        // Add a short delay to wait until the next page is built
         Future.delayed(const Duration(milliseconds: 1000), () {
-          SnackBarShower.info(loginPageScaffold, 'User delete successful!');
+          SnackBarShower.info(loginPageScaffold, 'User Delete Successful!');
         });
       } else {
         Future.delayed(const Duration(milliseconds: 1000), () {
@@ -149,7 +146,10 @@ class UserService {
         });
       }
     } catch (e) {
-      log.severe('Error during registration: $e');
+      log.severe('Error in User Delete', e);
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        SnackBarShower.error(loginPageScaffold, 'Internal App Error!');
+      });
     }
   }
 }

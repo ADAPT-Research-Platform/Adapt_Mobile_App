@@ -13,14 +13,14 @@ import 'CookieService.dart';
 class AuthService {
   final log = Logger('AuthService');
 
-  void login(String email, String password) async {
-    if(email.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'Email not provided!');
+  void login(String userNameOrEmail, String password) async {
+    if(userNameOrEmail.isEmpty){
+      SnackBarShower.warn(loginPageScaffold, 'Username or Email not provided!');
       return;
     }
 
     if(password.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'Password not provided!');
+      SnackBarShower.warn(loginPageScaffold, 'Password not provided!');
       return;
     }
 
@@ -29,7 +29,7 @@ class AuthService {
             Uri.parse('${AppConfig.baseUrl}/auth/login'),
             headers: SessionManager().getHeaders(),
             body: jsonEncode({
-              'login': email,
+              'login': userNameOrEmail,
               'password': password,
             }),
           );
@@ -55,46 +55,52 @@ class AuthService {
 
           // Add a short delay to wait until the next page is built
           Future.delayed(const Duration(milliseconds: 1000), () {
-            SnackBarShower.info(mainPageScaffold, 'Login successful');
+            SnackBarShower.info(mainPageScaffold, 'Login successful!');
           });
         } else {
-          log.severe('No cookies found in the response.');
-          SnackBarShower.error(loginPageScaffold, 'No cookies found!');
+          log.severe('No cookies found in Login Response.');
+          SnackBarShower.error(loginPageScaffold, 'Login unsuccessful!');
         }
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
-      log.severe('Error during login: $e');
+      log.severe('Error in Login', e);
+      SnackBarShower.error(loginPageScaffold, 'Internal App Error!');
     }
 
     return null;
   }
 
   void logout() async {
-    final response = await SessionManager().client.post(
-          Uri.parse('${AppConfig.baseUrl}/auth/logout'),
-          headers: SessionManager().getHeaders(),
-        );
+    try {
+      final response = await SessionManager().client.post(
+            Uri.parse('${AppConfig.baseUrl}/auth/logout'),
+            headers: SessionManager().getHeaders(),
+          );
 
-    log.info('Logout Response: ${response.body}');
-    // Navigate to the login page on any circumstances
-    mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+      // Navigate to the login page on any circumstances
+      mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
-    if (response.statusCode == 200) {
-      SessionManager().clearSessionInfo();
-      await CookieService().deleteCookie();
+      log.info('Logout Response: ${response.body}');
+      if (response.statusCode == 200) {
+        SessionManager().clearSessionInfo();
+        await CookieService().deleteCookie();
 
-      // Add a short delay to wait until the next page is built
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          SnackBarShower.info(loginPageScaffold, 'Logout Successful!');
+        });
+      } else {
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+          SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
+        });
+      }
+    } catch (e) {
+      log.severe('Error in Logout', e);
       Future.delayed(const Duration(milliseconds: 1000), () {
-        SnackBarShower.info(loginPageScaffold, 'Log out successful');
-      });
-    } else {
-      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-
-      Future.delayed(const Duration(milliseconds: 1000), (){
-        SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
+        SnackBarShower.error(loginPageScaffold, 'Internal App Error!');
       });
     }
   }

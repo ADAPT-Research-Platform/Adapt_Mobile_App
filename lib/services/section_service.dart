@@ -1,31 +1,33 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:adapt/services/session_manager.dart';
 import 'package:logging/logging.dart';
 
 import '../utils/app_config.dart';
+import '../utils/app_keys.dart';
+import '../widgets/snack_bar_shower.dart';
 
 class SectionService {
   final log = Logger('SectionService');
 
   Future<String> fetchSectionContent(String sectionFolderPath) async {
-    final String url = '${AppConfig.baseUrl}/uploads/$sectionFolderPath/content.md';
-
     try {
       final response = await SessionManager().client.get(
-        Uri.parse(url),
+        Uri.parse('${AppConfig.baseUrl}/uploads/$sectionFolderPath/content.md'),
         headers: SessionManager().getHeaders(),
       );
 
       if (response.statusCode == 200) {
         return utf8.decode(response.bodyBytes, allowMalformed: true);
       } else {
-        log.severe("Failed to load markdown content: ${response.statusCode}, ${response.body}");
-        throw Exception("Failed to load markdown content");
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        log.severe('Error in Get Section Content', jsonResponse['message']);
+        throw HttpException(jsonResponse['message']);
       }
     } catch (e) {
-      log.severe("Error fetching markdown content: $e");
-      return "";
+      log.severe("Error in Get Section Content", e);
+      rethrow;
     }
   }
 
@@ -40,17 +42,18 @@ class SectionService {
         }),
       );
 
+      log.info('Add/Update Answer Response: ${response.body}');
       if (response.statusCode == 200) {
-        log.info('Answer updated successfully!');
+        SnackBarShower.info(mainPageScaffold, 'Answer Updated Successfully!');
       }else if (response.statusCode == 201) {
-        log.info('Answer added successfully!');
-      } else if (response.statusCode == 400) {
-        log.severe('Bad Request: ${response.body}');
+        SnackBarShower.info(mainPageScaffold, 'Answer Added Successfully!');
       } else {
-        log.severe('Answer adding failed: ${response.statusCode}, ${response.body}');
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
-      log.severe('Error during answering: $e');
+      log.severe('Error in Answer Add/Update', e);
+      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
     }
   }
 
@@ -72,26 +75,21 @@ class SectionService {
         // Extract the 'text' field and ensure it's a Map<String, String>
         if (jsonResponse['text'] is Map<String, dynamic>) {
           final Map<String, dynamic> textMap = jsonResponse['text'];
-          return textMap.map((key, value) =>
-              MapEntry(key.toString(), value.toString()));
+          return textMap.map((key, value) => MapEntry(key.toString(), value.toString()));
         } else {
-          throw Exception('Invalid "text" field format');
+          throw const HttpException('Invalid data format!');
         }
       }else if (response.statusCode == 404) {
-        log.severe("No Answers Found");
+        log.info("No Answers Found");
         return {};
       } else {
-        // Log and throw exception for failed response
-        final errorMessage = "Failed to fetch answers: "
-            "Status Code: ${response.statusCode}, "
-            "Response: ${response.body}";
-        log.severe(errorMessage);
-        throw Exception(errorMessage);
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        log.severe('Error in Get Answers By SectionId', jsonResponse['message']);
+        throw HttpException(jsonResponse['message']);
       }
-    } catch (e, stackTrace) {
-      // Log the error with stack trace for debugging
-      log.severe("Error fetching answers: $e\n$stackTrace");
-      rethrow; // Optionally rethrow to let the caller handle it
+    } catch (e) {
+      log.severe('Error in Get Answers By SectionId', e);
+      rethrow;
     }
   }
 
@@ -108,17 +106,17 @@ class SectionService {
         }),
       );
 
+      log.info('Update Progress Response: ${response.body}');
       if (response.statusCode == 200) {
         log.info('Progress updated successfully! Section: $sectionId Progress: $progress');
       }else if (response.statusCode == 201) {
         log.info('Progress added successfully! Section: $sectionId Progress: $progress');
-      } else if (response.statusCode == 400) {
-        log.severe('Bad Request: ${response.body}');
       } else {
-        log.severe('Progress updating failed: ${response.statusCode}, ${response.body}');
+        SnackBarShower.error(mainPageScaffold, 'Progress Update Error!');
       }
     } catch (e) {
-      log.severe('Error during updating Progress: $e');
+      log.severe('Error in Update Progress!', e);
+      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
     }
   }
 }

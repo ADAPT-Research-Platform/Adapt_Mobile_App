@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:adapt/services/session_manager.dart';
 import 'package:logging/logging.dart';
@@ -6,6 +7,8 @@ import 'package:logging/logging.dart';
 import '../enums/feeling.dart';
 import '../models/mood.dart';
 import '../utils/app_config.dart';
+import '../utils/app_keys.dart';
+import '../widgets/snack_bar_shower.dart';
 
 class MoodService {
   final log = Logger('MoodService');
@@ -14,7 +17,7 @@ class MoodService {
 
   void saveMode(Feeling feeling, int motivation) async {
     if(motivation < 0 || motivation > maxMotivation){
-      log.info('Invalid motivation value');
+      log.warning('Invalid motivation value!');
       return;
     }
 
@@ -28,21 +31,28 @@ class MoodService {
         }),
       );
 
+      log.info('Add/Update Mood Response: ${response.body}');
       if (response.statusCode == 200) {
-        log.info('Mood data updated successfully!');
+        SnackBarShower.info(mainPageScaffold, 'Mood Updated Successfully!');
       }else if (response.statusCode == 201) {
-        log.info('Mood data added successfully!');
-      } else if (response.statusCode == 400) {
-        log.warning('Bad Request: ${response.body}');
+        SnackBarShower.info(mainPageScaffold, 'Mood Added Successfully!');
       } else {
-        log.severe('Mood data adding failed: ${response.statusCode}, ${response.body}');
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
-      log.severe('Error during saving Mood data: $e');
+      log.severe('Error in Mood Add/Update', e);
+      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
     }
   }
 
   Future<List<Mood>> fetchModeList({DateTime? startDate, DateTime? endDate}) async {
+    log.shout('fetchModeList Called');
+
+    // Validate that startDate is less than endDate
+    if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+      throw ArgumentError('Start date must be before or the same as the end date.');
+    }
 
     // Add query parameters
     final Map<String, String> queryParams = {};
@@ -58,15 +68,15 @@ class MoodService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        log.info("Mode Data Loaded");
         return data.map<Mood>((item) => Mood.parse(item)).toList();
       } else {
-        log.severe('Failed to fetch mood list: ${response.statusCode}, ${response.body}');
-        return [];
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        log.severe('Error in Get Mood Data By Date Range', jsonResponse['message']);
+        throw HttpException(jsonResponse['message']);
       }
     } catch (e) {
-      log.severe('Error during fetching mood list: $e');
-      return [];
+      log.severe('Error in Get Mood Data By Date Range', e);
+      rethrow;
     }
   }
 }
