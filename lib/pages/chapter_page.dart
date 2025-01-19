@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 
 import '../models/module.dart';
 import '../models/section.dart';
+import '../services/localization_service.dart';
 import '../services/module_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_keys.dart';
@@ -30,7 +31,7 @@ class _ChapterPageState extends State<ChapterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MainTitle(
-        title: 'Module ${widget.moduleId}',
+        title: '${LocalizationService().get('Module')} ${widget.moduleId}',
         leadingIcon: Icons.arrow_back_ios_rounded,
         onIconPressed: () {
           moduleNavigator.currentState!.pop(); // Go Backwards
@@ -123,7 +124,7 @@ class _ChapterPageState extends State<ChapterPage> {
                             children: [
                               const SizedBox(height: 8),
                               // Chapter Title
-                              SubTitle(text: 'Chapter ${chapterIndex + 1}'),
+                              SubTitle(text: '${LocalizationService().get('Chapter')} ${chapterIndex + 1}'),
                               const SizedBox(height: 8),
 
                               // List of sections under the chapter
@@ -136,7 +137,10 @@ class _ChapterPageState extends State<ChapterPage> {
                                 itemBuilder: (context, index) {
                                   final section = filteredSectionsMap.values.elementAt(index);
                                   final sectionIndex = filteredSectionsMap.keys.elementAt(index);
-                                  section.sectionName = section.isExercise ? 'Section ${sectionIndex + 1}: Exercise' : 'Section ${sectionIndex + 1}';
+
+                                  section.sectionName = section.isExercise ?
+                                  '${LocalizationService().get('Section')} ${sectionIndex + 1}: ${LocalizationService().get('Exercise')}' :
+                                  '${LocalizationService().get('Section')} ${sectionIndex + 1}';
 
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 10.0),

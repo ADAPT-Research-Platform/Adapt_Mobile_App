@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 
 import '../enums/filter_options.dart';
 import '../models/mood.dart';
+import '../services/localization_service.dart';
 import '../services/mood_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
@@ -59,7 +60,7 @@ class _ModePageState extends State<ModePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const MainTitle(title: 'Mood'),
+        appBar: MainTitle(title: LocalizationService().get('mood')),
         body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Column(

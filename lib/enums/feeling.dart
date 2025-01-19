@@ -1,3 +1,5 @@
+import '../services/localization_service.dart';
+
 enum Feeling {
   none, // Corresponds to 0
   happy, // Corresponds to 1
@@ -7,25 +9,21 @@ enum Feeling {
 }
 
 extension FeelingExtension on Feeling {
-  static const _feelingMap = {
-    Feeling.none: '',
-    Feeling.happy: 'Happy',
-    Feeling.sad: 'Sad',
-    Feeling.angry: 'Angry',
-    Feeling.tired: 'Tired',
-  };
-
-  /// Get string value from enum
-  String get value => _feelingMap[this] ?? '';
-
-  /// Get enum from string value
-  static Feeling fromValue(String value) {
-    return _feelingMap.entries
-        .firstWhere(
-          (entry) => entry.value == value,
-      orElse: () => const MapEntry(Feeling.none, ''),
-    )
-        .key;
+  /// Get string value from the enum dynamically
+  String get value {
+    switch (this) {
+      case Feeling.happy:
+        return LocalizationService().get('happy');
+      case Feeling.sad:
+        return LocalizationService().get('sad');
+      case Feeling.angry:
+        return LocalizationService().get('angry');
+      case Feeling.tired:
+        return LocalizationService().get('tired');
+      case Feeling.none:
+      default:
+        return '';
+    }
   }
 
   /// Get enum from index

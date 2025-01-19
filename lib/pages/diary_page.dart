@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../models/comment.dart';
+import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/comment_card.dart';
 import '../widgets/main_title.dart';
@@ -33,7 +34,7 @@ class _DiaryPage extends State<DiaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainTitle(title: 'Diary'),
+      appBar: MainTitle(title: LocalizationService().get('diary')),
       body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(

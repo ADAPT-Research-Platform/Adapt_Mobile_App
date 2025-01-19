@@ -1,0 +1,27 @@
+{
+  "overview": "Overview",
+  "diary": "Diary",
+  "mood": "Mood",
+  "contacts": "Contacts",
+  "settings": "Settings",
+
+  "module" : "Module",
+  "modules" : "Modules",
+  "chapter" : "Chapter",
+  "chapters" : "Chapters",
+  "section" : "Section",
+  "sections" : "Sections",
+  "exercise" : "Exercise",
+  "exercises" : "Exercises",
+
+  "everyday_questions" : "Everyday Questions",
+  "im_feeling_today": "I’m feeling today.",
+  "im_motivated_today": "I’m motivated today.",
+
+  "happy": "Happy",
+  "sad": "Sad",
+  "angry": "Angry",
+  "tired": "Tired",
+
+  "submit" : "Submit"
+}

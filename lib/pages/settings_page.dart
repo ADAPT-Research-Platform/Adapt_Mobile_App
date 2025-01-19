@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 import '../services/auth_service.dart';
+import '../services/localization_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/sub_title.dart';
@@ -70,7 +71,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainTitle(title: 'Settings'),
+      appBar: MainTitle(title: LocalizationService().get('settings')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ListView(
@@ -154,6 +155,8 @@ class _SettingsPageState extends State<SettingsPage> {
             _buildRadioOption('Language', ['German', 'English'], _selectedLanguage, (value) {
               setState(() {
                 _selectedLanguage = value!;
+                String languageCode = _selectedLanguage == 'English' ? 'en' : 'de';
+                LocalizationService().load(languageCode);
               });
             }),
             _buildRadioOption('Theme', ['System', 'Light', 'Dark'], _selectedTheme, (value) {

@@ -1,6 +1,7 @@
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 
+import '../services/localization_service.dart';
 import '../utils/app_colors.dart';
 import 'hexagon_shape.dart';
 
@@ -46,27 +47,27 @@ class _AppNavigationBar extends State<BottomNavBar> {
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.home_rounded, true),
             icon: _buildHexagonButton(Icons.home_rounded, false),
-            label: 'Overview',
+            label: LocalizationService().get('overview'),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.book_rounded, true),
             icon: _buildHexagonButton(Icons.book_rounded, false),
-            label: 'Diary',
+            label: LocalizationService().get('diary'),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.emoji_emotions, true),
             icon: _buildHexagonButton(Icons.emoji_emotions, false),
-            label: 'Mood',
+            label: LocalizationService().get('mood'),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.account_box_rounded, true),
             icon: _buildHexagonButton(Icons.account_box_rounded, false),
-            label: 'Contacts',
+            label: LocalizationService().get('contacts'),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.settings, true),
             icon: _buildHexagonButton(Icons.settings, false),
-            label: 'Settings',
+            label: LocalizationService().get('settings'),
           ),
         ],
       ),

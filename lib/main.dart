@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:adapt/pages/consent_page.dart';
 import 'package:adapt/pages/overview_page.dart';
 import 'package:adapt/pages/splash_page.dart';
+import 'package:adapt/services/localization_service.dart';
 import 'package:adapt/services/notification_service.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,9 @@ void main() async {
 
   await NotificationService.init();
   tz.initializeTimeZones();
+
+  // Load default language (German)
+  await LocalizationService().load('de');
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

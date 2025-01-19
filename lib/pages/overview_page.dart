@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 import '../enums/feeling.dart';
+import '../services/localization_service.dart';
 import '../services/module_service.dart';
 import '../services/mood_service.dart';
 import '../services/notification_service.dart';
@@ -42,7 +43,7 @@ class _OverviewPageState extends State<OverviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainTitle(title: 'Overview'),
+      appBar: MainTitle(title: LocalizationService().get('overview')),
       body: FutureBuilder<List<String>>(
         future: _modulesIdFuture,
         builder: (context, snapshot) {
@@ -63,7 +64,7 @@ class _OverviewPageState extends State<OverviewPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const SubTitle(text: 'Modules'),
+                  SubTitle(text: LocalizationService().get('Modules')),
                   ModuleGrid(
                     moduleIdList: moduleIdList,
                     size: MediaQuery.of(context).size.width / 4, // Adjust dynamically
@@ -76,11 +77,11 @@ class _OverviewPageState extends State<OverviewPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SubTitle(text: 'Everyday Questions'),
+                      SubTitle(text: LocalizationService().get('everyday_questions')),
                       const SizedBox(height: 10),
-                      const Text(
-                        'I’m feeling today.',
-                        style: TextStyle(
+                      Text(
+                        LocalizationService().get('im_feeling_today'),
+                        style: const TextStyle(
                           color: AppColors.fontColor,
                           fontSize: AppFontSizes.small,
                         ),
@@ -97,9 +98,9 @@ class _OverviewPageState extends State<OverviewPage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        'I’m motivated today.',
-                        style: TextStyle(
+                      Text(
+                        LocalizationService().get('im_motivated_today'),
+                        style: const TextStyle(
                           color: AppColors.fontColor,
                           fontSize: AppFontSizes.small,
                         ),
@@ -114,7 +115,7 @@ class _OverviewPageState extends State<OverviewPage> {
                       ),
                       const SizedBox(height: 20),
                       TaskButton(
-                        text: 'Submit',
+                        text: LocalizationService().get('Submit'),
                         onPressed: () {
                           _modeService.saveMode(_selectedFeeling, _selectedMotivation);
 

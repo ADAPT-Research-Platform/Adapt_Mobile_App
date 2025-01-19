@@ -5,7 +5,7 @@ class StarSlider extends StatefulWidget {
   final int sliderLength; // Maximum value for the slider
   final ValueChanged<int> onChanged;
 
-  const StarSlider({Key? key, this.sliderLength = 10, required this.onChanged}) : super(key: key); // Default max value is 10
+  const StarSlider({super.key, this.sliderLength = 10, required this.onChanged}); // Default max value is 10
 
   @override
   _StarSliderState createState() => _StarSliderState();

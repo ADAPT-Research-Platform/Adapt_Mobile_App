@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
+import '../services/localization_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/main_title.dart';
@@ -14,7 +15,7 @@ class ContactPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MainTitle(title: 'Contact'),
+      appBar: MainTitle(title: LocalizationService().get('contacts')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
         child: Column(

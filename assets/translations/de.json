@@ -1,0 +1,27 @@
+{
+  "overview": "Übersicht",
+  "diary": "Tagebuch",
+  "mood": "Stimmung",
+  "contacts": "Kontakte",
+  "settings": "Einstellungen",
+
+  "module": "Modul",
+  "modules": "Module",
+  "chapter": "Kapitel",
+  "chapters": "Kapitel",
+  "section": "Abschnitt",
+  "sections": "Abschnitte",
+  "exercise": "Übung",
+  "exercises": "Übungen",
+
+  "everyday_questions": "Alltägliche Fragen",
+  "im_feeling_today": "Ich fühle mich heute.",
+  "im_motivated_today": "Ich bin heute motiviert.",
+
+  "happy": "Glücklich",
+  "sad": "Traurig",
+  "angry": "Wütend",
+  "tired": "Müde",
+
+  "submit": "Absenden"
+}
