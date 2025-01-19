@@ -16,8 +16,14 @@ class _StarSliderState extends State<StarSlider> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the device width
+    double deviceWidth = MediaQuery.of(context).size.width;
+
+    // Calculate the maximum size for each star. Adjust padding value accordingly
+    double starSize = (deviceWidth - 24 - 24 - 16 - 16) / widget.sliderLength;
+
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child:
         GestureDetector(
           onHorizontalDragUpdate: (details) {
@@ -43,12 +49,12 @@ class _StarSliderState extends State<StarSlider> {
               ),
               // Custom star icons over the line
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(widget.sliderLength, (index) {
                   return Icon(
                     Icons.star_rounded,
                     color: index < _sliderValue ? AppColors.primaryYellow : AppColors.darkGrey,
-                    size: 30,
+                    size: starSize.clamp(0, 30),
                   );
                 }),
               ),
