@@ -178,111 +178,11 @@ class _SectionPageState extends State<SectionPage> {
                               child: TaskButton(
                                 text: 'Comment',
                                 icon: Icons.comment_rounded,
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    useSafeArea: true,
-                                    context: context,
-                                    isScrollControlled: true,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(12.0)), // Adjust the top corners
-                                    ),
-                                    builder: (BuildContext context) {
-                                      final maxHeight = 2 * MediaQuery.of(context).size.height / 3;
-
-                                      return Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                        constraints: BoxConstraints(maxHeight: maxHeight), // Set minimum height
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                const SizedBox(width: 24), // Placeholder to align the title center
-                                                const Text(
-                                                  'Comments',
-                                                  style: TextStyle(
-                                                    color: AppColors.fontColor,
-                                                    fontSize: AppFontSizes.small,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(Icons.close_rounded),
-                                                  onPressed: () {
-                                                    Navigator.pop(context); // Close the bottom sheet
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                            const Divider(
-                                              color: AppColors.lightGrey,
-                                              // Customize the color as needed
-                                              thickness: 2.5, // Customize the thickness as needed
-                                            ),
-                                            Expanded( // Use Expanded here
-                                              child: FutureBuilder<List<Comment>>(
-                                                  future: _commentService.fetchComments(sectionId: widget.section.sectionId),
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                                      return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
-                                                    } else if (snapshot.hasError) {
-                                                      return const Center(child: Text("Error loading comments!"));
-                                                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                                      return const Center(child: Text("No comments available!"));
-                                                    }
-
-                                                    final List<Comment> comments = snapshot.data!;
-
-                                                    return ListView.separated(
-                                                          shrinkWrap: true,
-                                                          itemCount: comments.length,
-                                                          itemBuilder: (context, index) {
-                                                            return CommentCard(comment: comments[index]);
-                                                          },
-                                                          separatorBuilder: (context, index) {
-                                                            return const Divider(
-                                                              color: AppColors.lightGrey,
-                                                              thickness: 2.5,
-                                                            );
-                                                          },
-                                                    );
-                                                  },
-                                            ),
-                                        ),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: TextField(
-                                                    controller: _commentTextController, // Add a controller to get the text input
-                                                    maxLines: null, // Makes the TextField multiline
-                                                    decoration: InputDecoration(
-                                                      labelText: 'Write a comment...',
-                                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
-                                                    ),
-                                                  ),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(Icons.send_rounded, color: AppColors.darkYellow, size: 25),
-                                                  onPressed: () {
-                                                    _commentService.addComment(_commentTextController.text.trim(), widget.section.sectionId);
-                                                    _commentTextController.clear();
-                                                    Navigator.pop(context); // Close the bottom sheet
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
+                                onPressed: _showModalBottomSheet
                               ),
                             ),
                             if (widget.section.isExercise) ...[
-                              const SizedBox(width: 10,),
+                              const SizedBox(width: 10),
                               Expanded(
                                   child: TaskButton(
                                     text: 'Submit',
@@ -298,5 +198,107 @@ class _SectionPageState extends State<SectionPage> {
                 ));
           },
         ));
+  }
+
+  void _showModalBottomSheet(){
+    showModalBottomSheet(
+      useSafeArea: true,
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+            top: Radius.circular(12.0)), // Adjust the top corners
+      ),
+      builder: (BuildContext context) {
+        final maxHeight = 2 * MediaQuery.of(context).size.height / 3;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          constraints: BoxConstraints(maxHeight: maxHeight), // Set minimum height
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 24), // Placeholder to align the title center
+                  const Text(
+                    'Comments',
+                    style: TextStyle(
+                      color: AppColors.fontColor,
+                      fontSize: AppFontSizes.small,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () {
+                      Navigator.pop(context); // Close the bottom sheet
+                    },
+                  ),
+                ],
+              ),
+              const Divider(
+                color: AppColors.lightGrey,
+                // Customize the color as needed
+                thickness: 2.5, // Customize the thickness as needed
+              ),
+              Expanded( // Use Expanded here
+                child: FutureBuilder<List<Comment>>(
+                  future: _commentService.fetchComments(sectionId: widget.section.sectionId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+                    } else if (snapshot.hasError) {
+                      return const Center(child: Text("Error loading comments!"));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text("No comments available!"));
+                    }
+
+                    final List<Comment> comments = snapshot.data!;
+
+                    return ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        return CommentCard(comment: comments[index]);
+                      },
+                      separatorBuilder: (context, index) {
+                        return const Divider(
+                          color: AppColors.lightGrey,
+                          thickness: 2.5,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _commentTextController, // Add a controller to get the text input
+                      maxLines: null, // Makes the TextField multiline
+                      decoration: InputDecoration(
+                        labelText: 'Write a comment...',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send_rounded, color: AppColors.darkYellow, size: 25),
+                    onPressed: () {
+                      _commentService.addComment(_commentTextController.text.trim(), widget.section.sectionId);
+                      _commentTextController.clear();
+                      Navigator.pop(context); // Close the bottom sheet
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

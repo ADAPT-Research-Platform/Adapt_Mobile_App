@@ -82,93 +82,7 @@ class _ModePageState extends State<ModePage> {
                     )),
                     IconButton(
                       icon: const Icon(Icons.access_time_filled_rounded, color: AppColors.darkYellow, size: 35), // Static color
-                        onPressed: () {
-                          showModalBottomSheet(
-                            useSafeArea: true,
-                            context: context,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(12.0)), // Adjust the top corners
-                            ),
-                            builder: (BuildContext context) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                        // Title with Close Button
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const SizedBox(width: 24), // Placeholder to align the title center
-                                            const Text(
-                                              'Time Period',
-                                              style: TextStyle(
-                                                color: AppColors.fontColor,
-                                                fontSize: AppFontSizes.small,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(Icons.close_rounded),
-                                              onPressed: () {
-                                                Navigator.pop(context); // Close the bottom sheet
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                        const Divider(
-                                          color: AppColors.lightGrey,
-                                          // Customize the color as needed
-                                          thickness: 2.5, // Customize the thickness as needed
-                                        ),
-                                        // List of Options with Dividers
-                                        Flexible(
-                                          child: ListView.separated(
-                                            shrinkWrap: true,
-                                            itemCount: FilterOption.values.length,
-                                            itemBuilder: (context, index) {
-                                              final option = FilterOption.values[index];
-                                              return ListTile(
-                                                leading: Radio<FilterOption>(
-                                                  value: option,
-                                                  groupValue: selectedOption,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      updateDateRange(value!);
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                ),
-                                                title: Text(
-                                                    filterOptionLabels[option]!,
-                                                    style: const TextStyle(
-                                                    color: AppColors.fontColor,
-                                                    fontSize: AppFontSizes.small
-                                                )),
-                                                onTap: () {
-                                                  setState(() {
-                                                    updateDateRange(option);
-                                                  });
-                                                  Navigator.pop(context);
-                                                },
-                                              );
-                                            },
-                                            separatorBuilder: (context, index) {
-                                              return const Divider(
-                                                color: AppColors.lightGrey,
-                                                thickness: 2.5,
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                            },
-                          );
-                        }
+                        onPressed: _showModalBottomSheet
                     ),
                   ],
                 ),
@@ -217,6 +131,94 @@ class _ModePageState extends State<ModePage> {
               ],
             ),
           ),
+    );
+  }
+
+  void _showModalBottomSheet(){
+    showModalBottomSheet(
+      useSafeArea: true,
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+            top: Radius.circular(12.0)), // Adjust the top corners
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title with Close Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 24), // Placeholder to align the title center
+                  const Text(
+                    'Time Period',
+                    style: TextStyle(
+                      color: AppColors.fontColor,
+                      fontSize: AppFontSizes.small,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () {
+                      Navigator.pop(context); // Close the bottom sheet
+                    },
+                  ),
+                ],
+              ),
+              const Divider(
+                color: AppColors.lightGrey,
+                // Customize the color as needed
+                thickness: 2.5, // Customize the thickness as needed
+              ),
+              // List of Options with Dividers
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: FilterOption.values.length,
+                  itemBuilder: (context, index) {
+                    final option = FilterOption.values[index];
+                    return ListTile(
+                      leading: Radio<FilterOption>(
+                        value: option,
+                        groupValue: selectedOption,
+                        onChanged: (value) {
+                          setState(() {
+                            updateDateRange(value!);
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+                      title: Text(
+                          filterOptionLabels[option]!,
+                          style: const TextStyle(
+                              color: AppColors.fontColor,
+                              fontSize: AppFontSizes.small
+                          )),
+                      onTap: () {
+                        setState(() {
+                          updateDateRange(option);
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return const Divider(
+                      color: AppColors.lightGrey,
+                      thickness: 2.5,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

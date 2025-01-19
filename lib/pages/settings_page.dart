@@ -27,6 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _confirmCurrentPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmNewPasswordController = TextEditingController();
 
@@ -51,6 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _userNameController.dispose();
     _emailController.dispose();
     _currentPasswordController.dispose();
+    _confirmCurrentPasswordController.dispose();
     _newPasswordController.dispose();
     _confirmNewPasswordController.dispose();
     super.dispose();
@@ -63,12 +65,6 @@ class _SettingsPageState extends State<SettingsPage> {
     String confirmNewPassword = _confirmNewPasswordController.text.trim();
 
     _userService.updateUser(userName, currentPassword, newPassword, confirmNewPassword);
-  }
-
-  void _deleteUser() async {
-    String currentPassword = _currentPasswordController.text.trim();
-
-    _userService.deleteUser(currentPassword);
   }
 
   @override
@@ -140,11 +136,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     icon: Icons.update_rounded,
                   ),
                 ),
-                const SizedBox(width: 15),
+                const SizedBox(width: 10),
                 Expanded(
                   child: TaskButton(
                     text: 'Delete',
-                    onPressed: _deleteUser,
+                    onPressed: _showDeleteConfirmationDialog,
                     backgroundColor: AppColors.darkYellow,
                     icon: Icons.delete_rounded,
                   ),
@@ -202,9 +198,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   //TODO: Move this to a separate widget later
-  // Reusable widget for label and text field
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool enabled = true, bool obscureText = false}) {
+  Widget _buildTextField(String label, TextEditingController controller, {bool enabled = true, bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -269,7 +263,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  //TODO: Move this to a separate widget later
   Widget _buildSwitchOption(String title, bool currentValue, Function(bool) onChanged) {
     return SwitchListTile(
       title: Text(title, style: const TextStyle(
@@ -279,6 +272,48 @@ class _SettingsPageState extends State<SettingsPage> {
       value: currentValue,
       onChanged: onChanged,
       activeColor: AppColors.primaryYellow,
+    );
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12), // Rounded corners
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16), // Dialog padding
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Align(
+                  alignment: Alignment.center,
+                  child: SubTitle(text: 'Delete')
+                ),
+                const SizedBox(height: 10),
+                _buildTextField('Current Password', _confirmCurrentPasswordController, obscureText: true),
+                const SizedBox(height: 10),
+                // Confirm button
+                Align(
+                  alignment: Alignment.center,
+                  child: TaskButton(
+                    text: 'Confirm',
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                      _userService.deleteUser(_confirmCurrentPasswordController.text.trim());
+                      _confirmCurrentPasswordController.clear();
+                    },
+                    backgroundColor: AppColors.darkYellow,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
