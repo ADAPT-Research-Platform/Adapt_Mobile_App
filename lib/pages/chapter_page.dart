@@ -42,9 +42,9 @@ class _ChapterPageState extends State<ChapterPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
             } else if (snapshot.hasError) {
-              return const Center(child: Text("Error loading chapters"));
+              return const Center(child: Text("Error loading chapters!"));
             } else if (!snapshot.hasData) {
-              return const Center(child: Text("No chapters available"));
+              return const Center(child: Text("No chapters available!"));
             }
 
             final module = snapshot.data!;

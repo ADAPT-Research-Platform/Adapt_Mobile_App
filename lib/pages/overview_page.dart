@@ -16,7 +16,7 @@ import '../widgets/sub_title.dart';
 class OverviewPage extends StatefulWidget {
   final VoidCallback reloadModePage;
 
-  OverviewPage({super.key, required this.reloadModePage});
+  const OverviewPage({super.key, required this.reloadModePage});
 
   @override
   _OverviewPageState createState() => _OverviewPageState();
@@ -49,9 +49,9 @@ class _OverviewPageState extends State<OverviewPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
           } else if (snapshot.hasError) {
-            return const Center(child: Text("Error loading data"));
+            return const Center(child: Text("Error loading modules!"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No data available"));
+            return const Center(child: Text("No data available!"));
           }
 
           final moduleIdList = snapshot.data!;
@@ -90,10 +90,10 @@ class _OverviewPageState extends State<OverviewPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildFeelingIcon(Icons.sentiment_satisfied_alt, Feeling.happy),
-                          _buildFeelingIcon(Icons.sentiment_dissatisfied, Feeling.sad),
-                          _buildFeelingIcon(Icons.sentiment_very_dissatisfied, Feeling.angry),
-                          _buildFeelingIcon(Icons.sentiment_neutral, Feeling.tired),
+                          _buildFeelingIcon(Feeling.happy, Icons.sentiment_satisfied_alt),
+                          _buildFeelingIcon(Feeling.sad, Icons.sentiment_dissatisfied),
+                          _buildFeelingIcon(Feeling.angry, Icons.sentiment_very_dissatisfied),
+                          _buildFeelingIcon(Feeling.tired, Icons.sentiment_neutral),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -140,7 +140,7 @@ class _OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  Widget _buildFeelingIcon(IconData icon, Feeling feeling) {
+  Widget _buildFeelingIcon(Feeling feeling, IconData icon) {
     return GestureDetector(
       onTap: () {
         setState(() {

@@ -131,9 +131,9 @@ class _SectionPageState extends State<SectionPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
             } else if (snapshot.hasError) {
-              return const Center(child: Text("Error loading exercise"));
+              return const Center(child: Text("Error loading content!"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text("No content available"));
+              return const Center(child: Text("No content available!"));
             }
 
             // Extract data
@@ -228,9 +228,9 @@ class _SectionPageState extends State<SectionPage> {
                                                     if (snapshot.connectionState == ConnectionState.waiting) {
                                                       return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
                                                     } else if (snapshot.hasError) {
-                                                      return const Center(child: Text("Error loading comments"));
+                                                      return const Center(child: Text("Error loading comments!"));
                                                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                                      return const Center(child: Text("No comments available"));
+                                                      return const Center(child: Text("No comments available!"));
                                                     }
 
                                                     final List<Comment> comments = snapshot.data!;

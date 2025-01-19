@@ -186,9 +186,9 @@ class _ModePageState extends State<ModePage> {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
                         } else if (snapshot.hasError) {
-                          return const Center(child: Text("Error loading mood data"));
+                          return const Center(child: Text("Error loading mood data!"));
                         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Center(child: Text("No mood data available"));
+                          return const Center(child: Text("No mood data available!"));
                         }
 
                         final modeData = snapshot.data!;
