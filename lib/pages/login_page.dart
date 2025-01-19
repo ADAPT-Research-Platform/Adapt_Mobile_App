@@ -25,23 +25,15 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
 
   @override
-  void dispose(){
+  void dispose() {
     _userEmailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _login() async{
+  void _login() async {
     String userEmail = _userEmailController.text.trim();
     String password = _passwordController.text.trim();
-
-    _authService.login(userEmail, password);
-  }
-
-  //TODO: Temporary Method Just to ByPass login
-  void _login_bypass() async{
-    String userEmail = "risithmarshall@gmail.com";
-    String password = "apple123";
 
     _authService.login(userEmail, password);
   }
@@ -49,36 +41,53 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final bool isSmallScreen = size.height < 600; // Adjust based on your desired cutoff for small screens
+    const double hexagonSize = 150;
+    final screenWidth = size.width;
+    final screenHeight = size.height;
+    final bool isSmallScreen = screenHeight < 600; // Adjust based on your desired cutoff for small screens
 
     return ScaffoldMessenger(
         key: loginPageScaffold,
         child: Scaffold(
-          body: SingleChildScrollView(
-            child: Stack(
-              children: [
-                const Positioned.fill(
-                  left: -45,
-                  top: -160,
-                  child: HexagonGrid(
-                    rows: 6,
-                    cols: 4,
-                    size: 175,
-                    fillColor: AppColors.primaryYellow,
-                    strokeColor: Colors.white,
-                    strokeWidth: 6,
+          resizeToAvoidBottomInset: true,
+          // Ensures the layout adjusts when keyboard pops up
+          body: Stack(
+            children: [
+              Positioned.fill(
+                left: -hexagonSize / 2,
+                top: -hexagonSize / 2,
+                child: HexagonGrid(
+                  rows: (1.5 * screenHeight / hexagonSize).roundToDouble().toInt(),
+                  cols: (screenWidth / hexagonSize).roundToDouble().toInt(),
+                  size: hexagonSize,
+                  fillColor: AppColors.primaryYellow,
+                  strokeColor: Colors.white,
+                  strokeWidth: 6,
+                ),
+              ),
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Colors.transparent],
+                    stops: [0.5, 1.0],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
                   ),
                 ),
-                Positioned.fill(
-                  top: -size.height / 1.5,
-                  child: Image.asset(
-                    'assets/images/hands_icon.png',
-                    width: size.width + 100, // Stretch to full screen width
-                    fit: BoxFit.fitWidth, // Maintains the aspect ratio
-                  ),
+              ),
+              // Centered Text
+              Positioned.fill(
+                top: -screenHeight / 1.5,
+                child: Image.asset(
+                  'assets/images/hands_icon.png',
+                  width: screenWidth + 100, // Stretch to full screen width
+                  fit: BoxFit.fitWidth, // Maintains the aspect ratio
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
+              ),
+              // Scrollable content
+              Positioned.fill(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 100),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -93,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        'Please login to your account.',
+                        'Please enter your credentials',
                         style: TextStyle(fontSize: AppFontSizes.small),
                       ),
                       const SizedBox(height: 20),
@@ -131,17 +140,12 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: _login
                       ),
                       const SizedBox(height: 10),
-                      TaskButton(
-                          text: 'Login ByPass',
-                          onPressed: _login_bypass
-                      ),
-                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text("Don't have an account? "),
                           TextButton(
-                            onPressed: (){
+                            onPressed: () {
                               mainNavigator.currentState!.pushReplacementNamed(Routes.routeSignUp);
                             },
                             child: const Text('Register'),
@@ -152,10 +156,10 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-              ],
-            ),
+              )
+            ],
           ),
         )
-      );
+    );
   }
 }

@@ -50,161 +50,178 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final bool isSmallScreen =
-        size.height < 600; // Adjust cutoff for small screens
+    const double hexagonSize = 150;
+    final screenWidth = size.width;
+    final screenHeight = size.height;
+    final bool isSmallScreen = screenHeight < 600; // Adjust based on your desired cutoff for small screens
 
     return ScaffoldMessenger(
-      key: signupPageScaffold,
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Stack(
+        key: signupPageScaffold,
+        child: Scaffold(
+          resizeToAvoidBottomInset: true,
+          // Ensures the layout adjusts when keyboard pops up
+          body: Stack(
             children: [
-              const Positioned.fill(
-                left: -45,
-                top: -160,
+              Positioned.fill(
+                left: -hexagonSize / 2,
+                top: -hexagonSize / 2,
                 child: HexagonGrid(
-                  rows: 6,
-                  cols: 4,
-                  size: 175,
+                  rows: (screenHeight / hexagonSize).roundToDouble().toInt(),
+                  cols: (screenWidth / hexagonSize).roundToDouble().toInt(),
+                  size: hexagonSize,
                   fillColor: AppColors.primaryYellow,
                   strokeColor: Colors.white,
                   strokeWidth: 6,
                 ),
               ),
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Colors.transparent],
+                    stops: [0.6, 1.0],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  ),
+                ),
+              ),
+              // Centered Text
               Positioned.fill(
-                top: -size.height / 1.5,
+                top: -screenHeight / 1.5,
                 child: Image.asset(
                   'assets/images/hands_icon.png',
-                  width: size.width + 100, // Stretch to full screen width
+                  width: screenWidth + 100, // Stretch to full screen width
                   fit: BoxFit.fitWidth, // Maintains the aspect ratio
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: size.height / (isSmallScreen ? 4 : 3)),
-                    const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        color: AppColors.darkYellow,
-                        fontSize: AppFontSizes.large,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Please fill your information.',
-                      style: TextStyle(fontSize: AppFontSizes.small),
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: _displayNameController,
-                      decoration: InputDecoration(
-                        labelText: 'User Name',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6.0),
+              // Scrollable content
+              Positioned.fill(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: size.height / (isSmallScreen ? 4 : 3)),
+                      const Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          color: AppColors.darkYellow,
+                          fontSize: AppFontSizes.large,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _userEmailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email Address',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6.0),
-                        ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Please fill your information.',
+                        style: TextStyle(fontSize: AppFontSizes.small),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6.0),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _passwordConfirmController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: 'Confirm Password',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6.0),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _isChecked,
-                          fillColor: WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return AppColors.darkYellow;
-                            }
-                            return null;
-                          }),
-                          onChanged: (value) {
-                            setState(() {
-                              _isChecked = value!;
-                            });
-                          },
-                        ),
-                        Expanded(
-                          child: Text.rich(
-                            TextSpan(
-                              text: 'I agree to the data protection regulations and would like to continue to participate. ',
-                              children: [
-                                TextSpan(
-                                  text: 'Here.',
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      mainNavigator.currentState!.pushNamed(Routes.routeConsent);
-                                    },
-                                ),
-                              ],
-                            ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _displayNameController,
+                        decoration: InputDecoration(
+                          labelText: 'User Name',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6.0),
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    TaskButton(
-                      text: 'Register',
-                      onPressed: _isChecked ? _register : null,
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Already have an account?"),
-                        TextButton(
-                          onPressed: () {
-                            mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
-                          },
-                          child: const Text('Login'),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _userEmailController,
+                        decoration: InputDecoration(
+                          labelText: 'Email Address',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                          ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _passwordConfirmController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm Password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: _isChecked,
+                            fillColor: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return AppColors.darkYellow;
+                              }
+                              return null;
+                            }),
+                            onChanged: (value) {
+                              setState(() {
+                                _isChecked = value!;
+                              });
+                            },
+                          ),
+                          Expanded(
+                            child: Text.rich(
+                              TextSpan(
+                                text: 'I agree to the data protection regulations and would like to continue to participate. ',
+                                children: [
+                                  TextSpan(
+                                    text: 'Here.',
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        mainNavigator.currentState!
+                                            .pushNamed(Routes.routeConsent);
+                                      },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      TaskButton(
+                        text: 'Register',
+                        onPressed: _isChecked ? _register : null,
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Already have an account?"),
+                          TextButton(
+                            onPressed: () {
+                              mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+                            },
+                            child: const Text('Login'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
-              ),
+              )
             ],
           ),
-        ),
-      ),
+        )
     );
   }
 }
