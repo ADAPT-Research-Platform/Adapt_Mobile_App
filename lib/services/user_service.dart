@@ -115,7 +115,7 @@ class UserService {
 
   void deleteUser(String currentPassword) async {
     if(currentPassword.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'Password not provided!');
+      SnackBarShower.warn(mainPageScaffold, 'Password not provided!');
       return;
     }
 
@@ -128,28 +128,24 @@ class UserService {
         }),
       );
 
-      // Navigate to the login page on any circumstances
-      mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
-
       log.info('User Delete Response: ${response.body}');
       if (response.statusCode == 200) {
         SessionManager().clearSessionInfo();
         await CookieService().deleteCookie();
 
+        // Navigate to the login page
+        mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+
         Future.delayed(const Duration(milliseconds: 1000), () {
           SnackBarShower.info(loginPageScaffold, 'User Delete Successful!');
         });
       } else {
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-          SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
-        });
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       log.severe('Error in User Delete', e);
-      Future.delayed(const Duration(milliseconds: 1000), () {
-        SnackBarShower.error(loginPageScaffold, 'Internal App Error!');
-      });
+      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
     }
   }
 }

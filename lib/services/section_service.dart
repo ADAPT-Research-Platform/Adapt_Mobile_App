@@ -94,11 +94,9 @@ class SectionService {
   }
 
   void updateProgress(String sectionId, double progress) async {
-    const url = '${AppConfig.baseUrl}/progress';
-
     try {
       final response = await SessionManager().client.post(
-        Uri.parse(url),
+        Uri.parse('${AppConfig.baseUrl}/progress'),
         headers: SessionManager().getHeaders(),
         body: jsonEncode({
           'sectionId': sectionId,
@@ -112,10 +110,11 @@ class SectionService {
       }else if (response.statusCode == 201) {
         log.info('Progress added successfully! Section: $sectionId Progress: $progress');
       } else {
-        SnackBarShower.error(mainPageScaffold, 'Progress Update Error!');
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
-      log.severe('Error in Update Progress!', e);
+      log.severe('Error in Update Progress: $e');
       SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
     }
   }
