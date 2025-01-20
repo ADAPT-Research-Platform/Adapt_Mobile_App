@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:adapt/pages/consent_page.dart';
-import 'package:adapt/pages/overview_page.dart';
 import 'package:adapt/pages/splash_page.dart';
 import 'package:adapt/services/localization_service.dart';
 import 'package:adapt/services/notification_service.dart';

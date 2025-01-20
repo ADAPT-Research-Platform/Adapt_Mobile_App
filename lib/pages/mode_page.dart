@@ -3,7 +3,7 @@ import 'package:adapt/widgets/sub_title.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
-import '../enums/filter_options.dart';
+import '../enums/mood_period_filter.dart';
 import '../models/mood.dart';
 import '../services/localization_service.dart';
 import '../services/mood_service.dart';
@@ -26,11 +26,11 @@ class _ModePageState extends State<ModePage> {
 
   final MoodService _modeService = MoodService();
 
-  static FilterOption selectedOption = FilterOption.thisMonth; // Default option
+  static ModePeriodFilter selectedOption = ModePeriodFilter.thisMonth; // Default option
   DateTime? startDate;
   DateTime? endDate;
 
-  void updateDateRange(FilterOption option) {
+  void updateDateRange(ModePeriodFilter option) {
     Map<String, DateTime> period = getDateRange(option);
     selectedOption = option;
     startDate = period['start'];
@@ -40,7 +40,7 @@ class _ModePageState extends State<ModePage> {
   @override
   void initState() {
     super.initState();
-    updateDateRange(FilterOption.thisMonth);
+    updateDateRange(ModePeriodFilter.thisMonth);
   }
 
   bool shouldReloadData = false;
@@ -180,11 +180,11 @@ class _ModePageState extends State<ModePage> {
               Flexible(
                 child: ListView.separated(
                   shrinkWrap: true,
-                  itemCount: FilterOption.values.length,
+                  itemCount: ModePeriodFilter.values.length,
                   itemBuilder: (context, index) {
-                    final option = FilterOption.values[index];
+                    final option = ModePeriodFilter.values[index];
                     return ListTile(
-                      leading: Radio<FilterOption>(
+                      leading: Radio<ModePeriodFilter>(
                         value: option,
                         groupValue: selectedOption,
                         onChanged: (value) {

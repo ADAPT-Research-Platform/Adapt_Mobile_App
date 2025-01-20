@@ -3,11 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 
 import '../services/auth_service.dart';
-import '../services/session_manager.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
-import '../utils/app_keys.dart';
-import '../utils/app_routes.dart';
 import '../widgets/hexagon_grid.dart';
 
 class SplashPage extends StatefulWidget {
