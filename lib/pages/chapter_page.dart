@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
+import '../enums/section_filter.dart';
 import '../models/module.dart';
 import '../models/section.dart';
 import '../services/localization_service.dart';
@@ -25,7 +26,7 @@ class _ChapterPageState extends State<ChapterPage> {
   final log = Logger('ChapterPage');
 
   final ModuleService _moduleService = ModuleService();
-  String selectedFilter = 'All'; // Default filter
+  SectionFilter selectedFilter = SectionFilter.all; // Default filter
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,7 @@ class _ChapterPageState extends State<ChapterPage> {
                 child: Column(
                   children: [
                     // Segmented Button to filter chapters
-                    SegmentedButton<String>(
+                    SegmentedButton<SectionFilter>(
                       style: SegmentedButton.styleFrom(
                         backgroundColor: AppColors.darkWhite,
                         foregroundColor: AppColors.fontColor,
@@ -66,28 +67,28 @@ class _ChapterPageState extends State<ChapterPage> {
                           width: 2.2, // Set the border width
                         ),
                       ),
-                      segments: const <ButtonSegment<String>>[
+                      segments: <ButtonSegment<SectionFilter>>[
                         ButtonSegment(
-                            value: 'All',
+                            value: SectionFilter.all,
                             label: SizedBox(
                               width: 70, // Fixed width
-                              child: Center(child: Text('All')),
+                              child: Center(child: Text(SectionFilter.all.value)),
                             )),
                         ButtonSegment(
-                            value: 'Readings',
+                            value: SectionFilter.readings,
                             label: SizedBox(
                               width: 70, // Fixed width
-                              child: Center(child: Text('Readings')),
+                              child: Center(child: Text(SectionFilter.readings.value)),
                             )),
                         ButtonSegment(
-                            value: 'Exercises',
+                            value: SectionFilter.exercises,
                             label: SizedBox(
                               width: 70, // Fixed width
-                              child: Center(child: Text('Exercises')),
+                              child: Center(child: Text(SectionFilter.exercises.value)),
                             )),
                       ],
-                      selected: <String>{selectedFilter},
-                      onSelectionChanged: (Set<String> newSelection) {
+                      selected: <SectionFilter>{selectedFilter},
+                      onSelectionChanged: (Set<SectionFilter> newSelection) {
                         setState(() {
                           selectedFilter = newSelection.first; // Update filter
                         });
@@ -108,13 +109,11 @@ class _ChapterPageState extends State<ChapterPage> {
                           Map<int, Section> filteredSectionsMap = {};
                           // Show all sections, maintain the original index
                           for (int i = 0; i < chapter.sections.length; i++) {
-                            if (selectedFilter == 'All') {
+                            if (selectedFilter == SectionFilter.all) {
                               filteredSectionsMap[i] = chapter.sections[i];
-                            } else if (selectedFilter == 'Readings' &&
-                                !chapter.sections[i].isExercise) {
+                            } else if (selectedFilter == SectionFilter.readings && !chapter.sections[i].isExercise) {
                               filteredSectionsMap[i] = chapter.sections[i];
-                            } else if (selectedFilter == 'Exercises' &&
-                                chapter.sections[i].isExercise) {
+                            } else if (selectedFilter == SectionFilter.exercises && chapter.sections[i].isExercise) {
                               filteredSectionsMap[i] = chapter.sections[i];
                             }
                           }
@@ -162,7 +161,7 @@ class _ChapterPageState extends State<ChapterPage> {
                                       const Icon(Icons.access_time_filled_rounded, color: AppColors.darkYellow),
                                       const SizedBox(width: 4),
                                       Text(
-                                        "${chapter.progress.round()}% Progress",
+                                        "${chapter.progress.round()}% ${LocalizationService().get('Progress')}",
                                         style: const TextStyle(
                                           fontSize: 14,
                                           color: AppColors.fontColor,
@@ -176,7 +175,7 @@ class _ChapterPageState extends State<ChapterPage> {
                                       const Icon(Icons.list_alt_rounded, color: AppColors.darkYellow),
                                       const SizedBox(width: 4),
                                       Text(
-                                        "${chapter.numOfComments} Comments",
+                                        "${chapter.numOfComments} ${LocalizationService().get('Comments')}",
                                         style: const TextStyle(
                                           fontSize: 14,
                                           color: AppColors.fontColor,

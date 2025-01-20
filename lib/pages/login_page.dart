@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 import '../services/auth_service.dart';
+import '../services/localization_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
@@ -92,24 +93,24 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(height: size.height / (isSmallScreen ? 4 : 3)),
-                      const Text(
-                        'Login',
-                        style: TextStyle(
+                      Text(
+                        LocalizationService().get('sign_in'),
+                        style: const TextStyle(
                           color: AppColors.darkYellow, // Static text color
                           fontSize: AppFontSizes.large, // Static font size
                           fontWeight: FontWeight.bold, // Static font weight
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        'Please enter your credentials',
-                        style: TextStyle(fontSize: AppFontSizes.small),
+                      Text(
+                        LocalizationService().get('enter_your_credentials'),
+                        style: const TextStyle(fontSize: AppFontSizes.small),
                       ),
                       const SizedBox(height: 20),
                       TextField(
                         controller: _userEmailController,
                         decoration: InputDecoration(
-                          labelText: 'Username or Email',
+                          labelText: LocalizationService().get('username_or_email'),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
@@ -120,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: 'Password',
+                          labelText: LocalizationService().get('Password'),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
@@ -131,24 +132,24 @@ class _LoginPageState extends State<LoginPage> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {},
-                          child: const Text('Forgot Password?'),
+                          child: Text(LocalizationService().get('forgot_password')),
                         ),
                       ),
                       const SizedBox(height: 20),
                       TaskButton(
-                          text: 'Login',
+                          text: LocalizationService().get('Login'),
                           onPressed: _login
                       ),
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don't have an account? "),
+                          Text(LocalizationService().get('dont_have_an_account')),
                           TextButton(
                             onPressed: () {
                               mainNavigator.currentState!.pushReplacementNamed(Routes.routeSignUp);
                             },
-                            child: const Text('Register'),
+                            child: Text(LocalizationService().get('Register')),
                           ),
                         ],
                       ),

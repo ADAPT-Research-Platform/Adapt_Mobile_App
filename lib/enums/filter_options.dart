@@ -1,3 +1,5 @@
+import '../services/localization_service.dart';
+
 enum FilterOption {
   thisMonth,
   thisYear,
@@ -6,13 +8,25 @@ enum FilterOption {
   lastYear
 }
 
-Map<FilterOption, String> filterOptionLabels = {
-  FilterOption.thisMonth: 'This Month',
-  FilterOption.thisYear: 'This Year',
-  FilterOption.lastThreeMonths: 'Last Three Months',
-  FilterOption.lastSixMonths: 'Last Six Months',
-  FilterOption.lastYear: 'Last Year',
-};
+extension FilterOptionExtension on FilterOption {
+  /// Get string value from the enum dynamically
+  String get value {
+    switch (this) {
+      case FilterOption.thisMonth:
+        return LocalizationService().get('this_month');
+      case FilterOption.thisYear:
+        return LocalizationService().get('this_year');
+      case FilterOption.lastThreeMonths:
+        return LocalizationService().get('last_3_months');
+      case FilterOption.lastSixMonths:
+        return LocalizationService().get('last_6_months');
+      case FilterOption.lastYear:
+        return LocalizationService().get('last_year');
+      default:
+        return 'Unknown';
+    }
+  }
+}
 
 Map<String, DateTime> getDateRange(FilterOption filterOption) {
   switch (filterOption) {

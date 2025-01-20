@@ -87,11 +87,11 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: ListView(
           children: [
-            const SubTitle(text: 'Account'),
+            SubTitle(text: LocalizationService().get('Account')),
             const SizedBox(height: 10),
-            _buildTextField('User Name', _userNameController),
+            _buildTextField(LocalizationService().get('user_name'), _userNameController),
             const SizedBox(height: 10),
-            _buildTextField('Email Address', _emailController, enabled: false),
+            _buildTextField(LocalizationService().get('email_address'), _emailController, enabled: false),
             const SizedBox(height: 10),
 
             // Checkbox for Change Password
@@ -117,9 +117,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     });
                   },
                 ),
-                const Text(
-                  'Change Password',
-                  style: TextStyle(
+                Text(
+                  LocalizationService().get('change_password'),
+                  style: const TextStyle(
                     color: AppColors.fontColor,
                     fontSize: AppFontSizes.small,
                     fontWeight: FontWeight.bold,
@@ -130,11 +130,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
             // Collapsible password fields
             if (_changePassword) ...[
-              _buildTextField('Current Password', _currentPasswordController, obscureText: true),
+              _buildTextField(LocalizationService().get('current_password'), _currentPasswordController, obscureText: true),
               const SizedBox(height: 10),
-              _buildTextField('New Password', _newPasswordController, obscureText: true),
+              _buildTextField(LocalizationService().get('new_password'), _newPasswordController, obscureText: true),
               const SizedBox(height: 10),
-              _buildTextField('Confirm New Password', _confirmNewPasswordController, obscureText: true),
+              _buildTextField(LocalizationService().get('confirm_new_password'), _confirmNewPasswordController, obscureText: true),
               const SizedBox(height: 15),
             ],
 
@@ -143,7 +143,7 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 Expanded(
                   child: TaskButton(
-                    text: 'Update',
+                    text: LocalizationService().get('Update'),
                     onPressed: _updateUser,
                     icon: Icons.update_rounded,
                   ),
@@ -151,7 +151,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: TaskButton(
-                    text: 'Delete',
+                    text: LocalizationService().get('Delete'),
                     onPressed: _showDeleteConfirmationDialog,
                     backgroundColor: AppColors.darkYellow,
                     icon: Icons.delete_rounded,
@@ -162,15 +162,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
             const SizedBox(height: 10),
             const Divider(color: AppColors.lightGrey, thickness: 2.5),
-            const SubTitle(text: 'Appearance'),
-            _buildRadioOption('Language', ['German', 'English'], _selectedLanguage, (value) {
+            SubTitle(text: LocalizationService().get('Appearance')),
+            _buildRadioOption(LocalizationService().get('Language'), ['Deutch', 'English'], _selectedLanguage, (value) {
               setState(() {
                 _selectedLanguage = value!;
                 String languageCode = _selectedLanguage == 'English' ? 'en' : 'de';
                 LocalizationService().load(languageCode);
               });
             }),
-            _buildRadioOption('Theme', ['System', 'Light', 'Dark'], _selectedTheme, (value) {
+            _buildRadioOption(LocalizationService().get('Theme'), ['System', 'Light', 'Dark'], _selectedTheme, (value) {
               setState(() {
                 _selectedTheme = value!;
               });
@@ -180,13 +180,13 @@ class _SettingsPageState extends State<SettingsPage> {
               color: AppColors.lightGrey,
               thickness: 2.5,
             ),
-            const SubTitle(text: 'Notifications'),
-            _buildSwitchOption('Mute Notifications', _isMuteNotifications, (value) {
+            SubTitle(text: LocalizationService().get('Notifications')),
+            _buildSwitchOption(LocalizationService().get('mute_notifications'), _isMuteNotifications, (value) {
               setState(() {
                 _isMuteNotifications = value;
               });
             }),
-            _buildSwitchOption('Notification Sound', _isNotificationSoundEnabled, (value) {
+            _buildSwitchOption(LocalizationService().get('notification_sound'), _isNotificationSoundEnabled, (value) {
               setState(() {
                 _isNotificationSoundEnabled = value;
               });
@@ -198,7 +198,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 5),
             // Logout button at the bottom
             TaskButton(
-              text: 'Logout',
+              text: LocalizationService().get('Logout'),
               onPressed: () {
                 _authService.logout();
               },
@@ -303,18 +303,18 @@ class _SettingsPageState extends State<SettingsPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Align(
+                Align(
                   alignment: Alignment.center,
-                  child: SubTitle(text: 'Delete')
+                  child: SubTitle(text: LocalizationService().get('Delete'))
                 ),
                 const SizedBox(height: 10),
-                _buildTextField('Current Password', _confirmCurrentPasswordController, obscureText: true),
+                _buildTextField(LocalizationService().get('current_password'), _confirmCurrentPasswordController, obscureText: true),
                 const SizedBox(height: 10),
                 // Confirm button
                 Align(
                   alignment: Alignment.center,
                   child: TaskButton(
-                    text: 'Confirm',
+                    text: LocalizationService().get('Confirm'),
                     onPressed: () {
                       Navigator.of(context).pop(); // Close the dialog
                       _userService.deleteUser(_confirmCurrentPasswordController.text.trim());

@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
+import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
@@ -101,24 +102,24 @@ class _SignUpPageState extends State<SignUpPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(height: size.height / (isSmallScreen ? 4 : 3)),
-                      const Text(
-                        'Sign Up',
-                        style: TextStyle(
+                      Text(
+                        LocalizationService().get('sign_up'),
+                        style: const TextStyle(
                           color: AppColors.darkYellow,
                           fontSize: AppFontSizes.large,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        'Please fill your information.',
-                        style: TextStyle(fontSize: AppFontSizes.small),
+                       Text(
+                        LocalizationService().get('fill_your_information'),
+                        style: const TextStyle(fontSize: AppFontSizes.small),
                       ),
                       const SizedBox(height: 20),
                       TextField(
                         controller: _displayNameController,
                         decoration: InputDecoration(
-                          labelText: 'User Name',
+                          labelText: LocalizationService().get('user_name'),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
@@ -128,7 +129,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       TextField(
                         controller: _userEmailController,
                         decoration: InputDecoration(
-                          labelText: 'Email Address',
+                          labelText: LocalizationService().get('email_address'),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
@@ -139,7 +140,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: 'Password',
+                          labelText: LocalizationService().get('Password'),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
@@ -150,7 +151,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         controller: _passwordConfirmController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: 'Confirm Password',
+                          labelText: LocalizationService().get('confirm_password'),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
@@ -176,7 +177,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           Expanded(
                             child: Text.rich(
                               TextSpan(
-                                text: 'I agree to the data protection regulations and would like to continue to participate. ',
+                                text: LocalizationService().get('regulation'),
                                 children: [
                                   TextSpan(
                                     text: 'Here.',
@@ -198,19 +199,19 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       const SizedBox(height: 20),
                       TaskButton(
-                        text: 'Register',
+                        text: LocalizationService().get('Register'),
                         onPressed: _isChecked ? _register : null,
                       ),
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Already have an account?"),
+                          Text(LocalizationService().get('already_have_an_account')),
                           TextButton(
                             onPressed: () {
                               mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
                             },
-                            child: const Text('Login'),
+                            child: Text(LocalizationService().get('Login')),
                           ),
                         ],
                       ),

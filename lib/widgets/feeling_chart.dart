@@ -71,7 +71,7 @@ class FeelingChart extends StatelessWidget {
             axisNameSize: 20,
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 40,
+              reservedSize: 50,
               interval: 1, // Show all feeling values
               getTitlesWidget: (value, _) {
                 final int index = value.toInt();

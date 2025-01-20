@@ -15,7 +15,7 @@ import '../widgets/motivation_chart.dart';
 class ModePage extends StatefulWidget {
   bool shouldReload;
 
-  ModePage({required this.shouldReload});
+  ModePage({super.key, required this.shouldReload});
 
   @override
   _ModePageState createState() => _ModePageState();
@@ -26,7 +26,7 @@ class _ModePageState extends State<ModePage> {
 
   final MoodService _modeService = MoodService();
 
-  static FilterOption? selectedOption; // Default option
+  static FilterOption selectedOption = FilterOption.thisMonth; // Default option
   DateTime? startDate;
   DateTime? endDate;
 
@@ -69,7 +69,7 @@ class _ModePageState extends State<ModePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      filterOptionLabels[selectedOption]!,
+                      selectedOption.value,
                       style: const TextStyle(
                         color: AppColors.fontColor,
                         fontSize: AppFontSizes.small,
@@ -112,7 +112,7 @@ class _ModePageState extends State<ModePage> {
 
                         return Column(
                           children: [
-                            const SubTitle(text: 'Feeling'),
+                            SubTitle(text: LocalizationService().get('Feeling')),
                             Expanded(
                               child: FeelingChart(modeData: modeData, startDate: startDate!, endDate: endDate!),
                             ),
@@ -120,7 +120,7 @@ class _ModePageState extends State<ModePage> {
                               color: AppColors.lightGrey,
                               thickness: 2.5,
                             ),
-                            const SubTitle(text: 'Motivation'),
+                            SubTitle(text: LocalizationService().get('Motivation')),
                             Expanded(
                               child: MotivationChart(modeData: modeData),
                             ),
@@ -155,9 +155,9 @@ class _ModePageState extends State<ModePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(width: 24), // Placeholder to align the title center
-                  const Text(
-                    'Time Period',
-                    style: TextStyle(
+                  Text(
+                    LocalizationService().get('time_period'),
+                    style: const TextStyle(
                       color: AppColors.fontColor,
                       fontSize: AppFontSizes.small,
                       fontWeight: FontWeight.bold,
@@ -195,7 +195,7 @@ class _ModePageState extends State<ModePage> {
                         },
                       ),
                       title: Text(
-                          filterOptionLabels[option]!,
+                          option.value,
                           style: const TextStyle(
                               color: AppColors.fontColor,
                               fontSize: AppFontSizes.small

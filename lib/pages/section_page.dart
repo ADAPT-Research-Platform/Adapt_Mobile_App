@@ -13,6 +13,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 
 import '../models/comment.dart';
+import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
 import '../widgets/comment_card.dart';
@@ -176,7 +177,7 @@ class _SectionPageState extends State<SectionPage> {
                           children: [
                             Expanded(
                               child: TaskButton(
-                                text: 'Comment',
+                                text: LocalizationService().get('Comment'),
                                 icon: Icons.comment_rounded,
                                 onPressed: _showModalBottomSheet
                               ),
@@ -185,7 +186,7 @@ class _SectionPageState extends State<SectionPage> {
                               const SizedBox(width: 10),
                               Expanded(
                                   child: TaskButton(
-                                    text: 'Submit',
+                                    text: LocalizationService().get('Submit'),
                                     onPressed: _submitAnswers,
                                     backgroundColor: AppColors.darkYellow,
                                     icon: Icons.question_answer_rounded,
@@ -222,9 +223,9 @@ class _SectionPageState extends State<SectionPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(width: 24), // Placeholder to align the title center
-                  const Text(
-                    'Comments',
-                    style: TextStyle(
+                  Text(
+                    LocalizationService().get('Comments'),
+                    style: const TextStyle(
                       color: AppColors.fontColor,
                       fontSize: AppFontSizes.small,
                       fontWeight: FontWeight.bold,
@@ -280,7 +281,7 @@ class _SectionPageState extends State<SectionPage> {
                       controller: _commentTextController, // Add a controller to get the text input
                       maxLines: null, // Makes the TextField multiline
                       decoration: InputDecoration(
-                        labelText: 'Write a comment...',
+                        labelText: LocalizationService().get('write_a_comment'),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
                       ),
                     ),

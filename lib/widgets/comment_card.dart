@@ -4,12 +4,13 @@ import 'package:logging/logging.dart';
 
 import '../models/comment.dart';
 import '../services/comment_service.dart';
+import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
 
-  const CommentCard({Key? key, required this.comment}) : super(key: key);
+  const CommentCard({super.key, required this.comment});
 
   @override
   _CommentCardState createState() => _CommentCardState();
@@ -38,7 +39,7 @@ class _CommentCardState extends State<CommentCard> {
                   size: 15, // Adjust size as needed
                   color: AppColors.primaryYellow, // Adjust color as needed
                 ),
-                SizedBox(width: 10), // Add spacing between the dot and username
+                const SizedBox(width: 10), // Add spacing between the dot and username
                 Text(
                   widget.comment.commentUserName,
                   style: const TextStyle(
@@ -73,7 +74,7 @@ class _CommentCardState extends State<CommentCard> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 18.0),
                 child: Text(
-                  _isRepliesVisible ? 'Hide Replies' : 'View ${widget.comment.comments.length} Replies',
+                  _isRepliesVisible ? LocalizationService().get('hide_replies') : '${LocalizationService().get('View')} ${widget.comment.comments.length} ${LocalizationService().get('Replies')}',
                   style: const TextStyle(color: AppColors.darkYellow),
                 ),
               ),
@@ -109,7 +110,7 @@ class _CommentCardState extends State<CommentCard> {
                                     children: [
                                       const SizedBox(width: 24), // Placeholder to align the title center
                                       Text(
-                                        "Reply to ${widget.comment.commentUserName}",
+                                        "${LocalizationService().get('reply_to')} ${widget.comment.commentUserName}",
                                         style: const TextStyle(
                                           color: AppColors.fontColor,
                                           fontSize: AppFontSizes.small,
@@ -136,7 +137,7 @@ class _CommentCardState extends State<CommentCard> {
                                           controller: _commentTextController, // Add a controller to get the text input
                                           maxLines: null, // Makes the TextField multiline
                                           decoration: InputDecoration(
-                                            labelText: 'Write a reply...',
+                                            labelText: LocalizationService().get('write_a_reply'),
                                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
                                           ),
                                         ),
@@ -158,9 +159,9 @@ class _CommentCardState extends State<CommentCard> {
                           },
                         );
                       },
-                      child: const Text(
-                        'Reply',
-                        style: TextStyle(
+                      child: Text(
+                        LocalizationService().get('Reply'),
+                        style: const TextStyle(
                             color: AppColors.darkYellow,
                             fontWeight: FontWeight.bold
                         ),

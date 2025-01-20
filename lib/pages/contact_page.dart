@@ -20,9 +20,8 @@ class ContactPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
         child: Column(
           children: [
-            const Text(
-              '''Wenn du feststellst, dass du dich durch deine Ängste sehr unwohl oder beklemmt fühlst und das Gefühl hast nicht alleine zurechtzukommen, findest du hier Telefonnummern an die du dich wenden kannst. Dort bekommst du weitere Unterstützung.''',
-              style: TextStyle(fontSize: AppFontSizes.small),
+            Text(LocalizationService().get('contact_detail'),
+              style: const TextStyle(fontSize: AppFontSizes.small),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -31,7 +30,7 @@ class ContactPage extends StatelessWidget {
               thickness: 2.5,
             ),
             ContactSection(
-              title: 'TelefonSeelsorge',
+              title: LocalizationService().get('counseling_service'),
               sections: [
                 Section(name: 'Kosten', value: 'kostenfrei'),
                 Section(
@@ -48,7 +47,7 @@ class ContactPage extends StatelessWidget {
               thickness: 2.5,
             ),
             ContactSection(
-              title: 'NummergegenKummer',
+              title: LocalizationService().get('helpline'),
               sections: [
                 Section(name: 'Kosten', value: 'kostenfrei'),
                 Section(name: 'Eltern-Telefon', value: '+49 800 111 0 550'),
