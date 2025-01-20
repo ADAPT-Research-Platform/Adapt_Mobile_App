@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 
-import '../services/CookieService.dart';
+import '../services/auth_service.dart';
 import '../services/session_manager.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
@@ -20,6 +20,8 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
   final log = Logger('SplashPage');
 
+  final AuthService _authService = AuthService();
+
   @override
   void initState() {
     super.initState();
@@ -27,33 +29,11 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     _checkLoginStatus();
   }
 
-  /// Check login status and navigate accordingly
   Future<void> _checkLoginStatus() async {
-    // Retrieve cookie and user simultaneously for efficiency
-    final cookieFuture = CookieService().getCookie();
-    final userFuture = CookieService().getUser();
 
     // Delay for splash screen visibility
     await Future.delayed(const Duration(seconds: 2));
-
-    final cookie = await cookieFuture;
-    final user = await userFuture;
-
-    // Check if both cookie and user are present
-    if (cookie != null && cookie.isNotEmpty && user != null) {
-      // Validate the cookie with the backend
-      final isValid = await CookieService().verifyCookieWithBackend();
-
-      if (isValid) {
-        // Set cookie and user details in session manager
-        SessionManager().setSessionInfo(cookie: cookie, user: user);
-        mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
-        return;
-      }
-    }
-
-    // Navigate to the login screen if not logged in or validation fails
-    mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+    _authService.verify();
   }
 
   @override

@@ -44,8 +44,9 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _userNameController.text = SessionManager().sessionUser!.userName;
-    _emailController.text = SessionManager().sessionUser!.email;
+    _userNameController.text = 'Loading...';
+    _emailController.text = 'Loading...';
+    _initializeUserData(); // Call an async helper method
   }
 
   @override
@@ -57,6 +58,16 @@ class _SettingsPageState extends State<SettingsPage> {
     _newPasswordController.dispose();
     _confirmNewPasswordController.dispose();
     super.dispose();
+  }
+
+  void _initializeUserData() async {
+    final sessionUser = await SessionManager().getSessionUser();
+    if (sessionUser != null) {
+      setState(() {
+        _userNameController.text = sessionUser.userName;
+        _emailController.text = sessionUser.email;
+      });
+    }
   }
 
   void _updateUser() async {

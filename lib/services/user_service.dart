@@ -7,7 +7,6 @@ import '../utils/app_config.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
 import '../widgets/snack_bar_shower.dart';
-import 'CookieService.dart';
 
 class UserService {
   final log = Logger('UserService');
@@ -69,7 +68,8 @@ class UserService {
       return;
     }
 
-    if(userName == SessionManager().sessionUser!.userName && newPassword.isEmpty){
+    final sessionUser = await SessionManager().getSessionUser();
+    if(userName == sessionUser!.userName && newPassword.isEmpty){
       SnackBarShower.warn(mainPageScaffold, 'Nothing to update!');
       return;
     }
@@ -101,7 +101,12 @@ class UserService {
 
       log.info('User Update Response: ${response.body}');
       if (response.statusCode == 200) {
-        SessionManager().sessionUser?.userName = userName;
+        //Update username on current session!
+        sessionUser.userName = userName;
+        SessionManager().setSessionInfo(
+          user: sessionUser,
+        ); // Extract the cookie value
+
         SnackBarShower.info(mainPageScaffold, 'User Update Successful!');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -131,7 +136,6 @@ class UserService {
       log.info('User Delete Response: ${response.body}');
       if (response.statusCode == 200) {
         SessionManager().clearSessionInfo();
-        await CookieService().deleteCookie();
 
         // Navigate to the login page
         mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);

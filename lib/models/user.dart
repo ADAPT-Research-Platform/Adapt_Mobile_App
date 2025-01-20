@@ -21,8 +21,8 @@ class User {
   // Convert a User object to a JSON map
   Map<String, String> toJson() {
     return {
-      'userId': userId,
-      'userName': userName,
+      'id': userId,
+      'username': userName,
       'email': email,
     };
   }

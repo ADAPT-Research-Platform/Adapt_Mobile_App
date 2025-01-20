@@ -8,7 +8,6 @@ import '../models/user.dart';
 import '../utils/app_config.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
-import 'CookieService.dart';
 
 class AuthService {
   final log = Logger('AuthService');
@@ -48,8 +47,6 @@ class AuthService {
               user: loggedIdUser,
               cookie: sessionCookie
           ); // Extract the cookie value
-          await CookieService().saveCookie(sessionCookie);
-          await CookieService().saveUser(loggedIdUser);
 
           mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
 
@@ -73,6 +70,45 @@ class AuthService {
     return null;
   }
 
+  void verify() async {
+    final sessionCookie = await SessionManager().getSessionCookie();
+    if (sessionCookie == null || sessionCookie.isEmpty) {
+      log.warning('Session cookie not found!');
+      mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+      return;
+    }
+
+    final loggedIdUser = await SessionManager().getSessionUser();
+    if (loggedIdUser == null) {
+      log.warning('Session user not found!');
+      mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+      return;
+    }
+
+    try {
+      final response = await SessionManager().client.get(
+        Uri.parse('${AppConfig.baseUrl}/auth/verify-cookie'),
+        headers: {
+          'Cookie': sessionCookie.split('=')[1],
+        },
+      );
+
+      log.info('Verify Response: ${response.body}');
+      if (response.statusCode == 200) {
+        log.info('Session is verified and redirecting to main page');
+        mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
+        return;
+      } else {
+        log.warning('Session verify failed!');
+      }
+    } catch (e) {
+      log.severe('Error verifying session: $e');
+    }
+
+    // Navigate to the login screen if not logged in or validation fails
+    mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+  }
+
   void logout() async {
     try {
       final response = await SessionManager().client.post(
@@ -86,7 +122,6 @@ class AuthService {
       log.info('Logout Response: ${response.body}');
       if (response.statusCode == 200) {
         SessionManager().clearSessionInfo();
-        await CookieService().deleteCookie();
 
         Future.delayed(const Duration(milliseconds: 1000), () {
           SnackBarShower.info(loginPageScaffold, 'Logout Successful!');
