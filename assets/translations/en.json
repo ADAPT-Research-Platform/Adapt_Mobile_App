@@ -1,4 +1,7 @@
 {
+  "department" : "Department of Psychology",
+  "university" : "Philipps-University Marburg",
+
   "sign_in": "Sign In",
   "enter_your_credentials": "Please enter your credentials",
   "username_or_email": "Username or Email",
@@ -80,7 +83,10 @@
   "language": "Language",
   "theme": "Theme",
   "notifications": "Notifications",
+  "notification_time": "Notification Time",
   "mute_notifications": "Mute Notifications",
   "notification_sound": "Notification Sound",
+  "set_time" : "Set Time",
+  "scheduled_time" : "Scheduled Time",
   "logout": "Logout"
 }

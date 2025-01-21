@@ -1,4 +1,7 @@
 {
+  "department" : "Fachbereich Psychologie",
+  "university" : "Philipps-Universität Marburg",
+
   "sign_in": "Anmelden",
   "enter_your_credentials": "Bitte geben Sie Ihre Anmeldedaten ein",
   "username_or_email": "Benutzername oder E-Mail",
@@ -80,7 +83,10 @@
   "language": "Sprache",
   "theme": "Thema",
   "notifications": "Benachrichtigungen",
+  "notification_time": "Benachrichtigungszeit",
   "mute_notifications": "Benachrichtigungen stumm schalten",
   "notification_sound": "Benachrichtigungston",
+  "set_time" : "Zeit einstellen",
+  "scheduled_time" : "Geplante Zeit",
   "logout": "Abmelden"
 }
