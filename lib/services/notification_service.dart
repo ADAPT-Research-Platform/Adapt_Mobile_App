@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logging/logging.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -6,9 +8,10 @@ class NotificationService {
   static final log = Logger('NotificationService');
 
   static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   static Future<void> onDidReceiveNotification(NotificationResponse notificationResponse) async {
-    log.info("Notification receive");
+    log.info("Notification received: \${notificationResponse.payload}");
   }
 
   static Future<void> init() async {
@@ -20,6 +23,7 @@ class NotificationService {
       android: androidInitializationSettings,
       iOS: iOSInitializationSettings,
     );
+
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: onDidReceiveNotification,
@@ -68,5 +72,71 @@ class NotificationService {
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.dateAndTime,
     );
+  }
+
+  static Future<void> scheduleDailyNotification(int id, String title, String body, TimeOfDay time) async {
+    final now = tz.TZDateTime.now(tz.local);
+
+    // Calculate the scheduled time
+    final scheduledTime = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    ).isBefore(now)
+        ? tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day + 1,
+      time.hour,
+      time.minute,
+    )
+        : tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
+
+    // Save the scheduled time to secure storage
+    await secureStorage.write(key: 'daily_notification_time', value: '${time.hour}:${time.minute}');
+
+    // Schedule the notification
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      id,
+      title,
+      body,
+      scheduledTime,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'daily_notification_channel_id',
+          'Daily Notifications',
+          channelDescription: 'Notifications that trigger daily at the same time',
+          importance: Importance.max,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time, // Matches time daily
+    );
+  }
+
+  static Future<String?> getScheduledTime() async {
+    // Retrieve the stored time
+    return await secureStorage.read(key: 'daily_notification_time');
+  }
+
+  static Future<void> updateScheduledTime(int id, String title, String body, TimeOfDay newTime) async {
+    // Cancel the existing notification
+    await flutterLocalNotificationsPlugin.cancel(id);
+
+    // Reschedule with the new time
+    await scheduleDailyNotification(id, title, body, newTime);
   }
 }

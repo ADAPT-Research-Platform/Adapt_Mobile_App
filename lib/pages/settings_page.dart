@@ -6,14 +6,16 @@ import 'package:logging/logging.dart';
 
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
+import '../services/notification_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
+import '../utils/app_keys.dart';
+import '../widgets/snack_bar_shower.dart';
 import '../widgets/sub_title.dart';
 import '../widgets/task_button.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
-
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -27,10 +29,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _currentPasswordController = TextEditingController();
-  final TextEditingController _confirmCurrentPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController =
+      TextEditingController();
+  final TextEditingController _confirmCurrentPasswordController =
+      TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmNewPasswordController = TextEditingController();
+  final TextEditingController _confirmNewPasswordController =
+      TextEditingController();
 
   bool _changePassword = false; // Toggle for the collapsible password fields
   // State variables for the appearance section
@@ -40,6 +45,8 @@ class _SettingsPageState extends State<SettingsPage> {
   // State variables for the notifications section
   bool _isNotificationSoundEnabled = true;
   bool _isMuteNotifications = false;
+  TimeOfDay?
+      _selectedNotificationTime; // For storing the selected notification time
 
   @override
   void initState() {
@@ -47,6 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _userNameController.text = 'Loading...';
     _emailController.text = 'Loading...';
     _initializeUserData(); // Call an async helper method
+    _loadNotificationTime(); // Load the notification time
   }
 
   @override
@@ -76,143 +84,247 @@ class _SettingsPageState extends State<SettingsPage> {
     String newPassword = _newPasswordController.text.trim();
     String confirmNewPassword = _confirmNewPasswordController.text.trim();
 
-    _userService.updateUser(userName, currentPassword, newPassword, confirmNewPassword);
+    _userService.updateUser(
+        userName, currentPassword, newPassword, confirmNewPassword);
+  }
+
+  Future<void> _loadNotificationTime() async {
+    // Load the stored notification time
+    final storedTime = await NotificationService.getScheduledTime();
+    if (storedTime != null) {
+      final parts = storedTime.split(':');
+      setState(() {
+        _selectedNotificationTime = TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      });
+    }
+  }
+
+  Future<void> _pickNotificationTime() async {
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: _selectedNotificationTime ?? TimeOfDay.now(),
+    );
+    if (pickedTime != null) {
+      setState(() {
+        _selectedNotificationTime = pickedTime;
+      });
+
+      // Schedule the notification with the selected time
+      await NotificationService.updateScheduledTime(
+        1,
+        LocalizationService().get("Time to log your Mood and Motivation"),
+        LocalizationService().get("Don't forget to log your mood and motivation for today!"),
+        pickedTime,
+      );
+
+      SnackBarShower.info(
+          settingPageScaffold,
+          LocalizationService().get('Notification Scheduled at ') +
+              pickedTime.format(context));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MainTitle(title: LocalizationService().get('settings')),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: ListView(
-          children: [
-            SubTitle(text: LocalizationService().get('Account')),
-            const SizedBox(height: 10),
-            _buildTextField(LocalizationService().get('user_name'), _userNameController),
-            const SizedBox(height: 10),
-            _buildTextField(LocalizationService().get('email_address'), _emailController, enabled: false),
-            const SizedBox(height: 10),
+    return ScaffoldMessenger(
+      key: settingPageScaffold,
+      child: Scaffold(
+        appBar: MainTitle(title: LocalizationService().get('settings')),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: ListView(
+            children: [
+              SubTitle(text: LocalizationService().get('Account')),
+              const SizedBox(height: 10),
+              _buildTextField(
+                  LocalizationService().get('user_name'), _userNameController),
+              const SizedBox(height: 10),
+              _buildTextField(
+                  LocalizationService().get('email_address'), _emailController,
+                  enabled: false),
+              const SizedBox(height: 10),
 
-            // Checkbox for Change Password
-            Row(
-              children: [
-                Checkbox(
-                  value: _changePassword,
-                  fillColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return AppColors.darkYellow;
-                    }
-                    return null;
-                  }),
-                  onChanged: (value) {
-                    setState(() {
-                      _changePassword = value!;
-
-                      if(!_changePassword){
-                        _currentPasswordController.clear();
-                        _newPasswordController.clear();
-                        _confirmNewPasswordController.clear();
+              // Checkbox for Change Password
+              Row(
+                children: [
+                  Checkbox(
+                    value: _changePassword,
+                    fillColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return AppColors.darkYellow;
                       }
-                    });
-                  },
+                      return null;
+                    }),
+                    onChanged: (value) {
+                      setState(() {
+                        _changePassword = value!;
+
+                        if (!_changePassword) {
+                          _currentPasswordController.clear();
+                          _newPasswordController.clear();
+                          _confirmNewPasswordController.clear();
+                        }
+                      });
+                    },
+                  ),
+                  Text(
+                    LocalizationService().get('change_password'),
+                    style: const TextStyle(
+                      color: AppColors.fontColor,
+                      fontSize: AppFontSizes.small,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
+              // Collapsible password fields
+              if (_changePassword) ...[
+                _buildTextField(LocalizationService().get('current_password'),
+                    _currentPasswordController,
+                    obscureText: true),
+                const SizedBox(height: 10),
+                _buildTextField(LocalizationService().get('new_password'),
+                    _newPasswordController,
+                    obscureText: true),
+                const SizedBox(height: 10),
+                _buildTextField(
+                    LocalizationService().get('confirm_new_password'),
+                    _confirmNewPasswordController,
+                    obscureText: true),
+                const SizedBox(height: 15),
+              ],
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: TaskButton(
+                      text: LocalizationService().get('Update'),
+                      onPressed: _updateUser,
+                      icon: Icons.update_rounded,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TaskButton(
+                      text: LocalizationService().get('Delete'),
+                      onPressed: _showDeleteConfirmationDialog,
+                      backgroundColor: AppColors.darkYellow,
+                      icon: Icons.delete_rounded,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+              const Divider(color: AppColors.lightGrey, thickness: 2.5),
+              SubTitle(text: LocalizationService().get('Appearance')),
+              _buildRadioOption(LocalizationService().get('Language'),
+                  ['Deutch', 'English'], _selectedLanguage, (value) {
+                setState(() {
+                  _selectedLanguage = value!;
+                  String languageCode =
+                      _selectedLanguage == 'English' ? 'en' : 'de';
+                  LocalizationService().load(languageCode);
+                });
+              }),
+              _buildRadioOption(LocalizationService().get('Theme'),
+                  ['System', 'Light', 'Dark'], _selectedTheme, (value) {
+                setState(() {
+                  _selectedTheme = value!;
+                });
+              }),
+
+              const Divider(
+                color: AppColors.lightGrey,
+                thickness: 2.5,
+              ),
+              SubTitle(text: LocalizationService().get('Notifications')),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      LocalizationService().get('Notification Time'),
+                      style: const TextStyle(
+                        color: AppColors.fontColor,
+                        fontSize: AppFontSizes.small,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _pickNotificationTime,
+                      child: Text(
+                        LocalizationService().get('Set Time'),
+                        style: const TextStyle(color: AppColors.primaryYellow),
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  LocalizationService().get('change_password'),
-                  style: const TextStyle(
-                    color: AppColors.fontColor,
-                    fontSize: AppFontSizes.small,
-                    fontWeight: FontWeight.bold,
+              ),
+              // Display Scheduled Time
+              if (_selectedNotificationTime != null) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.schedule, color: AppColors.primaryYellow),
+                      const SizedBox(width: 8),
+                      Text(
+                        LocalizationService().get('Scheduled Time: ') +
+                            _selectedNotificationTime!.format(context),
+                        style: const TextStyle(
+                          color: AppColors.fontColor,
+                          fontSize: AppFontSizes.mini,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-
-            // Collapsible password fields
-            if (_changePassword) ...[
-              _buildTextField(LocalizationService().get('current_password'), _currentPasswordController, obscureText: true),
-              const SizedBox(height: 10),
-              _buildTextField(LocalizationService().get('new_password'), _newPasswordController, obscureText: true),
-              const SizedBox(height: 10),
-              _buildTextField(LocalizationService().get('confirm_new_password'), _confirmNewPasswordController, obscureText: true),
+              _buildSwitchOption(
+                  LocalizationService().get('mute_notifications'),
+                  _isMuteNotifications, (value) {
+                setState(() {
+                  _isMuteNotifications = value;
+                });
+              }),
+              _buildSwitchOption(
+                  LocalizationService().get('notification_sound'),
+                  _isNotificationSoundEnabled, (value) {
+                setState(() {
+                  _isNotificationSoundEnabled = value;
+                });
+              }),
+              const Divider(
+                color: AppColors.lightGrey,
+                thickness: 2.5,
+              ),
+              const SizedBox(height: 5),
+              // Logout button at the bottom
+              TaskButton(
+                text: LocalizationService().get('Logout'),
+                onPressed: () {
+                  _authService.logout();
+                },
+                icon: Icons.logout_rounded,
+              ),
               const SizedBox(height: 15),
             ],
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: TaskButton(
-                    text: LocalizationService().get('Update'),
-                    onPressed: _updateUser,
-                    icon: Icons.update_rounded,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TaskButton(
-                    text: LocalizationService().get('Delete'),
-                    onPressed: _showDeleteConfirmationDialog,
-                    backgroundColor: AppColors.darkYellow,
-                    icon: Icons.delete_rounded,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-            const Divider(color: AppColors.lightGrey, thickness: 2.5),
-            SubTitle(text: LocalizationService().get('Appearance')),
-            _buildRadioOption(LocalizationService().get('Language'), ['Deutch', 'English'], _selectedLanguage, (value) {
-              setState(() {
-                _selectedLanguage = value!;
-                String languageCode = _selectedLanguage == 'English' ? 'en' : 'de';
-                LocalizationService().load(languageCode);
-              });
-            }),
-            _buildRadioOption(LocalizationService().get('Theme'), ['System', 'Light', 'Dark'], _selectedTheme, (value) {
-              setState(() {
-                _selectedTheme = value!;
-              });
-            }),
-
-            const Divider(
-              color: AppColors.lightGrey,
-              thickness: 2.5,
-            ),
-            SubTitle(text: LocalizationService().get('Notifications')),
-            _buildSwitchOption(LocalizationService().get('mute_notifications'), _isMuteNotifications, (value) {
-              setState(() {
-                _isMuteNotifications = value;
-              });
-            }),
-            _buildSwitchOption(LocalizationService().get('notification_sound'), _isNotificationSoundEnabled, (value) {
-              setState(() {
-                _isNotificationSoundEnabled = value;
-              });
-            }),
-            const Divider(
-              color: AppColors.lightGrey,
-              thickness: 2.5,
-            ),
-            const SizedBox(height: 5),
-            // Logout button at the bottom
-            TaskButton(
-              text: LocalizationService().get('Logout'),
-              onPressed: () {
-                _authService.logout();
-              },
-              icon: Icons.logout_rounded,
-            ),
-            const SizedBox(height: 15),
-          ],
+          ),
         ),
       ),
     );
   }
 
   //TODO: Move this to a separate widget later
-  Widget _buildTextField(String label, TextEditingController controller, {bool enabled = true, bool obscureText = false}) {
+  Widget _buildTextField(String label, TextEditingController controller,
+      {bool enabled = true, bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -239,7 +351,8 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildRadioOption(String title, List<String> options, String selectedValue, Function(String?) onChanged) {
+  Widget _buildRadioOption(String title, List<String> options,
+      String selectedValue, Function(String?) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -265,10 +378,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   onChanged: onChanged,
                   activeColor: Colors.amber,
                 ),
-                Text(option, style: const TextStyle(
-                  color: AppColors.fontColor,
-                  fontSize: AppFontSizes.small
-                )),
+                Text(option,
+                    style: const TextStyle(
+                        color: AppColors.fontColor,
+                        fontSize: AppFontSizes.small)),
               ],
             );
           }).toList(),
@@ -277,12 +390,12 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSwitchOption(String title, bool currentValue, Function(bool) onChanged) {
+  Widget _buildSwitchOption(
+      String title, bool currentValue, Function(bool) onChanged) {
     return SwitchListTile(
-      title: Text(title, style: const TextStyle(
-          color: AppColors.fontColor,
-          fontSize: AppFontSizes.small
-      )),
+      title: Text(title,
+          style: const TextStyle(
+              color: AppColors.fontColor, fontSize: AppFontSizes.small)),
       value: currentValue,
       onChanged: onChanged,
       activeColor: AppColors.primaryYellow,
@@ -304,11 +417,12 @@ class _SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Align(
-                  alignment: Alignment.center,
-                  child: SubTitle(text: LocalizationService().get('Delete'))
-                ),
+                    alignment: Alignment.center,
+                    child: SubTitle(text: LocalizationService().get('Delete'))),
                 const SizedBox(height: 10),
-                _buildTextField(LocalizationService().get('current_password'), _confirmCurrentPasswordController, obscureText: true),
+                _buildTextField(LocalizationService().get('current_password'),
+                    _confirmCurrentPasswordController,
+                    obscureText: true),
                 const SizedBox(height: 10),
                 // Confirm button
                 Align(
@@ -317,7 +431,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     text: LocalizationService().get('Confirm'),
                     onPressed: () {
                       Navigator.of(context).pop(); // Close the dialog
-                      _userService.deleteUser(_confirmCurrentPasswordController.text.trim());
+                      _userService.deleteUser(
+                          _confirmCurrentPasswordController.text.trim());
                       _confirmCurrentPasswordController.clear();
                     },
                     backgroundColor: AppColors.darkYellow,

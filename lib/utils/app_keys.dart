@@ -13,3 +13,5 @@ final GlobalKey<ScaffoldMessengerState> loginPageScaffold = GlobalKey<ScaffoldMe
 final GlobalKey<ScaffoldMessengerState> signupPageScaffold = GlobalKey<ScaffoldMessengerState>(debugLabel: "register");
 
 final GlobalKey<ScaffoldMessengerState> mainPageScaffold = GlobalKey<ScaffoldMessengerState>(debugLabel: "main");
+
+final GlobalKey<ScaffoldMessengerState> settingPageScaffold = GlobalKey<ScaffoldMessengerState>(debugLabel: "setting");

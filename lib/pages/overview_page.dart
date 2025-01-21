@@ -121,12 +121,11 @@ class _OverviewPageState extends State<OverviewPage> {
 
                           widget.reloadModePage();
                           // Schedule a notification for the next day
-                          DateTime scheduledDate = DateTime.now().add( const Duration(days: 1));
-                          NotificationService.scheduleNotification(
-                            0,
+                          NotificationService.scheduleDailyNotification(
+                            1,
                             "Time to log your Mood and Motivation",
                             "Don't forget to log your mood and motivation for today!",
-                            scheduledDate,
+                            TimeOfDay.now(),
                           );
                         },
                       ),
