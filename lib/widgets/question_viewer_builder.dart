@@ -12,14 +12,10 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
   final log = Logger('QuestionViewerBuilder');
 
   final Map<String, String> questions;
-  final Map<String, String> currentAnswers;
+  final Map<String, Map<String, String>> currentAnswers;
   final Map<String, TextEditingController> controllers;
 
-  QuestionViewerBuilder(
-      this.questions,
-      this.currentAnswers,
-      this.controllers
-    );
+  QuestionViewerBuilder(this.questions, this.currentAnswers, this.controllers);
 
   final _jsonPattern = RegExp(r'^\{.*\}$', multiLine: true, dotAll: true);
 
@@ -32,18 +28,23 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
 
         if (jsonMap.isNotEmpty) {
           String questionKey = jsonMap.keys.first; // Extract the single key
-          String questionValue = jsonMap.values.first; // Extract the single value
+          String questionValue =
+              jsonMap.values.first; // Extract the single value
 
           // Add to questions map
           questions[questionKey] = questionValue;
 
           // Create or fetch a controller and pre-fill with current answers if available
-          controllers[questionKey] = controllers[questionKey] ?? TextEditingController(text: currentAnswers[questionKey]);
+          controllers[questionKey] = controllers[questionKey] ??
+              TextEditingController(
+                text: currentAnswers[questionKey]?['answer'] ?? "",
+              );
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(questions[questionKey] ?? "",
+              Text(
+                questions[questionKey] ?? "",
                 style: const TextStyle(
                   color: AppColors.fontColor,
                   fontSize: AppFontSizes.small,
@@ -66,7 +67,7 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
       } catch (e) {
         log.severe("Error parsing JSON: $e");
       }
-    }else{
+    } else {
       log.severe("Question JSON Content Not Valid: $content");
     }
 
@@ -77,10 +78,12 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
 
 class QuestionSyntax extends md.BlockSyntax {
   final log = Logger('QuestionSyntax');
+
   QuestionSyntax();
 
   @override
-  RegExp get pattern => RegExp(r'^\[question\](\{".+?":\s*".*?"\})$', dotAll: true);
+  RegExp get pattern =>
+      RegExp(r'^\[question\](\{".+?":\s*".*?"\})$', dotAll: true);
 
   @override
   md.Node? parse(md.BlockParser parser) {
@@ -96,10 +99,9 @@ class QuestionSyntax extends md.BlockSyntax {
       ]);
 
       return el;
-    }else{
+    } else {
       log.warning("Question Pattern Not Matched: $match");
     }
     return null;
   }
 }
-

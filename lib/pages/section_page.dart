@@ -39,13 +39,16 @@ class _SectionPageState extends State<SectionPage> {
 
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, String> _questions = {};
-  final Map<String, String> _answers = {};
+  final Map<String, Map<String, String>> _answers = {};
 
   double maxScrollPixels = 0.0;
 
   void _submitAnswers() {
     for (var key in _questions.keys) {
-      _answers[key] = _controllers[key]?.text ?? "";
+      _answers[key] = {
+        "question": _questions[key] ?? "", // The actual question text
+        "answer": _controllers[key]?.text ?? "" // The provided answer text
+      };
     }
 
     _sectionService.addAnswer(widget.section.sectionId, _answers);
@@ -141,7 +144,13 @@ class _SectionPageState extends State<SectionPage> {
             final String markdownContent = snapshot.data![0];
 
             if (widget.section.isExercise) {
-              _answers.addAll(snapshot.data![1]);
+              final fetchedAnswers = snapshot.data![1];
+              for (var key in fetchedAnswers.keys) {
+                _answers[key] = {
+                  "question": _questions[key] ?? "", // Fetch the question text from `_questions`
+                  "answer": fetchedAnswers[key] ?? "" // Fetch the answer text from `snapshot.data![1]`
+                };
+              }
             }
 
             return Padding(

@@ -14,9 +14,10 @@ class SectionService {
   Future<String> fetchSectionContent(String sectionFolderPath) async {
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/uploads/$sectionFolderPath/content.md'),
-        headers: SessionManager().getHeaders(),
-      );
+            Uri.parse(
+                '${AppConfig.baseUrl}/uploads/$sectionFolderPath/content.md'),
+            headers: SessionManager().getHeaders(),
+          );
 
       if (response.statusCode == 200) {
         return utf8.decode(response.bodyBytes, allowMalformed: true);
@@ -31,21 +32,22 @@ class SectionService {
     }
   }
 
-  void addAnswer(String sectionId, Map<String, String> answers) async {
+  void addAnswer(
+      String sectionId, Map<String, Map<String, String>> answers) async {
     try {
       final response = await SessionManager().client.post(
-        Uri.parse('${AppConfig.baseUrl}/answers'),
-        headers: SessionManager().getHeaders(),
-        body: jsonEncode({
-          'sectionId': sectionId,
-          'text': answers,
-        }),
-      );
+            Uri.parse('${AppConfig.baseUrl}/answers'),
+            headers: SessionManager().getHeaders(),
+            body: jsonEncode({
+              'sectionId': sectionId,
+              'text': answers,
+            }),
+          );
 
       log.info('Add/Update Answer Response: ${response.body}');
       if (response.statusCode == 200) {
         SnackBarShower.info(mainPageScaffold, 'Answer Updated Successfully!');
-      }else if (response.statusCode == 201) {
+      } else if (response.statusCode == 201) {
         SnackBarShower.info(mainPageScaffold, 'Answer Added Successfully!');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -64,27 +66,39 @@ class SectionService {
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/answers').replace(queryParameters: queryParams),
-        headers: SessionManager().getHeaders(),
-      );
+            Uri.parse('${AppConfig.baseUrl}/answers')
+                .replace(queryParameters: queryParams),
+            headers: SessionManager().getHeaders(),
+          );
 
       if (response.statusCode == 200) {
         // Decode the JSON response
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-        // Extract the 'text' field and ensure it's a Map<String, String>
+        // Extract the 'text' field and ensure it's a Map<String, dynamic>
         if (jsonResponse['text'] is Map<String, dynamic>) {
           final Map<String, dynamic> textMap = jsonResponse['text'];
-          return textMap.map((key, value) => MapEntry(key.toString(), value.toString()));
+          return textMap.map((key, value) {
+            if (value is Map<String, dynamic> && value.containsKey('answer')) {
+              // If value is a map and contains 'answer', extract the answer
+              return MapEntry(key.toString(), value['answer'].toString());
+            } else if (value is String) {
+              // If value is a direct string, use it as the answer
+              return MapEntry(key.toString(), value);
+            } else {
+              throw const HttpException('Invalid data format for answer!');
+            }
+          });
         } else {
           throw const HttpException('Invalid data format!');
         }
-      }else if (response.statusCode == 404) {
+      } else if (response.statusCode == 404) {
         log.info("No Answers Found");
         return {};
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        log.severe('Error in Get Answers By SectionId', jsonResponse['message']);
+        log.severe(
+            'Error in Get Answers By SectionId', jsonResponse['message']);
         throw HttpException(jsonResponse['message']);
       }
     } catch (e) {
@@ -96,19 +110,21 @@ class SectionService {
   void updateProgress(String sectionId, double progress) async {
     try {
       final response = await SessionManager().client.post(
-        Uri.parse('${AppConfig.baseUrl}/progress'),
-        headers: SessionManager().getHeaders(),
-        body: jsonEncode({
-          'sectionId': sectionId,
-          'progress': progress,
-        }),
-      );
+            Uri.parse('${AppConfig.baseUrl}/progress'),
+            headers: SessionManager().getHeaders(),
+            body: jsonEncode({
+              'sectionId': sectionId,
+              'progress': progress,
+            }),
+          );
 
       log.info('Update Progress Response: ${response.body}');
       if (response.statusCode == 200) {
-        log.info('Progress updated successfully! Section: $sectionId Progress: $progress');
-      }else if (response.statusCode == 201) {
-        log.info('Progress added successfully! Section: $sectionId Progress: $progress');
+        log.info(
+            'Progress updated successfully! Section: $sectionId Progress: $progress');
+      } else if (response.statusCode == 201) {
+        log.info(
+            'Progress added successfully! Section: $sectionId Progress: $progress');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
