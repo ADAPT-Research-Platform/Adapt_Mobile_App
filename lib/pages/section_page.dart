@@ -5,9 +5,8 @@ import 'package:adapt/models/section.dart';
 import 'package:adapt/services/comment_service.dart';
 import 'package:adapt/services/section_service.dart';
 import 'package:adapt/utils/app_colors.dart';
-import 'package:adapt/widgets/image_viewer_builder.dart';
 import 'package:adapt/widgets/main_title.dart';
-import 'package:adapt/widgets/question_viewer_builder.dart';
+import 'package:adapt/widgets/markdown_builders/right_align_text_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
@@ -17,8 +16,11 @@ import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
 import '../widgets/comment_card.dart';
+import '../widgets/markdown_builders/image_viewer_builder.dart';
+import '../widgets/markdown_builders/question_viewer_builder.dart';
+import '../widgets/markdown_builders/underline_text_builder.dart';
 import '../widgets/task_button.dart';
-import '../widgets/video_viewer_builder.dart';
+import '../widgets/markdown_builders/video_viewer_builder.dart';
 
 class SectionPage extends StatefulWidget {
   final Section section;
@@ -169,11 +171,14 @@ class _SectionPageState extends State<SectionPage> {
                           child: MarkdownBody(
                             data: markdownContent,
                             blockSyntaxes: [QuestionSyntax()],
+                            inlineSyntaxes: [UnderlineSyntax(), RightAlignSyntax()],
                             selectable: false,
                             builders: <String, MarkdownElementBuilder>{
                               'a': VideoViewerBuilder(),
                               'img': ImageViewerBuilder(widget.section.folderPath),
                               'question': QuestionViewerBuilder(_questions, _answers, _controllers),
+                              "ul": UnderlineBuilder(),
+                              'rl': RightAlignBuilder(),
                             },
                           ),
                         ),

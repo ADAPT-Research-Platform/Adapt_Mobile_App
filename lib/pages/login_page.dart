@@ -42,10 +42,10 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    const double hexagonSize = 150;
     final screenWidth = size.width;
     final screenHeight = size.height;
     final bool isSmallScreen = screenHeight < 600; // Adjust based on your desired cutoff for small screens
+    final double hexagonSize = screenWidth / 3;
 
     return ScaffoldMessenger(
         key: loginPageScaffold,

@@ -29,13 +29,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _currentPasswordController =
-      TextEditingController();
-  final TextEditingController _confirmCurrentPasswordController =
-      TextEditingController();
+  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _confirmCurrentPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmNewPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmNewPasswordController = TextEditingController();
 
   bool _changePassword = false; // Toggle for the collapsible password fields
   // State variables for the appearance section
@@ -45,8 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
   // State variables for the notifications section
   bool _isNotificationSoundEnabled = true;
   bool _isMuteNotifications = false;
-  TimeOfDay?
-      _selectedNotificationTime; // For storing the selected notification time
+  TimeOfDay? _selectedNotificationTime; // For storing the selected notification time
 
   @override
   void initState() {
@@ -183,18 +179,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
               // Collapsible password fields
               if (_changePassword) ...[
-                _buildTextField(LocalizationService().get('current_password'),
-                    _currentPasswordController,
-                    obscureText: true),
+                _buildTextField(LocalizationService().get('current_password'), _currentPasswordController, obscureText: true),
                 const SizedBox(height: 10),
-                _buildTextField(LocalizationService().get('new_password'),
-                    _newPasswordController,
-                    obscureText: true),
+                _buildTextField(LocalizationService().get('new_password'), _newPasswordController, obscureText: true),
                 const SizedBox(height: 10),
-                _buildTextField(
-                    LocalizationService().get('confirm_new_password'),
-                    _confirmNewPasswordController,
-                    obscureText: true),
+                _buildTextField(LocalizationService().get('confirm_new_password'), _confirmNewPasswordController, obscureText: true),
                 const SizedBox(height: 15),
               ],
 
@@ -239,10 +228,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
               }),
 
-              const Divider(
-                color: AppColors.lightGrey,
-                thickness: 2.5,
-              ),
+              const Divider(color: AppColors.lightGrey, thickness: 2.5),
               SubTitle(text: LocalizationService().get('Notifications')),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -250,7 +236,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      LocalizationService().get('Notification Time'),
+                      LocalizationService().get('notification_time'),
                       style: const TextStyle(
                         color: AppColors.fontColor,
                         fontSize: AppFontSizes.small,
@@ -259,8 +245,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     TextButton(
                       onPressed: _pickNotificationTime,
                       child: Text(
-                        LocalizationService().get('Set Time'),
-                        style: const TextStyle(color: AppColors.primaryYellow),
+                        LocalizationService().get('set_time'),
+                        style: const TextStyle(
+                            color: AppColors.darkYellow,
+                            fontWeight: FontWeight.bold
+                        ),
                       ),
                     ),
                   ],
@@ -273,11 +262,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.schedule, color: AppColors.primaryYellow),
+                      const Icon(Icons.schedule_rounded, color: AppColors.primaryYellow),
                       const SizedBox(width: 8),
                       Text(
-                        LocalizationService().get('Scheduled Time: ') +
-                            _selectedNotificationTime!.format(context),
+                        '${LocalizationService().get('scheduled_time')}: ${_selectedNotificationTime!.format(context)}',
                         style: const TextStyle(
                           color: AppColors.fontColor,
                           fontSize: AppFontSizes.mini,

@@ -3,7 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
 
-import '../utils/app_config.dart';
+import '../../utils/app_config.dart';
 
 class ImageViewerBuilder extends MarkdownElementBuilder {
   static final log = Logger('ImageViewerBuilder');
