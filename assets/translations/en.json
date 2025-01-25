@@ -4,16 +4,9 @@
 
   "sign_in": "Sign In",
   "enter_your_credentials": "Please enter your credentials",
-  "username_or_email": "Username or Email",
-  "forgot_password": "Forgot Password?",
-  "login": "Login",
-  "dont_have_an_account": "Don't have an account?",
-  "register": "Register",
-
-  "sign_up": "Sign Up",
-  "fill_your_information": "Please fill your information.",
+  "username": "Username",
   "regulation": "I agree to the data protection regulations and would like to continue to participate.",
-  "already_have_an_account": "Already have an account?",
+  "login": "Login",
 
   "overview": "Overview",
   "diary": "Diary",
@@ -64,13 +57,8 @@
   "last_6_months" : "Last Six Months",
   "last_year" : "Last Year",
 
-  "counseling_service" : "Counseling Service",
-  "helpline" : "Helpline",
-  "contact_detail" : "If you find that your anxiety is making you feel very uncomfortable or anxious and you don't feel you can cope on your own, you can find telephone numbers here that you can contact. You can get further support there.",
-
   "account": "Account",
   "user_name": "User Name",
-  "email_address": "Email Address",
   "password" : "Password",
   "change_password": "Change Password",
   "current_password": "Current Password",
