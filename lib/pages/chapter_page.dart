@@ -1,137 +1,320 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:adapt/models/chapter.dart';
+import 'package:adapt/services/chapter_service.dart';
+import 'package:adapt/services/comment_service.dart';
+import 'package:adapt/utils/app_colors.dart';
+import 'package:adapt/widgets/main_title.dart';
+import 'package:adapt/widgets/markdown_builders/right_align_text_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 
-import '../enums/section_filter.dart';
-import '../models/module.dart';
-import '../models/chapter.dart';
+import '../models/comment.dart';
 import '../services/localization_service.dart';
-import '../services/module_service.dart';
-import '../utils/app_colors.dart';
+import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
-import '../utils/app_routes.dart';
-import '../widgets/main_title.dart';
-import '../widgets/section_card.dart';
-import '../widgets/sub_title.dart';
+import '../widgets/comment_card.dart';
+import '../widgets/markdown_builders/header_builder.dart';
+import '../widgets/markdown_builders/image_viewer_builder.dart';
+import '../widgets/markdown_builders/question_viewer_builder.dart';
+import '../widgets/markdown_builders/underline_text_builder.dart';
+import '../widgets/markdown_builders/video_viewer_builder.dart';
+import '../widgets/task_button.dart';
 
 class ChapterPage extends StatefulWidget {
-  final String moduleId;
+  final Chapter section;
 
-  const ChapterPage({super.key, required this.moduleId});
+  const ChapterPage({super.key, required this.section});
 
   @override
   _ChapterPageState createState() => _ChapterPageState();
 }
 
 class _ChapterPageState extends State<ChapterPage> {
-  final log = Logger('ChapterPage');
-  final ModuleService _moduleService = ModuleService();
+  final log = Logger('SectionPage');
 
-  SectionFilter selectedFilter = SectionFilter.all; // Default filter
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController _commentTextController = TextEditingController();
+  final ChapterService _sectionService = ChapterService();
+  final CommentService _commentService = CommentService();
+
+  final Map<String, TextEditingController> _controllers = {};
+  final Map<String, String> _questions = {};
+  final Map<String, Map<String, String>> _answers = {};
+
+  double maxScrollPixels = 0.0;
+
+  void _submitAnswers() {
+    for (var key in _questions.keys) {
+      _answers[key] = {
+        "question": _questions[key] ?? "", // The actual question text
+        "answer": _controllers[key]?.text ?? "" // The provided answer text
+      };
+    }
+
+    _sectionService.addAnswer(widget.section.chapterId, _answers);
+    log.info("Submitted Answers: ${jsonEncode(_answers)}");
+  }
+
+  void _updateMaxScrollPixels() {
+    //Memorize how much max he scrolled
+    double currentScroll = _scrollController.position.pixels;
+    maxScrollPixels = max(maxScrollPixels, currentScroll);
+  }
+
+  void _updateSectionProgress() {
+    // For exercises use different strategy. Percentage means how many questions have answered
+    if(widget.section.isExercise){
+      // Count total number of questions
+      int totalQuestions = _questions.length;
+
+      // Count the number of valid answers (non-null and non-empty)
+      int validAnswers = _answers.values.where((answer) => answer.isNotEmpty).length;
+
+      double exerciseProgress = (validAnswers / totalQuestions) * 100;
+      _sectionService.updateProgress(widget.section.chapterId, exerciseProgress);
+      return ;
+    }
+
+    // For reading section use different strategy. How much the user maximum scrolled so far
+    if (!_scrollController.hasClients) {
+      return;
+    }
+
+    final double maxScrollExtent = _scrollController.position.maxScrollExtent;
+    final double viewportHeight = _scrollController.position.viewportDimension;
+
+    // Total scrollable height includes the visible portion (viewportHeight)
+    final double totalContentHeight = maxScrollExtent + viewportHeight;
+
+    // Calculate percentage based on visible + scrolled content
+    final double visibleScrolledContent = maxScrollPixels + viewportHeight;
+    final double percentage = (visibleScrolledContent / totalContentHeight) * 100;
+
+    // Clamp percentage between 0 and 100
+    double readingProgress = percentage.clamp(0, 100);
+    if(readingProgress > widget.section.progress){
+      _sectionService.updateProgress(widget.section.chapterId, readingProgress);
+    }
+    return ;
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_updateMaxScrollPixels);
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _controllers.values) {
+      controller.dispose();
+    }
+    _scrollController.dispose();
+    _commentTextController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainTitle(
-        title: '${LocalizationService().get('Module')} ${widget.moduleId}',
-        leadingIcon: Icons.arrow_back_ios_rounded,
-        onIconPressed: () {
-          moduleNavigator.currentState!.pop(); // Go Backwards
-        },
-      ),
-      body: FutureBuilder<Module>(
-        future: _moduleService.fetchModuleById(widget.moduleId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.darkYellow),
-            );
-          } else if (snapshot.hasError) {
-            return const Center(child: Text("Error loading chapters!"));
-          } else if (!snapshot.hasData || snapshot.data!.chapters.isEmpty) {
-            return const Center(child: Text("No chapters available!"));
-          }
+        appBar: MainTitle(
+            title: widget.section.chapterName,
+            leadingIcon: Icons.arrow_back_ios_rounded,
+            onIconPressed: () {
+              _updateSectionProgress();
+              moduleNavigator.currentState!.pop(); //Go Backwards
+            }),
+        body: FutureBuilder<List<dynamic>>(
+          future: Future.wait([
+            _sectionService.fetchChapterContent('${widget.section.folderPath}/content.md'),
+            if (widget.section.isExercise)
+              _sectionService.fetchAnswer(widget.section.chapterId),
+          ]),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+            } else if (snapshot.hasError) {
+              return const Center(child: Text("Error loading content!"));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text("No content available!"));
+            }
 
-          final module = snapshot.data!;
-          final filteredChapters = _getFilteredChapters(module.chapters);
+            // Extract data
+            final String markdownContent = snapshot.data![0];
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              children: [
-                _buildSegmentedButton(),
-                const SizedBox(height: 5),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredChapters.length,
-                    itemBuilder: (context, index) {
-                      final chapter = filteredChapters[index];
-                      chapter.chapterName = chapter.isExercise
-                          ? '${LocalizationService().get('Chapter')} ${index + 1}: ${LocalizationService().get('Exercise')}'
-                          : '${LocalizationService().get('Chapter')} ${index + 1}';
+            if (widget.section.isExercise) {
+              final fetchedAnswers = snapshot.data![1];
+              for (var key in fetchedAnswers.keys) {
+                _answers[key] = {
+                  "question": _questions[key] ?? "", // Fetch the question text from `_questions`
+                  "answer": fetchedAnswers[key] ?? "" // Fetch the answer text from `snapshot.data![1]`
+                };
+              }
+            }
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: SectionCard(
-                          section: chapter,
-                          onPressed: () {
-                            moduleNavigator.currentState!.pushNamed(
-                              Routes.routeSections,
-                              arguments: chapter,
-                            );
-                          },
+            return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        radius: const Radius.circular(10.0),
+                        thickness: 5,
+                        thumbVisibility: true,
+                        //trackVisibility: true,
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          child: MarkdownBody(
+                            data: markdownContent,
+                            blockSyntaxes: [QuestionSyntax()],
+                            inlineSyntaxes: [UnderlineSyntax(), RightAlignSyntax()],
+                            selectable: false,
+                            builders: <String, MarkdownElementBuilder>{
+                              'a': VideoViewerBuilder(),
+                              'img': ImageViewerBuilder(widget.section.folderPath),
+                              'h3': CenteredHeaderBuilder(),
+                              'question': QuestionViewerBuilder(_questions, _answers, _controllers),
+                              "ul": UnderlineBuilder(),
+                              'rl': RightAlignBuilder(),
+                            },
+                          ),
                         ),
-                      );
+                      ),
+                    ),
+                    SizedBox(
+                        height: 80, // Set the desired height
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: TaskButton(
+                                text: LocalizationService().get('Comment'),
+                                icon: Icons.comment_rounded,
+                                onPressed: _showModalBottomSheet
+                              ),
+                            ),
+                            if (widget.section.isExercise) ...[
+                              const SizedBox(width: 10),
+                              Expanded(
+                                  child: TaskButton(
+                                    text: LocalizationService().get('Submit'),
+                                    onPressed: _submitAnswers,
+                                    backgroundColor: AppColors.darkYellow,
+                                    icon: Icons.question_answer_rounded,
+                                  )
+                              )
+                            ]
+                          ],
+                        ))
+                  ],
+                ));
+          },
+        ));
+  }
+
+  void _showModalBottomSheet(){
+    showModalBottomSheet(
+      useSafeArea: true,
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)), // Adjust the top corners
+      ),
+      builder: (BuildContext context) {
+        final maxHeight = 2 * MediaQuery.of(context).size.height / 3;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          constraints: BoxConstraints(maxHeight: maxHeight), // Set minimum height
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 24), // Placeholder to align the title center
+                  Text(
+                    LocalizationService().get('Comments'),
+                    style: const TextStyle(
+                      color: AppColors.fontColor,
+                      fontSize: AppFontSizes.small,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () {
+                      Navigator.pop(context); // Close the bottom sheet
                     },
                   ),
+                ],
+              ),
+              const Divider(
+                color: AppColors.lightGrey,
+                // Customize the color as needed
+                thickness: 2.5, // Customize the thickness as needed
+              ),
+              Expanded( // Use Expanded here
+                child: FutureBuilder<List<Comment>>(
+                  future: _commentService.fetchComments(chapterId: widget.section.chapterId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+                    } else if (snapshot.hasError) {
+                      return const Center(child: Text("Error loading comments!"));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text("No comments available!"));
+                    }
+
+                    final List<Comment> comments = snapshot.data!;
+
+                    return ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        return CommentCard(comment: comments[index]);
+                      },
+                      separatorBuilder: (context, index) {
+                        return const Divider(
+                          color: AppColors.lightGrey,
+                          thickness: 2.5,
+                        );
+                      },
+                    );
+                  },
                 ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  // Filters the chapters based on the selected filter
-  List<Chapter> _getFilteredChapters(List<Chapter> chapters) {
-    if (selectedFilter == SectionFilter.all) return chapters;
-
-    return chapters.where((chapter) {
-      return selectedFilter == SectionFilter.readings
-          ? !chapter.isExercise
-          : chapter.isExercise;
-    }).toList();
-  }
-
-  // Builds the segmented button for filtering
-  Widget _buildSegmentedButton() {
-    return SegmentedButton<SectionFilter>(
-      style: SegmentedButton.styleFrom(
-        backgroundColor: AppColors.darkWhite,
-        foregroundColor: AppColors.fontColor,
-        selectedForegroundColor: AppColors.fontColor,
-        selectedBackgroundColor: AppColors.primaryYellow,
-        side: const BorderSide(
-          color: AppColors.darkYellow,
-          width: 2.2,
-        ),
-      ),
-      segments: SectionFilter.values.map((filter) {
-        return ButtonSegment(
-          value: filter,
-          label: SizedBox(
-            width: 70,
-            child: Center(child: Text(filter.value)),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _commentTextController, // Add a controller to get the text input
+                      maxLines: null, // Makes the TextField multiline
+                      decoration: InputDecoration(
+                        labelText: LocalizationService().get('write_a_comment'),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send_rounded, color: AppColors.darkYellow, size: 25),
+                    onPressed: () {
+                      _commentService.addComment(_commentTextController.text.trim(), widget.section.chapterId);
+                      _commentTextController.clear();
+                      Navigator.pop(context); // Close the bottom sheet
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         );
-      }).toList(),
-      selected: <SectionFilter>{selectedFilter},
-      onSelectionChanged: (Set<SectionFilter> newSelection) {
-        setState(() {
-          selectedFilter = newSelection.first;
-        });
       },
     );
   }
 }
-

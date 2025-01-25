@@ -12,7 +12,6 @@ import 'package:timezone/data/latest.dart' as tz;
 
 import '../../pages/login_page.dart';
 import '../../pages/main_page.dart';
-import '../../pages/signup_page.dart';
 import '../../utils/app_routes.dart';
 
 void main() async {

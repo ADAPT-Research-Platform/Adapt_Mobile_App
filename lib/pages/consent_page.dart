@@ -1,11 +1,9 @@
-import 'package:adapt/utils/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 
-
-import '../services/localization_service.dart';
 import '../services/chapter_service.dart';
+import '../services/localization_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_keys.dart';
 import '../widgets/main_title.dart';

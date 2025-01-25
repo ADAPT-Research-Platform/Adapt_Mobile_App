@@ -5,8 +5,8 @@ import 'package:logging/logging.dart';
 
 import '../utils/app_routes.dart';
 import 'chapter_page.dart';
+import 'module_page.dart';
 import 'overview_page.dart';
-import 'section_page.dart';
 
 class ModuleIndexPage extends StatelessWidget {
   final log = Logger('ModuleIndexPage');
@@ -27,11 +27,11 @@ class ModuleIndexPage extends StatelessWidget {
               );
             case Routes.routeChapters:
               return MaterialPageRoute(
-                builder: (context) => ChapterPage(moduleId: settings.arguments! as String),
+                builder: (context) => ModulePage(moduleId: settings.arguments! as String),
               );
             case Routes.routeSections:
               return MaterialPageRoute(
-                builder: (context) => SectionPage(section: settings.arguments! as Chapter),
+                builder: (context) => ChapterPage(section: settings.arguments! as Chapter),
               );
             default:
               return MaterialPageRoute(

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 
-import '../services/localization_service.dart';
 import '../services/chapter_service.dart';
+import '../services/localization_service.dart';
 import '../utils/app_colors.dart';
 import '../widgets/main_title.dart';
 import '../widgets/markdown_builders/header_builder.dart';
