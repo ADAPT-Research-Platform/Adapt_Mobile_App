@@ -60,10 +60,6 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(
                 builder: (context) => const LoginPage(),
               );
-            case Routes.routeSignUp:
-              return MaterialPageRoute(
-                builder: (context) => const SignUpPage(),
-              );
             case Routes.routeConsent:
               return MaterialPageRoute(
                 builder: (context) => const ConsentPage(),

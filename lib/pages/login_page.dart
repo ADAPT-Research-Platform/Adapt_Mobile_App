@@ -1,4 +1,5 @@
 import 'package:adapt/widgets/hexagon_grid.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
@@ -24,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isChecked = false;
 
   @override
   void dispose() {
@@ -110,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                       TextField(
                         controller: _userEmailController,
                         decoration: InputDecoration(
-                          labelText: LocalizationService().get('username_or_email'),
+                          labelText: LocalizationService().get('username'),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
                           ),
@@ -128,30 +130,48 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text(LocalizationService().get('forgot_password')),
-                        ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: _isChecked,
+                            fillColor: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return AppColors.darkYellow;
+                              }
+                              return null;
+                            }),
+                            onChanged: (value) {
+                              setState(() {
+                                _isChecked = value!;
+                              });
+                            },
+                          ),
+                          Expanded(
+                            child: Text.rich(
+                              TextSpan(
+                                text: LocalizationService().get('regulation'),
+                                children: [
+                                  TextSpan(
+                                    text: 'Here.',
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        mainNavigator.currentState!.pushNamed(Routes.routeConsent);
+                                      },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 20),
                       TaskButton(
                           text: LocalizationService().get('Login'),
-                          onPressed: _login
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(LocalizationService().get('dont_have_an_account')),
-                          TextButton(
-                            onPressed: () {
-                              mainNavigator.currentState!.pushReplacementNamed(Routes.routeSignUp);
-                            },
-                            child: Text(LocalizationService().get('Register')),
-                          ),
-                        ],
+                          onPressed: _isChecked ? _login : null,
                       ),
                       const SizedBox(height: 20),
                     ],
