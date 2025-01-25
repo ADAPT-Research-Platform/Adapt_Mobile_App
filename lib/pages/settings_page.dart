@@ -28,7 +28,6 @@ class _SettingsPageState extends State<SettingsPage> {
   final UserService _userService = UserService();
 
   final TextEditingController _userNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _currentPasswordController = TextEditingController();
   final TextEditingController _confirmCurrentPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
@@ -48,7 +47,6 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _userNameController.text = 'Loading...';
-    _emailController.text = 'Loading...';
     _initializeUserData(); // Call an async helper method
     _loadNotificationTime(); // Load the notification time
   }
@@ -56,7 +54,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void dispose() {
     _userNameController.dispose();
-    _emailController.dispose();
     _currentPasswordController.dispose();
     _confirmCurrentPasswordController.dispose();
     _newPasswordController.dispose();
@@ -69,7 +66,6 @@ class _SettingsPageState extends State<SettingsPage> {
     if (sessionUser != null) {
       setState(() {
         _userNameController.text = sessionUser.userName;
-        _emailController.text = sessionUser.email;
       });
     }
   }
@@ -80,8 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
     String newPassword = _newPasswordController.text.trim();
     String confirmNewPassword = _confirmNewPasswordController.text.trim();
 
-    _userService.updateUser(
-        userName, currentPassword, newPassword, confirmNewPassword);
+    _userService.updateUser(userName, currentPassword, newPassword, confirmNewPassword);
   }
 
   Future<void> _loadNotificationTime() async {
@@ -135,12 +130,7 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               SubTitle(text: LocalizationService().get('Account')),
               const SizedBox(height: 10),
-              _buildTextField(
-                  LocalizationService().get('user_name'), _userNameController),
-              const SizedBox(height: 10),
-              _buildTextField(
-                  LocalizationService().get('email_address'), _emailController,
-                  enabled: false),
+              _buildTextField(LocalizationService().get('user_name'), _userNameController),
               const SizedBox(height: 10),
 
               // Checkbox for Change Password
@@ -212,17 +202,14 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 10),
               const Divider(color: AppColors.lightGrey, thickness: 2.5),
               SubTitle(text: LocalizationService().get('Appearance')),
-              _buildRadioOption(LocalizationService().get('Language'),
-                  ['Deutch', 'English'], _selectedLanguage, (value) {
+              _buildRadioOption(LocalizationService().get('Language'), ['Deutch', 'English'], _selectedLanguage, (value) {
                 setState(() {
                   _selectedLanguage = value!;
-                  String languageCode =
-                      _selectedLanguage == 'English' ? 'en' : 'de';
+                  String languageCode = _selectedLanguage == 'English' ? 'en' : 'de';
                   LocalizationService().load(languageCode);
                 });
               }),
-              _buildRadioOption(LocalizationService().get('Theme'),
-                  ['System', 'Light', 'Dark'], _selectedTheme, (value) {
+              _buildRadioOption(LocalizationService().get('Theme'), ['System', 'Light', 'Dark'], _selectedTheme, (value) {
                 setState(() {
                   _selectedTheme = value!;
                 });
