@@ -28,7 +28,7 @@ class AuthService {
             Uri.parse('${AppConfig.baseUrl}/auth/login'),
             headers: SessionManager().getHeaders(),
             body: jsonEncode({
-              'login': userNameOrEmail,
+              'username': userNameOrEmail,
               'password': password,
             }),
           );

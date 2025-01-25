@@ -12,14 +12,14 @@ import '../widgets/snack_bar_shower.dart';
 class CommentService {
   final log = Logger('CommentService');
 
-  void addComment(String text, String sectionId) async {
+  void addComment(String text, String chapterId) async {
     try {
       final response = await SessionManager().client.post(
         Uri.parse('${AppConfig.baseUrl}/comments'),
         headers: SessionManager().getHeaders(),
         body: jsonEncode({
           'text': text,
-          'sectionId': sectionId,
+          'chapterId': chapterId,
         }),
       );
 
@@ -60,11 +60,11 @@ class CommentService {
     }
   }
 
-  Future<List<Comment>> fetchComments({String? sectionId, DateTime? date}) async {
+  Future<List<Comment>> fetchComments({String? chapterId, DateTime? date}) async {
     // Add query parameters
     final Map<String, String> queryParams = {};
-    if (sectionId != null) {
-      queryParams['sectionId'] = sectionId;
+    if (chapterId != null) {
+      queryParams['chapterId'] = chapterId;
     }
 
     if (date != null) {
@@ -82,11 +82,11 @@ class CommentService {
         return data.map((json) => Comment.parse(json)).toList();
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        log.severe('Error in Get Comments By SectionId', jsonResponse['message']);
+        log.severe('Error in Get Comments By ChapterId', jsonResponse['message']);
         throw HttpException(jsonResponse['message']);
       }
     } catch (e) {
-      log.severe('Error in Get Comments By SectionId', e);
+      log.severe('Error in Get Comments By ChapterId', e);
       rethrow;
     }
   }

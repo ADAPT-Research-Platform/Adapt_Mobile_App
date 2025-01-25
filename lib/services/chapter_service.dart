@@ -8,14 +8,14 @@ import '../utils/app_config.dart';
 import '../utils/app_keys.dart';
 import '../widgets/snack_bar_shower.dart';
 
-class SectionService {
-  final log = Logger('SectionService');
+class ChapterService {
+  final log = Logger('ChapterService');
 
-  Future<String> fetchSectionContent(String sectionFolderPath) async {
+  Future<String> fetchChapterContent(String filePath) async {
     try {
       final response = await SessionManager().client.get(
             Uri.parse(
-                '${AppConfig.baseUrl}/uploads/$sectionFolderPath/content.md'),
+                '${AppConfig.baseUrl}/uploads/$filePath'),
             headers: SessionManager().getHeaders(),
           );
 
@@ -23,23 +23,22 @@ class SectionService {
         return utf8.decode(response.bodyBytes, allowMalformed: true);
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        log.severe('Error in Get Section Content', jsonResponse['message']);
+        log.severe('Error in Get Chapter Content', jsonResponse['message']);
         throw HttpException(jsonResponse['message']);
       }
     } catch (e) {
-      log.severe("Error in Get Section Content", e);
+      log.severe("Error in Get Chapter Content", e);
       rethrow;
     }
   }
 
-  void addAnswer(
-      String sectionId, Map<String, Map<String, String>> answers) async {
+  void addAnswer(String chapterId, Map<String, Map<String, String>> answers) async {
     try {
       final response = await SessionManager().client.post(
             Uri.parse('${AppConfig.baseUrl}/answers'),
             headers: SessionManager().getHeaders(),
             body: jsonEncode({
-              'sectionId': sectionId,
+              'chapterId': chapterId,
               'text': answers,
             }),
           );
@@ -59,10 +58,10 @@ class SectionService {
     }
   }
 
-  Future<Map<String, String>> fetchAnswer(String sectionId) async {
+  Future<Map<String, String>> fetchAnswer(String chapterId) async {
     // Add query parameters
     final Map<String, String> queryParams = {};
-    queryParams['sectionId'] = sectionId;
+    queryParams['chapterId'] = chapterId;
 
     try {
       final response = await SessionManager().client.get(
@@ -98,22 +97,22 @@ class SectionService {
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         log.severe(
-            'Error in Get Answers By SectionId', jsonResponse['message']);
+            'Error in Get Answers By ChapterId', jsonResponse['message']);
         throw HttpException(jsonResponse['message']);
       }
     } catch (e) {
-      log.severe('Error in Get Answers By SectionId', e);
+      log.severe('Error in Get Answers By ChapterId', e);
       rethrow;
     }
   }
 
-  void updateProgress(String sectionId, double progress) async {
+  void updateProgress(String chapterId, double progress) async {
     try {
       final response = await SessionManager().client.post(
             Uri.parse('${AppConfig.baseUrl}/progress'),
             headers: SessionManager().getHeaders(),
             body: jsonEncode({
-              'sectionId': sectionId,
+              'chapterId': chapterId,
               'progress': progress,
             }),
           );
@@ -121,10 +120,10 @@ class SectionService {
       log.info('Update Progress Response: ${response.body}');
       if (response.statusCode == 200) {
         log.info(
-            'Progress updated successfully! Section: $sectionId Progress: $progress');
+            'Progress updated successfully! Chapter: $chapterId Progress: $progress');
       } else if (response.statusCode == 201) {
         log.info(
-            'Progress added successfully! Section: $sectionId Progress: $progress');
+            'Progress added successfully! Chapter: $chapterId Progress: $progress');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
