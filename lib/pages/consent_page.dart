@@ -1,54 +1,69 @@
 import 'package:adapt/utils/app_config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
+
+import '../services/localization_service.dart';
+import '../services/chapter_service.dart';
+import '../utils/app_colors.dart';
 import '../utils/app_keys.dart';
 import '../widgets/main_title.dart';
+import '../widgets/markdown_builders/header_builder.dart';
+import '../widgets/markdown_builders/right_align_text_builder.dart';
+import '../widgets/markdown_builders/underline_text_builder.dart';
 
-class ConsentPage extends StatefulWidget {
-  const ConsentPage({super.key});
-
-  @override
-  State<ConsentPage> createState() => _ConsentPageState();
-}
-
-class _ConsentPageState extends State<ConsentPage> {
+class ConsentPage extends StatelessWidget {
   final log = Logger('ConsentPage');
-  late final WebViewController _controller;
+  final ChapterService _sectionService = ChapterService();
 
-  @override
-  void initState() {
-    super.initState();
-    // Initialize WebViewController with required settings
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.disabled)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (url) {
-            log.info('Page started loading: $url');
-          },
-          onPageFinished: (url) {
-            log.info('Page finished loading: $url');
-          },
-          onWebResourceError: (error) {
-            log.severe('Error loading page: $error');
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse('${AppConfig.baseUrl}/uploads/pages/consent.html'));
-  }
+  ConsentPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainTitle(
-          title: 'Consent',
-          leadingIcon: Icons.arrow_back_ios_rounded,
-          onIconPressed: () {
-            mainNavigator.currentState!.pop(); //Go Backwards
-          }),
-      body: WebViewWidget(controller: _controller) // Display the WebView
+        appBar: MainTitle(
+            title: 'Consent',
+            leadingIcon: Icons.arrow_back_ios_rounded,
+            onIconPressed: () {
+              mainNavigator.currentState!.pop(); //Go Backwards
+            }),
+        body: FutureBuilder<List<dynamic>>(
+          future: Future.wait([
+            _sectionService.fetchChapterContent('pages/consent/content_${LocalizationService().currentLanguage}.md'),
+          ]),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+            } else if (snapshot.hasError) {
+              return const Center(child: Text("Error loading content!"));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text("No content available!"));
+            }
+
+            // Extract data
+            final String markdownContent = snapshot.data![0];
+
+            return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: MarkdownBody(
+                          data: markdownContent,
+                          inlineSyntaxes: [UnderlineSyntax(), RightAlignSyntax()],
+                          selectable: false,
+                          builders: <String, MarkdownElementBuilder>{
+                            'h3': CenteredHeaderBuilder()
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ));
+          },
+        )
     );
   }
 }

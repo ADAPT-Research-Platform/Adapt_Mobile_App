@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
               );
             case Routes.routeConsent:
               return MaterialPageRoute(
-                builder: (context) => const ConsentPage(),
+                builder: (context) => ConsentPage(),
               );
             default:
               return MaterialPageRoute(
