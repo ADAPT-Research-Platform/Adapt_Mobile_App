@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:adapt/models/section.dart';
+import 'package:adapt/models/chapter.dart';
 import 'package:adapt/services/comment_service.dart';
-import 'package:adapt/services/section_service.dart';
+import 'package:adapt/services/chapter_service.dart';
 import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/main_title.dart';
 import 'package:adapt/widgets/markdown_builders/right_align_text_builder.dart';
@@ -16,6 +16,7 @@ import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
 import '../widgets/comment_card.dart';
+import '../widgets/markdown_builders/header_builder.dart';
 import '../widgets/markdown_builders/image_viewer_builder.dart';
 import '../widgets/markdown_builders/question_viewer_builder.dart';
 import '../widgets/markdown_builders/underline_text_builder.dart';
@@ -23,7 +24,7 @@ import '../widgets/task_button.dart';
 import '../widgets/markdown_builders/video_viewer_builder.dart';
 
 class SectionPage extends StatefulWidget {
-  final Section section;
+  final Chapter section;
 
   const SectionPage({super.key, required this.section});
 
@@ -36,7 +37,7 @@ class _SectionPageState extends State<SectionPage> {
 
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _commentTextController = TextEditingController();
-  final SectionService _sectionService = SectionService();
+  final ChapterService _sectionService = ChapterService();
   final CommentService _commentService = CommentService();
 
   final Map<String, TextEditingController> _controllers = {};
@@ -53,7 +54,7 @@ class _SectionPageState extends State<SectionPage> {
       };
     }
 
-    _sectionService.addAnswer(widget.section.sectionId, _answers);
+    _sectionService.addAnswer(widget.section.chapterId, _answers);
     log.info("Submitted Answers: ${jsonEncode(_answers)}");
   }
 
@@ -73,7 +74,7 @@ class _SectionPageState extends State<SectionPage> {
       int validAnswers = _answers.values.where((answer) => answer.isNotEmpty).length;
 
       double exerciseProgress = (validAnswers / totalQuestions) * 100;
-      _sectionService.updateProgress(widget.section.sectionId, exerciseProgress);
+      _sectionService.updateProgress(widget.section.chapterId, exerciseProgress);
       return ;
     }
 
@@ -95,7 +96,7 @@ class _SectionPageState extends State<SectionPage> {
     // Clamp percentage between 0 and 100
     double readingProgress = percentage.clamp(0, 100);
     if(readingProgress > widget.section.progress){
-      _sectionService.updateProgress(widget.section.sectionId, readingProgress);
+      _sectionService.updateProgress(widget.section.chapterId, readingProgress);
     }
     return ;
   }
@@ -121,7 +122,7 @@ class _SectionPageState extends State<SectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: MainTitle(
-            title: widget.section.sectionName,
+            title: widget.section.chapterName,
             leadingIcon: Icons.arrow_back_ios_rounded,
             onIconPressed: () {
               _updateSectionProgress();
@@ -129,9 +130,9 @@ class _SectionPageState extends State<SectionPage> {
             }),
         body: FutureBuilder<List<dynamic>>(
           future: Future.wait([
-            _sectionService.fetchSectionContent(widget.section.folderPath),
+            _sectionService.fetchChapterContent('${widget.section.folderPath}/content.md'),
             if (widget.section.isExercise)
-              _sectionService.fetchAnswer(widget.section.sectionId),
+              _sectionService.fetchAnswer(widget.section.chapterId),
           ]),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -176,6 +177,7 @@ class _SectionPageState extends State<SectionPage> {
                             builders: <String, MarkdownElementBuilder>{
                               'a': VideoViewerBuilder(),
                               'img': ImageViewerBuilder(widget.section.folderPath),
+                              'h3': CenteredHeaderBuilder(),
                               'question': QuestionViewerBuilder(_questions, _answers, _controllers),
                               "ul": UnderlineBuilder(),
                               'rl': RightAlignBuilder(),
@@ -221,8 +223,7 @@ class _SectionPageState extends State<SectionPage> {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-            top: Radius.circular(12.0)), // Adjust the top corners
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)), // Adjust the top corners
       ),
       builder: (BuildContext context) {
         final maxHeight = 2 * MediaQuery.of(context).size.height / 3;
@@ -260,7 +261,7 @@ class _SectionPageState extends State<SectionPage> {
               ),
               Expanded( // Use Expanded here
                 child: FutureBuilder<List<Comment>>(
-                  future: _commentService.fetchComments(sectionId: widget.section.sectionId),
+                  future: _commentService.fetchComments(chapterId: widget.section.chapterId),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
@@ -303,7 +304,7 @@ class _SectionPageState extends State<SectionPage> {
                   IconButton(
                     icon: const Icon(Icons.send_rounded, color: AppColors.darkYellow, size: 25),
                     onPressed: () {
-                      _commentService.addComment(_commentTextController.text.trim(), widget.section.sectionId);
+                      _commentService.addComment(_commentTextController.text.trim(), widget.section.chapterId);
                       _commentTextController.clear();
                       Navigator.pop(context); // Close the bottom sheet
                     },

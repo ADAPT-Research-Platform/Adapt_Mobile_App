@@ -3,7 +3,7 @@ import 'package:logging/logging.dart';
 
 import '../enums/section_filter.dart';
 import '../models/module.dart';
-import '../models/section.dart';
+import '../models/chapter.dart';
 import '../services/localization_service.dart';
 import '../services/module_service.dart';
 import '../utils/app_colors.dart';
@@ -24,8 +24,8 @@ class ChapterPage extends StatefulWidget {
 
 class _ChapterPageState extends State<ChapterPage> {
   final log = Logger('ChapterPage');
-
   final ModuleService _moduleService = ModuleService();
+
   SectionFilter selectedFilter = SectionFilter.all; // Default filter
 
   @override
@@ -39,165 +39,99 @@ class _ChapterPageState extends State<ChapterPage> {
         },
       ),
       body: FutureBuilder<Module>(
-          future: _moduleService.fetchModuleById(widget.moduleId),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
-            } else if (snapshot.hasError) {
-              return const Center(child: Text("Error loading chapters!"));
-            } else if (!snapshot.hasData) {
-              return const Center(child: Text("No chapters available!"));
-            }
+        future: _moduleService.fetchModuleById(widget.moduleId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.darkYellow),
+            );
+          } else if (snapshot.hasError) {
+            return const Center(child: Text("Error loading chapters!"));
+          } else if (!snapshot.hasData || snapshot.data!.chapters.isEmpty) {
+            return const Center(child: Text("No chapters available!"));
+          }
 
-            final module = snapshot.data!;
+          final module = snapshot.data!;
+          final filteredChapters = _getFilteredChapters(module.chapters);
 
-            return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Column(
-                  children: [
-                    // Segmented Button to filter chapters
-                    SegmentedButton<SectionFilter>(
-                      style: SegmentedButton.styleFrom(
-                        backgroundColor: AppColors.darkWhite,
-                        foregroundColor: AppColors.fontColor,
-                        selectedForegroundColor: AppColors.fontColor,
-                        selectedBackgroundColor: AppColors.primaryYellow,
-                        side: const BorderSide(
-                          color: AppColors.darkYellow, // Set the border color
-                          width: 2.2, // Set the border width
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              children: [
+                _buildSegmentedButton(),
+                const SizedBox(height: 5),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredChapters.length,
+                    itemBuilder: (context, index) {
+                      final chapter = filteredChapters[index];
+                      chapter.chapterName = chapter.isExercise
+                          ? '${LocalizationService().get('Chapter')} ${index + 1}: ${LocalizationService().get('Exercise')}'
+                          : '${LocalizationService().get('Chapter')} ${index + 1}';
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: SectionCard(
+                          section: chapter,
+                          onPressed: () {
+                            moduleNavigator.currentState!.pushNamed(
+                              Routes.routeSections,
+                              arguments: chapter,
+                            );
+                          },
                         ),
-                      ),
-                      segments: <ButtonSegment<SectionFilter>>[
-                        ButtonSegment(
-                            value: SectionFilter.all,
-                            label: SizedBox(
-                              width: 70, // Fixed width
-                              child: Center(child: Text(SectionFilter.all.value)),
-                            )),
-                        ButtonSegment(
-                            value: SectionFilter.readings,
-                            label: SizedBox(
-                              width: 70, // Fixed width
-                              child: Center(child: Text(SectionFilter.readings.value)),
-                            )),
-                        ButtonSegment(
-                            value: SectionFilter.exercises,
-                            label: SizedBox(
-                              width: 70, // Fixed width
-                              child: Center(child: Text(SectionFilter.exercises.value)),
-                            )),
-                      ],
-                      selected: <SectionFilter>{selectedFilter},
-                      onSelectionChanged: (Set<SectionFilter> newSelection) {
-                        setState(() {
-                          selectedFilter = newSelection.first; // Update filter
-                        });
-                      },
-                    ),
-                    const Divider(
-                      color: AppColors.lightGrey,
-                      // Customize the color as needed
-                      thickness: 2.5, // Customize the thickness as needed
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: module.chapters.length,
-                        itemBuilder: (context, chapterIndex) {
-                          final chapter = module.chapters[chapterIndex];
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 
-                          // Filter sections based on the selected filter
-                          Map<int, Section> filteredSectionsMap = {};
-                          // Show all sections, maintain the original index
-                          for (int i = 0; i < chapter.sections.length; i++) {
-                            if (selectedFilter == SectionFilter.all) {
-                              filteredSectionsMap[i] = chapter.sections[i];
-                            } else if (selectedFilter == SectionFilter.readings && !chapter.sections[i].isExercise) {
-                              filteredSectionsMap[i] = chapter.sections[i];
-                            } else if (selectedFilter == SectionFilter.exercises && chapter.sections[i].isExercise) {
-                              filteredSectionsMap[i] = chapter.sections[i];
-                            }
-                          }
+  // Filters the chapters based on the selected filter
+  List<Chapter> _getFilteredChapters(List<Chapter> chapters) {
+    if (selectedFilter == SectionFilter.all) return chapters;
 
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 8),
-                              // Chapter Title
-                              SubTitle(text: '${LocalizationService().get('Chapter')} ${chapterIndex + 1}'),
-                              const SizedBox(height: 8),
+    return chapters.where((chapter) {
+      return selectedFilter == SectionFilter.readings
+          ? !chapter.isExercise
+          : chapter.isExercise;
+    }).toList();
+  }
 
-                              // List of sections under the chapter
-                              ListView.builder(
-                                shrinkWrap: true,
-                                // Prevents expansion and allows for vertical scrolling only
-                                physics: const NeverScrollableScrollPhysics(),
-                                // Disable scrolling inside the chapter list
-                                itemCount: filteredSectionsMap.length,
-                                itemBuilder: (context, index) {
-                                  final section = filteredSectionsMap.values.elementAt(index);
-                                  final sectionIndex = filteredSectionsMap.keys.elementAt(index);
-
-                                  section.sectionName = section.isExercise ?
-                                  '${LocalizationService().get('Section')} ${sectionIndex + 1}: ${LocalizationService().get('Exercise')}' :
-                                  '${LocalizationService().get('Section')} ${sectionIndex + 1}';
-
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 10.0),
-                                    child: SectionCard(
-                                      section: section,
-                                      onPressed: () {
-                                        moduleNavigator.currentState!.pushNamed(Routes.routeSections, arguments: section);
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
-                              // Progress and Answers Row
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.access_time_filled_rounded, color: AppColors.darkYellow),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        "${chapter.progress.round()}% ${LocalizationService().get('Progress')}",
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: AppColors.fontColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.list_alt_rounded, color: AppColors.darkYellow),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        "${chapter.numOfComments} ${LocalizationService().get('Comments')}",
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: AppColors.fontColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              // Divider after each chapter
-                              const Divider(
-                                color: AppColors.lightGrey,
-                                thickness: 2.5,
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ));
-          }),
+  // Builds the segmented button for filtering
+  Widget _buildSegmentedButton() {
+    return SegmentedButton<SectionFilter>(
+      style: SegmentedButton.styleFrom(
+        backgroundColor: AppColors.darkWhite,
+        foregroundColor: AppColors.fontColor,
+        selectedForegroundColor: AppColors.fontColor,
+        selectedBackgroundColor: AppColors.primaryYellow,
+        side: const BorderSide(
+          color: AppColors.darkYellow,
+          width: 2.2,
+        ),
+      ),
+      segments: SectionFilter.values.map((filter) {
+        return ButtonSegment(
+          value: filter,
+          label: SizedBox(
+            width: 70,
+            child: Center(child: Text(filter.value)),
+          ),
+        );
+      }).toList(),
+      selected: <SectionFilter>{selectedFilter},
+      onSelectionChanged: (Set<SectionFilter> newSelection) {
+        setState(() {
+          selectedFilter = newSelection.first;
+        });
+      },
     );
   }
 }
+

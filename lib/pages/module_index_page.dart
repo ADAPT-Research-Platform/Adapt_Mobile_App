@@ -1,4 +1,4 @@
-import 'package:adapt/models/section.dart';
+import 'package:adapt/models/chapter.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -31,7 +31,7 @@ class ModuleIndexPage extends StatelessWidget {
               );
             case Routes.routeSections:
               return MaterialPageRoute(
-                builder: (context) => SectionPage(section: settings.arguments! as Section),
+                builder: (context) => SectionPage(section: settings.arguments! as Chapter),
               );
             default:
               return MaterialPageRoute(

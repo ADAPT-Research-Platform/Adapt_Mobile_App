@@ -1,11 +1,12 @@
 import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import '../models/section.dart';
+import '../models/chapter.dart';
+import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 
 class SectionCard extends StatelessWidget {
-  final Section section;
+  final Chapter section;
   final VoidCallback onPressed;
 
   const SectionCard({
@@ -36,7 +37,7 @@ class SectionCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  section.sectionName,
+                  section.chapterName,
                   style: const TextStyle(
                     color: AppColors.fontColor, // Static text color
                     fontSize: AppFontSizes.small,
@@ -52,13 +53,44 @@ class SectionCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
             Text(
               section.title,
               style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.fontColor,
               ),
+            ),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.access_time_filled_rounded, color: AppColors.darkYellow),
+                    const SizedBox(width: 4),
+                    Text("${section.progress.round()}% ${LocalizationService().get('Progress')}",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.fontColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.list_alt_rounded, color: AppColors.darkYellow),
+                    const SizedBox(width: 4),
+                    Text("${section.numOfComments} ${LocalizationService().get('Comments')}",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.fontColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
