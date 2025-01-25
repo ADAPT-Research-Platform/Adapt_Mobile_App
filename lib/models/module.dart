@@ -1,3 +1,5 @@
+
+
 import 'package:adapt/models/chapter.dart';
 
 class Module {
