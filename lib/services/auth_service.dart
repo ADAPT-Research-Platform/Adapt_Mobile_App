@@ -139,4 +139,34 @@ class AuthService {
       });
     }
   }
+
+  void track(DateTime? sessionStart, DateTime? sessionEnd) async{
+    if(sessionStart == null){
+      log.warning("Start time is null");
+      return;
+    }
+
+    try {
+      final response = await SessionManager().client.post(
+        Uri.parse('${AppConfig.baseUrl}/tracks'),
+        headers: SessionManager().getHeaders(),
+        body: jsonEncode({
+          'startedAt': sessionStart.toIso8601String(),
+          'endedAt': (sessionEnd != null) ? sessionEnd.toIso8601String() : "",
+        }),
+      );
+
+      log.info('Track Response: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        log.info('Tracking Data updated');
+      } else {
+        log.warning('Tracking Data update failed');
+      }
+    } catch (e) {
+      log.severe('Error in Tracking Data update', e);
+    }
+
+    return null;
+  }
 }
