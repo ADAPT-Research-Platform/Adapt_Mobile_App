@@ -97,6 +97,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: _selectedNotificationTime ?? TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.inputOnly
     );
     if (pickedTime != null) {
       setState(() {

@@ -8,7 +8,7 @@ class LocalizationService {
   LocalizationService._internal();
 
   Map<String, String> _localizedStrings = {};
-  String _languageCode = 'en'; // Default language
+  String _languageCode = 'de'; // Default language
 
   Future<void> load(String languageCode) async {
     _languageCode = languageCode;

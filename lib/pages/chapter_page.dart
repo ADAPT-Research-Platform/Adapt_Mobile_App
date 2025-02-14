@@ -130,7 +130,7 @@ class _ChapterPageState extends State<ChapterPage> {
             }),
         body: FutureBuilder<List<dynamic>>(
           future: Future.wait([
-            _sectionService.fetchChapterContent('${widget.section.folderPath}/content.md'),
+            _sectionService.fetchChapterContent('${widget.section.folderPath}/content_${LocalizationService().currentLanguage}.md'),
             if (widget.section.isExercise)
               _sectionService.fetchAnswer(widget.section.chapterId),
           ]),

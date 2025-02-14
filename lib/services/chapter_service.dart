@@ -14,8 +14,7 @@ class ChapterService {
   Future<String> fetchChapterContent(String filePath) async {
     try {
       final response = await SessionManager().client.get(
-            Uri.parse(
-                '${AppConfig.baseUrl}/uploads/$filePath'),
+            Uri.parse('${AppConfig.baseUrl}/uploads/$filePath'),
             headers: SessionManager().getHeaders(),
           );
 
