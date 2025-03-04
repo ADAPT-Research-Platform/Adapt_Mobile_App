@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:adapt/models/answer.dart';
 import 'package:adapt/models/chapter.dart';
 import 'package:adapt/services/chapter_service.dart';
 import 'package:adapt/services/comment_service.dart';
@@ -37,24 +38,21 @@ class _ChapterPageState extends State<ChapterPage> {
 
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _commentTextController = TextEditingController();
-  final ChapterService _sectionService = ChapterService();
+  final ChapterService _chapterService = ChapterService();
   final CommentService _commentService = CommentService();
 
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, String> _questions = {};
-  final Map<String, Map<String, String>> _answers = {};
+  final Map<String, String> _answers = {};
 
   double maxScrollPixels = 0.0;
 
   void _submitAnswers() {
     for (var key in _questions.keys) {
-      _answers[key] = {
-        "question": _questions[key] ?? "", // The actual question text
-        "answer": _controllers[key]?.text ?? "" // The provided answer text
-      };
+      _answers[key] = _controllers[key]?.text ?? "";
     }
 
-    _sectionService.addAnswer(widget.section.chapterId, _answers);
+    _chapterService.addAnswer(widget.section.chapterId, _answers);
     log.info("Submitted Answers: ${jsonEncode(_answers)}");
   }
 
@@ -74,7 +72,7 @@ class _ChapterPageState extends State<ChapterPage> {
       int validAnswers = _answers.values.where((answer) => answer.isNotEmpty).length;
 
       double exerciseProgress = (validAnswers / totalQuestions) * 100;
-      _sectionService.updateProgress(widget.section.chapterId, exerciseProgress);
+      _chapterService.updateProgress(widget.section.chapterId, exerciseProgress);
       return ;
     }
 
@@ -96,7 +94,7 @@ class _ChapterPageState extends State<ChapterPage> {
     // Clamp percentage between 0 and 100
     double readingProgress = percentage.clamp(0, 100);
     if(readingProgress > widget.section.progress){
-      _sectionService.updateProgress(widget.section.chapterId, readingProgress);
+      _chapterService.updateProgress(widget.section.chapterId, readingProgress);
     }
     return ;
   }
@@ -130,9 +128,9 @@ class _ChapterPageState extends State<ChapterPage> {
             }),
         body: FutureBuilder<List<dynamic>>(
           future: Future.wait([
-            _sectionService.fetchChapterContent('${widget.section.folderPath}/content_${LocalizationService().currentLanguage}.md'),
+            _chapterService.fetchChapterContent('${widget.section.folderPath}/content_${LocalizationService().currentLanguage}.md'),
             if (widget.section.isExercise)
-              _sectionService.fetchAnswer(widget.section.chapterId),
+              _chapterService.fetchAnswerByChapterId(widget.section.chapterId),
           ]),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -146,14 +144,9 @@ class _ChapterPageState extends State<ChapterPage> {
             // Extract data
             final String markdownContent = snapshot.data![0];
 
-            if (widget.section.isExercise) {
-              final fetchedAnswers = snapshot.data![1];
-              for (var key in fetchedAnswers.keys) {
-                _answers[key] = {
-                  "question": _questions[key] ?? "", // Fetch the question text from `_questions`
-                  "answer": fetchedAnswers[key] ?? "" // Fetch the answer text from `snapshot.data![1]`
-                };
-              }
+            if (widget.section.isExercise && snapshot.data![1] != null) {
+              Answer answer = snapshot.data![1];
+              _answers.addAll(answer.text);
             }
 
             return Padding(
@@ -261,7 +254,7 @@ class _ChapterPageState extends State<ChapterPage> {
               ),
               Expanded( // Use Expanded here
                 child: FutureBuilder<List<Comment>>(
-                  future: _commentService.fetchComments(chapterId: widget.section.chapterId),
+                  future: _commentService.fetchCommentsByChapterId(widget.section.chapterId),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
@@ -277,7 +270,7 @@ class _ChapterPageState extends State<ChapterPage> {
                       shrinkWrap: true,
                       itemCount: comments.length,
                       itemBuilder: (context, index) {
-                        return CommentCard(comment: comments[index]);
+                        return CommentCard(comment: comments[index], isChapterShowing: false);
                       },
                       separatorBuilder: (context, index) {
                         return const Divider(

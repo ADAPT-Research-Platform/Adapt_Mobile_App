@@ -19,7 +19,7 @@ class ContactPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainTitle(title: LocalizationService().get('contacts')),
+      appBar: MainTitle(title: LocalizationService().get('support')),
       body: FutureBuilder<List<dynamic>>(
         future: Future.wait([
           _sectionService.fetchChapterContent('pages/contacts/content_${LocalizationService().currentLanguage}.md'),

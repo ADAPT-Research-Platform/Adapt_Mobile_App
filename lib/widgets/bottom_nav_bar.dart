@@ -62,7 +62,7 @@ class _AppNavigationBar extends State<BottomNavBar> {
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.account_box_rounded, true),
             icon: _buildHexagonButton(Icons.account_box_rounded, false),
-            label: LocalizationService().get('contacts'),
+            label: LocalizationService().get('support'),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.settings, true),

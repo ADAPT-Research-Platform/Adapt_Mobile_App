@@ -12,7 +12,7 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
   final log = Logger('QuestionViewerBuilder');
 
   final Map<String, String> questions;
-  final Map<String, Map<String, String>> currentAnswers;
+  final Map<String, String> currentAnswers;
   final Map<String, TextEditingController> controllers;
 
   QuestionViewerBuilder(this.questions, this.currentAnswers, this.controllers);
@@ -28,17 +28,13 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
 
         if (jsonMap.isNotEmpty) {
           String questionKey = jsonMap.keys.first; // Extract the single key
-          String questionValue =
-              jsonMap.values.first; // Extract the single value
+          String questionValue = jsonMap.values.first; // Extract the single value
 
           // Add to questions map
           questions[questionKey] = questionValue;
 
           // Create or fetch a controller and pre-fill with current answers if available
-          controllers[questionKey] = controllers[questionKey] ??
-              TextEditingController(
-                text: currentAnswers[questionKey]?['answer'] ?? "",
-              );
+          controllers[questionKey] = controllers[questionKey] ?? TextEditingController(text: currentAnswers[questionKey]);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,8 +78,7 @@ class QuestionSyntax extends md.BlockSyntax {
   QuestionSyntax();
 
   @override
-  RegExp get pattern =>
-      RegExp(r'^\[question\](\{".+?":\s*".*?"\})$', dotAll: true);
+  RegExp get pattern => RegExp(r'^\[question\](\{".+?":\s*".*?"\})$', dotAll: true);
 
   @override
   md.Node? parse(md.BlockParser parser) {

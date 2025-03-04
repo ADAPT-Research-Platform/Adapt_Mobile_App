@@ -1,5 +1,6 @@
 import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 
 import '../models/comment.dart';
@@ -9,8 +10,9 @@ import '../utils/app_font_sizes.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;
+  final bool isChapterShowing;
 
-  const CommentCard({super.key, required this.comment});
+  const CommentCard({super.key, required this.comment, required this.isChapterShowing});
 
   @override
   _CommentCardState createState() => _CommentCardState();
@@ -29,6 +31,15 @@ class _CommentCardState extends State<CommentCard> {
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if(widget.isChapterShowing)
+            Text(
+              'Module ${widget.comment.moduleId}: Chapter ${widget.comment.chapterIndex}',
+              style: const TextStyle(
+                color: AppColors.fontColor, // Static text color
+                fontSize: AppFontSizes.small,
+                fontWeight: FontWeight.bold, // Static font size
+              ),
+            ),
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Row(
@@ -50,7 +61,7 @@ class _CommentCardState extends State<CommentCard> {
                 ),
                 const Spacer(),
                 Text(
-                  '${widget.comment.timeStamp.day}.${widget.comment.timeStamp.month}.${widget.comment.timeStamp.year}',
+                  DateFormat('dd.MM.yyyy HH:mm:ss').format(widget.comment.timeStamp),
                   style: const TextStyle(
                     color: AppColors.fontColor, // Static text color
                     fontSize: AppFontSizes.mini, // Static font size
@@ -86,7 +97,7 @@ class _CommentCardState extends State<CommentCard> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     ...widget.comment.comments
-                      .map((reply) => CommentCard(comment: reply)),
+                      .map((reply) => CommentCard(comment: reply,isChapterShowing: false)),
                     GestureDetector(
                       onTap: () {
                         log.info("Replied to ${widget.comment.commentId}..");
