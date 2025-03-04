@@ -60,16 +60,10 @@ class CommentService {
     }
   }
 
-  Future<List<Comment>> fetchComments({String? chapterId, DateTime? date}) async {
+  Future<List<Comment>> fetchCommentsByChapterId(String chapterId) async {
     // Add query parameters
     final Map<String, String> queryParams = {};
-    if (chapterId != null) {
-      queryParams['chapterId'] = chapterId;
-    }
-
-    if (date != null) {
-      queryParams['date'] = date.toIso8601String(); // Format as YYYY-MM-DD
-    }
+    queryParams['chapterId'] = chapterId;
 
     try {
       final response = await SessionManager().client.get(
@@ -87,6 +81,31 @@ class CommentService {
       }
     } catch (e) {
       log.severe('Error in Get Comments By ChapterId', e);
+      rethrow;
+    }
+  }
+
+  Future<List<Comment>> fetchCommentsByDate(DateTime date) async {
+    // Add query parameters
+    final Map<String, String> queryParams = {};
+    queryParams['date'] = date.toIso8601String(); // Format as YYYY-MM-DD
+
+    try {
+      final response = await SessionManager().client.get(
+        Uri.parse('${AppConfig.baseUrl}/comments').replace(queryParameters: queryParams),
+        headers: SessionManager().getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((json) => Comment.parse(json)).toList();
+      } else {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        log.severe('Error in Get Comments By Date', jsonResponse['message']);
+        throw HttpException(jsonResponse['message']);
+      }
+    } catch (e) {
+      log.severe('Error in Get Comments By Date', e);
       rethrow;
     }
   }

@@ -59,4 +59,25 @@ class ModuleService {
       rethrow;
     }
   }
+
+  Future<List<String>> fetchDiaryDateList() async {
+    try {
+      final response = await SessionManager().client.get(
+        Uri.parse('${AppConfig.baseUrl}/modules/diaryDates'),
+        headers: SessionManager().getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map<String>((item) => item).toList();
+      } else {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        log.severe('Error in Get Diary Date List', jsonResponse['message']);
+        throw HttpException(jsonResponse['message']);
+      }
+    } catch (e) {
+      log.severe('Error in Get Diary Date List', e);
+      rethrow;
+    }
+  }
 }
