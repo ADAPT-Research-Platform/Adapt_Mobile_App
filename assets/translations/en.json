@@ -11,7 +11,7 @@
   "overview": "Overview",
   "diary": "Diary",
   "mood": "Mood",
-  "contacts": "Contacts",
+  "support": "Support",
   "settings": "Settings",
 
   "module" : "Module",
@@ -28,6 +28,8 @@
   "progress" : "Progress",
   "comment" : "Comment",
   "comments" : "Comments",
+  "answer" : "Answer",
+  "answers" : "Answers",
   "submit" : "Submit",
   "confirm" : "Confirm",
   "reply" : "Reply",
