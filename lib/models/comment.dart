@@ -1,6 +1,8 @@
 
 class Comment {
   final String commentId;
+  final String moduleId;
+  final String chapterIndex;
   final String commentUserName;
   final DateTime timeStamp;
   final String text;
@@ -8,6 +10,8 @@ class Comment {
 
   Comment({
     required this.commentId,
+    required this.moduleId,
+    required this.chapterIndex,
     required this.commentUserName,
     required this.timeStamp,
     required this.text,
@@ -17,6 +21,8 @@ class Comment {
   factory Comment.parse(Map<String, dynamic> json) {
     return Comment(
       commentId: json['id'].toString(),
+      moduleId: json['moduleId'].toString(),
+      chapterIndex: json['chapterIndex'].toString(),
       commentUserName: json['commentUserName'],
       timeStamp: DateTime.parse(json['createdAt']),
       text: json['text'] ?? '',
