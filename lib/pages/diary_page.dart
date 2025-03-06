@@ -164,7 +164,7 @@ class _DiaryPage extends State<DiaryPage> {
                                     children: [
                                       ...List.generate(comments.length * 2 - 1, (index) {
                                         if (index.isEven) {
-                                          return CommentCard(comment: comments[index ~/ 2], isChapterShowing: true);
+                                          return CommentCard(comment: comments[index ~/ 2], isChapterShowing: true, isEnableReply: false);
                                         } else {
                                           return Divider(
                                             color: Theme.of(context).dividerColor,

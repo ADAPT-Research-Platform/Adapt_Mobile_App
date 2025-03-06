@@ -270,7 +270,7 @@ class _ChapterPageState extends State<ChapterPage> {
                       shrinkWrap: true,
                       itemCount: comments.length,
                       itemBuilder: (context, index) {
-                        return CommentCard(comment: comments[index], isChapterShowing: false);
+                        return CommentCard(comment: comments[index], isChapterShowing: false, isEnableReply: true);
                       },
                       separatorBuilder: (context, index) {
                         return Divider(
