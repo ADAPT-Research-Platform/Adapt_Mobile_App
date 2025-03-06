@@ -5,7 +5,6 @@ import 'package:logging/logging.dart';
 
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
-import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
@@ -63,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                   rows: (1.5 * screenHeight / hexagonSize).roundToDouble().toInt(),
                   cols: (screenWidth / hexagonSize).roundToDouble().toInt(),
                   size: hexagonSize,
-                  fillColor: AppColors.primaryYellow,
+                  fillColor: Theme.of(context).primaryColorLight,
                   strokeColor: Colors.white,
                   strokeWidth: 6,
                 ),
@@ -97,8 +96,8 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: size.height / (isSmallScreen ? 4 : 3)),
                       Text(
                         LocalizationService().get('sign_in'),
-                        style: const TextStyle(
-                          color: AppColors.darkYellow, // Static text color
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColorDark, // Static text color
                           fontSize: AppFontSizes.large, // Static font size
                           fontWeight: FontWeight.bold, // Static font weight
                         ),
@@ -136,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                             value: _isChecked,
                             fillColor: WidgetStateProperty.resolveWith((states) {
                               if (states.contains(WidgetState.selected)) {
-                                return AppColors.darkYellow;
+                                return Theme.of(context).primaryColorDark;
                               }
                               return null;
                             }),

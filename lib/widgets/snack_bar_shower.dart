@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../utils/app_colors.dart';
-
 class SnackBarShower {
 
   static void _showSnackBar(GlobalKey<ScaffoldMessengerState> scaffold, String message, Color backgroundColor) {
@@ -18,11 +16,11 @@ class SnackBarShower {
   }
 
   static void info(GlobalKey<ScaffoldMessengerState> scaffold, String message) {
-    _showSnackBar(scaffold, message, AppColors.primaryYellow);
+    _showSnackBar(scaffold, message, const Color(0xFFFEC63D));
   }
 
   static void warn(GlobalKey<ScaffoldMessengerState> scaffold, String message) {
-    _showSnackBar(scaffold, message, AppColors.darkYellow);
+    _showSnackBar(scaffold, message, const Color(0xFFA08030));
   }
 
   static void error(GlobalKey<ScaffoldMessengerState> scaffold, String message) {

@@ -13,7 +13,9 @@ import 'mode_page.dart';
 import 'module_index_page.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final Function(ThemeMode) onThemeChanged;
+
+  const MainPage({super.key, required this.onThemeChanged});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -82,7 +84,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               const DiaryPage(),
               ModePage(shouldReload: shouldReloadModePage),
               ContactPage(),
-              const SettingsPage(),
+              SettingsPage(onThemeChanged: widget.onThemeChanged),
             ],
           ),
           bottomNavigationBar: BottomNavBar(

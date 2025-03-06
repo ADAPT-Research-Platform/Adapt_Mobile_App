@@ -5,7 +5,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
 
-import '../../utils/app_colors.dart';
 import '../../utils/app_font_sizes.dart';
 
 class QuestionViewerBuilder extends MarkdownElementBuilder {
@@ -42,7 +41,6 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
               Text(
                 questions[questionKey] ?? "",
                 style: const TextStyle(
-                  color: AppColors.fontColor,
                   fontSize: AppFontSizes.small,
                   fontWeight: FontWeight.bold,
                 ),

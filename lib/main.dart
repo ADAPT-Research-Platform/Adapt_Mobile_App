@@ -5,6 +5,7 @@ import 'package:adapt/pages/splash_page.dart';
 import 'package:adapt/services/localization_service.dart';
 import 'package:adapt/services/notification_service.dart';
 import 'package:adapt/utils/app_keys.dart';
+import 'package:adapt/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
@@ -39,21 +40,37 @@ void main() async {
   });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system; // or start with ThemeMode.light/dark
+
+  void setThemeMode(ThemeMode mode) {
+    setState(() {
+      _themeMode = mode;
+    });
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'ADAPT',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: _themeMode, // Switches between light and dark themes
         debugShowCheckedModeBanner: false,
         navigatorKey: mainNavigator,
         onGenerateRoute: (settings) {
           switch (settings.name) {
             case Routes.routeMain:
               return MaterialPageRoute(
-                builder: (context) => const MainPage(),
+                builder: (context) => MainPage(onThemeChanged: setThemeMode),
               );
             case Routes.routeLogin:
               return MaterialPageRoute(

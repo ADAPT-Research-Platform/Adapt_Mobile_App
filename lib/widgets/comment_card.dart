@@ -1,4 +1,3 @@
-import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
@@ -35,7 +34,6 @@ class _CommentCardState extends State<CommentCard> {
             Text(
               'Module ${widget.comment.moduleId}: Chapter ${widget.comment.chapterIndex}',
               style: const TextStyle(
-                color: AppColors.fontColor, // Static text color
                 fontSize: AppFontSizes.small,
                 fontWeight: FontWeight.bold, // Static font size
               ),
@@ -45,16 +43,15 @@ class _CommentCardState extends State<CommentCard> {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   Icons.circle,
                   size: 15, // Adjust size as needed
-                  color: AppColors.primaryYellow, // Adjust color as needed
+                  color: Theme.of(context).primaryColorLight, // Adjust color as needed
                 ),
                 const SizedBox(width: 10), // Add spacing between the dot and username
                 Text(
                   widget.comment.commentUserName,
                   style: const TextStyle(
-                    color: AppColors.fontColor, // Static text color
                     fontSize: AppFontSizes.small,
                     fontWeight: FontWeight.bold, // Static font size
                   ),
@@ -63,7 +60,6 @@ class _CommentCardState extends State<CommentCard> {
                 Text(
                   DateFormat('dd.MM.yyyy HH:mm:ss').format(widget.comment.timeStamp),
                   style: const TextStyle(
-                    color: AppColors.fontColor, // Static text color
                     fontSize: AppFontSizes.mini, // Static font size
                   ),
                 ),
@@ -71,7 +67,6 @@ class _CommentCardState extends State<CommentCard> {
             ),
             subtitle: Text(widget.comment.text,
                 style: const TextStyle(
-                  color: AppColors.fontColor, // Static text color
                   fontSize: AppFontSizes.mini, // Static font size
                 )),
           ),
@@ -86,7 +81,7 @@ class _CommentCardState extends State<CommentCard> {
                 padding: const EdgeInsets.only(left: 18.0),
                 child: Text(
                   _isRepliesVisible ? LocalizationService().get('hide_replies') : '${LocalizationService().get('View')} ${widget.comment.comments.length} ${LocalizationService().get('Replies')}',
-                  style: const TextStyle(color: AppColors.darkYellow),
+                  style: TextStyle(color: Theme.of(context).primaryColorDark),
                 ),
               ),
             ),
@@ -123,7 +118,6 @@ class _CommentCardState extends State<CommentCard> {
                                       Text(
                                         "${LocalizationService().get('reply_to')} ${widget.comment.commentUserName}",
                                         style: const TextStyle(
-                                          color: AppColors.fontColor,
                                           fontSize: AppFontSizes.small,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -136,8 +130,8 @@ class _CommentCardState extends State<CommentCard> {
                                       ),
                                     ],
                                   ),
-                                  const Divider(
-                                    color: AppColors.lightGrey,
+                                  Divider(
+                                    color: Theme.of(context).dividerColor,
                                     // Customize the color as needed
                                     thickness: 2.5, // Customize the thickness as needed
                                   ),
@@ -154,7 +148,7 @@ class _CommentCardState extends State<CommentCard> {
                                         ),
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.send_rounded, color: AppColors.darkYellow, size: 25),
+                                        icon: Icon(Icons.send_rounded, color: Theme.of(context).primaryColorDark, size: 25),
                                         onPressed: () {
                                           _commentService.addReply(_commentTextController.text.trim(), widget.comment.commentId);
                                           _commentTextController.clear();
@@ -172,8 +166,8 @@ class _CommentCardState extends State<CommentCard> {
                       },
                       child: Text(
                         LocalizationService().get('Reply'),
-                        style: const TextStyle(
-                            color: AppColors.darkYellow,
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorDark,
                             fontWeight: FontWeight.bold
                         ),
                       ),

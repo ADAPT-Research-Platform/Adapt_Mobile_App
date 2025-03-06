@@ -1,7 +1,6 @@
 import 'package:adapt/services/chapter_service.dart';
 import 'package:adapt/services/comment_service.dart';
 import 'package:adapt/services/module_service.dart';
-import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/answer_card.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -48,7 +47,7 @@ class _DiaryPage extends State<DiaryPage> {
             future: _moduleService.fetchDiaryDateList(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+                return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
               } else if (snapshot.hasError) {
                 return const Center(child: Text("Error loading diary data!"));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -67,10 +66,10 @@ class _DiaryPage extends State<DiaryPage> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: AppColors.darkWhite,
+                      color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: AppColors.darkYellow, // Border color
+                        color: Theme.of(context).primaryColorDark, // Border color
                         width: 2.2, // Border width
                       ),
                     ),
@@ -94,9 +93,9 @@ class _DiaryPage extends State<DiaryPage> {
                           if (highlightedDates.contains(normalizedDay)) {
                             return Container(
                               margin: const EdgeInsets.all(4.0),
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: AppColors.primaryYellow,
+                                color: Theme.of(context).primaryColorLight,
                               ),
                               child: Center(
                                 child: Text(
@@ -109,26 +108,26 @@ class _DiaryPage extends State<DiaryPage> {
                           return null; // fall back to default builder
                         },
                       ),
-                      headerStyle: const HeaderStyle(
+                      headerStyle: HeaderStyle(
                         formatButtonVisible: false, // Hide the "2 weeks" button
                         titleCentered: true, // Center the header text
-                        headerPadding: EdgeInsets.symmetric(vertical: 0.0),
-                        leftChevronIcon: Icon(Icons.arrow_back_ios_rounded, color: AppColors.darkYellow, size: 32),
-                        rightChevronIcon: Icon(Icons.arrow_forward_ios_rounded, color: AppColors.darkYellow, size: 32),
+                        headerPadding: const EdgeInsets.symmetric(vertical: 0.0),
+                        leftChevronIcon: Icon(Icons.arrow_back_ios_rounded, color: Theme.of(context).primaryColorDark, size: 32),
+                        rightChevronIcon: Icon(Icons.arrow_forward_ios_rounded, color: Theme.of(context).primaryColorDark, size: 32),
                         titleTextStyle: TextStyle(
-                          color: AppColors.darkYellow, // Static text color
+                          color: Theme.of(context).primaryColorDark, // Static text color
                           fontSize: AppFontSizes.medium, // Static font size
                           fontWeight: FontWeight.bold, // Static font weight
                         ),
                       ),
-                      calendarStyle: const CalendarStyle(
+                      calendarStyle: CalendarStyle(
                         //tablePadding: EdgeInsets.fromLTRB(0, 0, 0, 15),
-                        cellMargin: EdgeInsets.all(4.0),
+                        cellMargin: const EdgeInsets.all(4.0),
                         todayDecoration: BoxDecoration(
-                          color: AppColors.darkYellow,
+                          color: Theme.of(context).primaryColorDark,
                           shape: BoxShape.circle,
                         ),
-                        selectedDecoration: BoxDecoration(
+                        selectedDecoration: const BoxDecoration(
                           color: Colors.black38,
                           shape: BoxShape.circle,
                         ),
@@ -143,7 +142,7 @@ class _DiaryPage extends State<DiaryPage> {
                     ]),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+                        return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
                       } else if (snapshot.hasError) {
                         return const Center(child: Text("Error loading diary data!"));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -160,15 +159,15 @@ class _DiaryPage extends State<DiaryPage> {
                                 if (comments.isNotEmpty)
                                   ExpansionTile(
                                     title: SubTitle(text: LocalizationService().get('comments')),
-                                    iconColor: AppColors.darkYellow,
-                                    collapsedIconColor: AppColors.darkYellow,
+                                    iconColor: Theme.of(context).primaryColorDark,
+                                    collapsedIconColor: Theme.of(context).primaryColorDark,
                                     children: [
                                       ...List.generate(comments.length * 2 - 1, (index) {
                                         if (index.isEven) {
                                           return CommentCard(comment: comments[index ~/ 2], isChapterShowing: true);
                                         } else {
-                                          return const Divider(
-                                            color: AppColors.lightGrey,
+                                          return Divider(
+                                            color: Theme.of(context).dividerColor,
                                             thickness: 2.5,
                                           );
                                         }
@@ -178,15 +177,15 @@ class _DiaryPage extends State<DiaryPage> {
                                 if (answers.isNotEmpty)
                                   ExpansionTile(
                                     title: SubTitle(text: LocalizationService().get('answers')),
-                                    iconColor: AppColors.darkYellow,
-                                    collapsedIconColor: AppColors.darkYellow,
+                                    iconColor: Theme.of(context).primaryColorDark,
+                                    collapsedIconColor: Theme.of(context).primaryColorDark,
                                     children: [
                                       ...List.generate(answers.length * 2 - 1, (index) {
                                         if (index.isEven) {
                                           return AnswerCard(answer: answers[index ~/ 2]);
                                         } else {
-                                          return const Divider(
-                                            color: AppColors.lightGrey,
+                                          return Divider(
+                                            color: Theme.of(context).dividerColor,
                                             thickness: 2.5,
                                           );
                                         }
@@ -195,49 +194,6 @@ class _DiaryPage extends State<DiaryPage> {
                                   ),
                               ],
                             ),
-
-                            /*Column(
-                              children: [
-                                if(comments.isNotEmpty)...[
-                                  SubTitle(text: LocalizationService().get('comments')),
-                                  ListView.separated(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(), // Prevents nested scroll issues
-                                    itemCount: comments.length,
-                                    itemBuilder: (context, index) {
-                                      return CommentCard(comment: comments[index], isChapterShowing: true);
-                                    },
-                                    separatorBuilder: (context, index) {
-                                      return const Divider(
-                                        color: AppColors.lightGrey, // Customize the color as needed
-                                        thickness: 2.5, // Customize the thickness as needed
-                                      );
-                                    },
-                                  ),
-                                ],
-                                if(answers.isNotEmpty)...[
-                                  const Divider(
-                                    color: AppColors.lightGrey, // Customize the color as needed
-                                    thickness: 2.5, // Customize the thickness as needed
-                                  ),
-                                  SubTitle(text: LocalizationService().get('answers')),
-                                  ListView.separated(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(), // Prevents nested scroll issues
-                                    itemCount: answers.length,
-                                    itemBuilder: (context, index) {
-                                      return AnswerCard(answer: answers[index]);
-                                    },
-                                    separatorBuilder: (context, index) {
-                                      return const Divider(
-                                        color: AppColors.lightGrey, // Customize the color as needed
-                                        thickness: 2.5, // Customize the thickness as needed
-                                      );
-                                    },
-                                  ),
-                                ]
-                              ],
-                            )*/
                       ));
                     },
                   ),

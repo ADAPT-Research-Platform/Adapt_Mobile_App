@@ -1,4 +1,3 @@
-import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
@@ -53,7 +52,7 @@ class VideoThumbnail extends StatelessWidget {
             ),
           ),
         ),
-        const Icon(Icons.play_circle_outline_rounded, size: 60, color: AppColors.white),
+        Icon(Icons.play_circle_outline_rounded, size: 60, color: Theme.of(context).scaffoldBackgroundColor),
       ],
     );
   }

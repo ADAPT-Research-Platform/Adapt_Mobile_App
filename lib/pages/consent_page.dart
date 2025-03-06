@@ -4,7 +4,6 @@ import 'package:logging/logging.dart';
 
 import '../services/chapter_service.dart';
 import '../services/localization_service.dart';
-import '../utils/app_colors.dart';
 import '../utils/app_keys.dart';
 import '../widgets/main_title.dart';
 import '../widgets/markdown_builders/header_builder.dart';
@@ -32,7 +31,7 @@ class ConsentPage extends StatelessWidget {
           ]),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+              return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
             } else if (snapshot.hasError) {
               return const Center(child: Text("Error loading content!"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

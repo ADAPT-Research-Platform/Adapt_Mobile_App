@@ -1,17 +1,16 @@
-import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../models/chapter.dart';
 import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 
-class SectionCard extends StatelessWidget {
-  final Chapter section;
+class ChapterCard extends StatelessWidget {
+  final Chapter chapter;
   final VoidCallback onPressed;
 
-  const SectionCard({
+  const ChapterCard({
     super.key,
-    required this.section,
+    required this.chapter,
     required this.onPressed,
   });
 
@@ -22,10 +21,10 @@ class SectionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
         decoration: BoxDecoration(
-          color: section.isExercise ? AppColors.paleYellow : AppColors.darkWhite,
+          color: chapter.isExercise ? Theme.of(context).highlightColor : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: AppColors.darkYellow, // Border color
+            color: Theme.of(context).primaryColorDark, // Border color
             width: 2.2,          // Border width
           ),
         ),
@@ -37,28 +36,27 @@ class SectionCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  section.chapterName,
+                  chapter.isExercise
+                  ? '${LocalizationService().get('Chapter')} ${chapter.chapterIndex}: ${LocalizationService().get('Exercise')}'
+                  : '${LocalizationService().get('Chapter')} ${chapter.chapterIndex}',
                   style: const TextStyle(
-                    color: AppColors.fontColor, // Static text color
                     fontSize: AppFontSizes.small,
                     fontWeight: FontWeight.bold, // Static font size
                   ),
                 ),
                 Text(
-                  timeAgo(section.timeStamp),
+                  timeAgo(chapter.timeStamp),
                   style: const TextStyle(
                     fontSize: AppFontSizes.mini,
-                    color: AppColors.fontColor,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 5),
             Text(
-              section.title,
+              chapter.title,
               style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.fontColor,
+                fontSize: AppFontSizes.mini,
               ),
             ),
             const SizedBox(height: 15),
@@ -67,12 +65,11 @@ class SectionCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.access_time_filled_rounded, color: AppColors.darkYellow),
+                    Icon(Icons.access_time_filled_rounded, color: Theme.of(context).primaryColorDark),
                     const SizedBox(width: 4),
-                    Text("${section.progress.round()}% ${LocalizationService().get('Progress')}",
+                    Text("${chapter.progress.round()}% ${LocalizationService().get('Progress')}",
                       style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.fontColor,
+                        fontSize: AppFontSizes.mini,
                       ),
                     ),
                   ],
@@ -80,12 +77,11 @@ class SectionCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Row(
                   children: [
-                    const Icon(Icons.list_alt_rounded, color: AppColors.darkYellow),
+                    Icon(Icons.list_alt_rounded, color: Theme.of(context).primaryColorDark),
                     const SizedBox(width: 4),
-                    Text("${section.numOfComments} ${LocalizationService().get('Comments')}",
+                    Text("${chapter.numOfComments} ${LocalizationService().get('Comments')}",
                       style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.fontColor,
+                        fontSize: AppFontSizes.mini,
                       ),
                     ),
                   ],

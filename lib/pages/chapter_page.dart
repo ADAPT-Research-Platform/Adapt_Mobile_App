@@ -5,7 +5,6 @@ import 'package:adapt/models/answer.dart';
 import 'package:adapt/models/chapter.dart';
 import 'package:adapt/services/chapter_service.dart';
 import 'package:adapt/services/comment_service.dart';
-import 'package:adapt/utils/app_colors.dart';
 import 'package:adapt/widgets/main_title.dart';
 import 'package:adapt/widgets/markdown_builders/right_align_text_builder.dart';
 import 'package:flutter/material.dart';
@@ -134,7 +133,7 @@ class _ChapterPageState extends State<ChapterPage> {
           ]),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+              return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
             } else if (snapshot.hasError) {
               return const Center(child: Text("Error loading content!"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -197,7 +196,7 @@ class _ChapterPageState extends State<ChapterPage> {
                                   child: TaskButton(
                                     text: LocalizationService().get('Submit'),
                                     onPressed: _submitAnswers,
-                                    backgroundColor: AppColors.darkYellow,
+                                    backgroundColor: Theme.of(context).primaryColorDark,
                                     icon: Icons.question_answer_rounded,
                                   )
                               )
@@ -234,7 +233,6 @@ class _ChapterPageState extends State<ChapterPage> {
                   Text(
                     LocalizationService().get('Comments'),
                     style: const TextStyle(
-                      color: AppColors.fontColor,
                       fontSize: AppFontSizes.small,
                       fontWeight: FontWeight.bold,
                     ),
@@ -247,8 +245,8 @@ class _ChapterPageState extends State<ChapterPage> {
                   ),
                 ],
               ),
-              const Divider(
-                color: AppColors.lightGrey,
+              Divider(
+                color: Theme.of(context).dividerColor,
                 // Customize the color as needed
                 thickness: 2.5, // Customize the thickness as needed
               ),
@@ -257,7 +255,7 @@ class _ChapterPageState extends State<ChapterPage> {
                   future: _commentService.fetchCommentsByChapterId(widget.section.chapterId),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+                      return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
                     } else if (snapshot.hasError) {
                       return const Center(child: Text("Error loading comments!"));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -273,8 +271,8 @@ class _ChapterPageState extends State<ChapterPage> {
                         return CommentCard(comment: comments[index], isChapterShowing: false);
                       },
                       separatorBuilder: (context, index) {
-                        return const Divider(
-                          color: AppColors.lightGrey,
+                        return Divider(
+                          color: Theme.of(context).dividerColor,
                           thickness: 2.5,
                         );
                       },
@@ -295,7 +293,7 @@ class _ChapterPageState extends State<ChapterPage> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.send_rounded, color: AppColors.darkYellow, size: 25),
+                    icon: Icon(Icons.send_rounded, color: Theme.of(context).primaryColorDark, size: 25),
                     onPressed: () {
                       _commentService.addComment(_commentTextController.text.trim(), widget.section.chapterId);
                       _commentTextController.clear();

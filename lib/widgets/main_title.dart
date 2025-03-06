@@ -1,8 +1,6 @@
 import 'package:adapt/utils/app_font_sizes.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/app_colors.dart';
-
 class MainTitle extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final IconData? leadingIcon;
@@ -20,11 +18,11 @@ class MainTitle extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       padding: const EdgeInsets.only(top: 4),
       margin: const EdgeInsets.all(8.0),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border(
           bottom: BorderSide(
-            color: AppColors.lightGrey, // Line color
+            color: Theme.of(context).dividerColor, // Line color
             width: 2.5, // Line thickness
           ),
         ),
@@ -34,14 +32,14 @@ class MainTitle extends StatelessWidget implements PreferredSizeWidget {
         elevation: 0, // Remove shadow
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(leadingIcon, color: AppColors.darkYellow, size: 35), // Static color
+          icon: Icon(leadingIcon, color: Theme.of(context).primaryColorDark, size: 35), // Static color
           onPressed: onIconPressed,
         ),
         centerTitle: true,
         title: Text(
           title,
-          style: const TextStyle(
-            color: AppColors.darkYellow, // Static text color
+          style: TextStyle(
+            color: Theme.of(context).primaryColorDark, // Static text color
             fontSize: AppFontSizes.large, // Static font size
             fontWeight: FontWeight.bold, // Static font weight
           ),

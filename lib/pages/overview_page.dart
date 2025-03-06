@@ -9,7 +9,6 @@ import '../services/localization_service.dart';
 import '../services/module_service.dart';
 import '../services/mood_service.dart';
 import '../services/notification_service.dart';
-import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/main_title.dart';
 import '../widgets/sub_title.dart';
@@ -48,7 +47,7 @@ class _OverviewPageState extends State<OverviewPage> {
         future: _modulesIdFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+            return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
           } else if (snapshot.hasError) {
             return const Center(child: Text("Error loading modules!"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -69,8 +68,8 @@ class _OverviewPageState extends State<OverviewPage> {
                     moduleIdList: moduleIdList,
                     size: MediaQuery.of(context).size.width / 4, // Adjust dynamically
                   ),
-                  const Divider(
-                    color: AppColors.lightGrey,
+                  Divider(
+                    color: Theme.of(context).dividerColor,
                     thickness: 2.5,
                   ),
                   //Expanded(child: Container()),
@@ -82,7 +81,6 @@ class _OverviewPageState extends State<OverviewPage> {
                       Text(
                         LocalizationService().get('im_feeling_today'),
                         style: const TextStyle(
-                          color: AppColors.fontColor,
                           fontSize: AppFontSizes.small,
                         ),
                       ),
@@ -101,7 +99,6 @@ class _OverviewPageState extends State<OverviewPage> {
                       Text(
                         LocalizationService().get('im_motivated_today'),
                         style: const TextStyle(
-                          color: AppColors.fontColor,
                           fontSize: AppFontSizes.small,
                         ),
                       ),
@@ -151,13 +148,13 @@ class _OverviewPageState extends State<OverviewPage> {
         children: [
           Icon(
             icon,
-            color: _selectedFeeling == feeling ? AppColors.primaryYellow : AppColors.darkGrey,
+            color: _selectedFeeling == feeling ? Theme.of(context).primaryColorLight : Theme.of(context).highlightColor,
             size: 40,
           ),
           Text(
             feeling.value,
             style: TextStyle(
-              color: _selectedFeeling == feeling ? AppColors.darkYellow : AppColors.darkGrey,
+              color: _selectedFeeling == feeling ? Theme.of(context).primaryColorDark : Theme.of(context).textTheme.displayLarge?.color,
             ),
           ),
         ],

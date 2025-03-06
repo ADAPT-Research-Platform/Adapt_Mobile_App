@@ -6,7 +6,6 @@ import '../models/chapter.dart';
 import '../models/module.dart';
 import '../services/localization_service.dart';
 import '../services/module_service.dart';
-import '../utils/app_colors.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
 import '../widgets/main_title.dart';
@@ -41,8 +40,8 @@ class _ModulePageState extends State<ModulePage> {
         future: _moduleService.fetchModuleById(widget.moduleId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.darkYellow),
+            return Center(
+              child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark),
             );
           } else if (snapshot.hasError) {
             return const Center(child: Text("Error loading chapters!"));
@@ -70,8 +69,8 @@ class _ModulePageState extends State<ModulePage> {
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
-                        child: SectionCard(
-                          section: chapter,
+                        child: ChapterCard(
+                          chapter: chapter,
                           onPressed: () {
                             moduleNavigator.currentState!.pushNamed(
                               Routes.routeSections,
@@ -106,12 +105,12 @@ class _ModulePageState extends State<ModulePage> {
   Widget _buildSegmentedButton() {
     return SegmentedButton<SectionFilter>(
       style: SegmentedButton.styleFrom(
-        backgroundColor: AppColors.darkWhite,
-        foregroundColor: AppColors.fontColor,
-        selectedForegroundColor: AppColors.fontColor,
-        selectedBackgroundColor: AppColors.primaryYellow,
-        side: const BorderSide(
-          color: AppColors.darkYellow,
+        backgroundColor: Theme.of(context).cardColor,
+        foregroundColor: Theme.of(context).textTheme.displayLarge?.color,
+        selectedForegroundColor: Theme.of(context).primaryColorDark,
+        selectedBackgroundColor: Theme.of(context).primaryColorLight,
+        side: BorderSide(
+          color: Theme.of(context).primaryColorDark,
           width: 2.2,
         ),
       ),

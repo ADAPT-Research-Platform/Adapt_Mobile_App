@@ -4,7 +4,6 @@ import 'package:logging/logging.dart';
 
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
-import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/hexagon_grid.dart';
 
@@ -59,7 +58,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
               rows: (3 * screenHeight / hexagonSize).roundToDouble().toInt(),
               cols: (screenWidth / hexagonSize).roundToDouble().toInt(),
               size: hexagonSize,
-              fillColor: AppColors.primaryYellow,
+              fillColor: Theme.of(context).primaryColorLight,
               strokeColor: Colors.white,
               strokeWidth: 6,
             ),
@@ -96,10 +95,10 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
+                      Text(
                         'ADAPT',
                         style: TextStyle(
-                          color: AppColors.darkYellow,
+                          color: Theme.of(context).primaryColorDark,
                           fontSize: AppFontSizes.massive,
                           fontWeight: FontWeight.bold,
                         ),
@@ -107,16 +106,16 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                       const SizedBox(height: 10),
                       Text(
                         LocalizationService().get('department'),
-                        style: const TextStyle(
-                          color: AppColors.darkYellow,
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColorDark,
                           fontSize: AppFontSizes.medium,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         LocalizationService().get('university'),
-                        style: const TextStyle(
-                          color: AppColors.darkYellow,
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColorDark,
                           fontSize: AppFontSizes.large,
                         ),
                       ),

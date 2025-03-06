@@ -1,4 +1,3 @@
-import 'package:adapt/utils/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -57,7 +56,7 @@ class FeelingChart extends StatelessWidget {
             barRods: [
               BarChartRodData(
                 toY: data.feeling.toDouble(),
-                color: AppColors.primaryYellow,
+                color: Theme.of(context).primaryColorLight,
                 width: 2,
                 borderRadius: BorderRadius.circular(6),
               ),

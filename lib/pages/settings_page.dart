@@ -7,7 +7,6 @@ import 'package:logging/logging.dart';
 import '../services/auth_service.dart';
 import '../services/localization_service.dart';
 import '../services/notification_service.dart';
-import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
 import '../widgets/snack_bar_shower.dart';
@@ -15,7 +14,9 @@ import '../widgets/sub_title.dart';
 import '../widgets/task_button.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  final Function(ThemeMode) onThemeChanged;
+
+  const SettingsPage({super.key, required this.onThemeChanged});
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -141,7 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     value: _changePassword,
                     fillColor: WidgetStateProperty.resolveWith((states) {
                       if (states.contains(WidgetState.selected)) {
-                        return AppColors.darkYellow;
+                        return Theme.of(context).primaryColorDark;
                       }
                       return null;
                     }),
@@ -160,7 +161,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     LocalizationService().get('change_password'),
                     style: const TextStyle(
-                      color: AppColors.fontColor,
                       fontSize: AppFontSizes.small,
                       fontWeight: FontWeight.bold,
                     ),
@@ -193,7 +193,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: TaskButton(
                       text: LocalizationService().get('Delete'),
                       onPressed: _showDeleteConfirmationDialog,
-                      backgroundColor: AppColors.darkYellow,
+                      backgroundColor: Theme.of(context).primaryColorDark,
                       icon: Icons.delete_rounded,
                     ),
                   ),
@@ -201,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
 
               const SizedBox(height: 10),
-              const Divider(color: AppColors.lightGrey, thickness: 2.5),
+              Divider(color: Theme.of(context).dividerColor, thickness: 2.5),
               SubTitle(text: LocalizationService().get('Appearance')),
               _buildRadioOption(LocalizationService().get('Language'), ['Deutch', 'English'], _selectedLanguage, (value) {
                 setState(() {
@@ -213,10 +213,17 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildRadioOption(LocalizationService().get('Theme'), ['System', 'Light', 'Dark'], _selectedTheme, (value) {
                 setState(() {
                   _selectedTheme = value!;
+                  if (value == 'Light') {
+                    widget.onThemeChanged(ThemeMode.light);
+                  } else if (value == 'Dark') {
+                    widget.onThemeChanged(ThemeMode.dark);
+                  } else {
+                    widget.onThemeChanged(ThemeMode.system);
+                  }
                 });
               }),
 
-              const Divider(color: AppColors.lightGrey, thickness: 2.5),
+              Divider(color: Theme.of(context).dividerColor, thickness: 2.5),
               SubTitle(text: LocalizationService().get('Notifications')),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -226,7 +233,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text(
                       LocalizationService().get('notification_time'),
                       style: const TextStyle(
-                        color: AppColors.fontColor,
                         fontSize: AppFontSizes.small,
                       ),
                     ),
@@ -234,8 +240,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       onPressed: _pickNotificationTime,
                       child: Text(
                         LocalizationService().get('set_time'),
-                        style: const TextStyle(
-                            color: AppColors.darkYellow,
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorDark,
                             fontWeight: FontWeight.bold
                         ),
                       ),
@@ -250,12 +256,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.schedule_rounded, color: AppColors.primaryYellow),
+                      Icon(Icons.schedule_rounded, color: Theme.of(context).primaryColorLight),
                       const SizedBox(width: 8),
                       Text(
                         '${LocalizationService().get('scheduled_time')}: ${_selectedNotificationTime!.format(context)}',
                         style: const TextStyle(
-                          color: AppColors.fontColor,
                           fontSize: AppFontSizes.mini,
                         ),
                       ),
@@ -277,8 +282,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   _isNotificationSoundEnabled = value;
                 });
               }),
-              const Divider(
-                color: AppColors.lightGrey,
+              Divider(
+                color: Theme.of(context).dividerColor,
                 thickness: 2.5,
               ),
               const SizedBox(height: 5),
@@ -299,15 +304,14 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   //TODO: Move this to a separate widget later
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool enabled = true, bool obscureText = false}) {
+  Widget _buildTextField(String label, TextEditingController controller, {bool enabled = true, bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: const TextStyle(
-            color: AppColors.fontColor,
+            //color: AppColors.fontColor,
             fontSize: AppFontSizes.small,
             fontWeight: FontWeight.bold,
           ),
@@ -327,8 +331,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildRadioOption(String title, List<String> options,
-      String selectedValue, Function(String?) onChanged) {
+  Widget _buildRadioOption(String title, List<String> options, String selectedValue, Function(String?) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -337,7 +340,7 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Text(
             title,
             style: const TextStyle(
-              color: AppColors.fontColor,
+              //color: AppColors.fontColor,
               fontSize: AppFontSizes.small,
               fontWeight: FontWeight.bold,
             ),
@@ -356,7 +359,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 Text(option,
                     style: const TextStyle(
-                        color: AppColors.fontColor,
                         fontSize: AppFontSizes.small)),
               ],
             );
@@ -366,15 +368,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSwitchOption(
-      String title, bool currentValue, Function(bool) onChanged) {
+  Widget _buildSwitchOption(String title, bool currentValue, Function(bool) onChanged) {
     return SwitchListTile(
       title: Text(title,
-          style: const TextStyle(
-              color: AppColors.fontColor, fontSize: AppFontSizes.small)),
+          style: const TextStyle(fontSize: AppFontSizes.small)
+      ),
       value: currentValue,
       onChanged: onChanged,
-      activeColor: AppColors.primaryYellow,
+      activeColor: Theme.of(context).primaryColorLight,
     );
   }
 
@@ -411,7 +412,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           _confirmCurrentPasswordController.text.trim());
                       _confirmCurrentPasswordController.clear();
                     },
-                    backgroundColor: AppColors.darkYellow,
+                    backgroundColor: Theme.of(context).primaryColorDark,
                   ),
                 ),
               ],

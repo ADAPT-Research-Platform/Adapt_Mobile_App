@@ -7,7 +7,6 @@ import '../enums/mood_period_filter.dart';
 import '../models/mood.dart';
 import '../services/localization_service.dart';
 import '../services/mood_service.dart';
-import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/feeling_chart.dart';
 import '../widgets/motivation_chart.dart';
@@ -71,24 +70,22 @@ class _ModePageState extends State<ModePage> {
                     Text(
                       selectedOption.value,
                       style: const TextStyle(
-                        color: AppColors.fontColor,
                         fontSize: AppFontSizes.small,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text('${startDate.toString().substring(0, 10)} - ${endDate.toString().substring(0, 10)}',
                         style: const TextStyle(
-                        color: AppColors.fontColor,
                         fontSize: AppFontSizes.small
                     )),
                     IconButton(
-                      icon: const Icon(Icons.access_time_filled_rounded, color: AppColors.darkYellow, size: 35), // Static color
+                      icon: Icon(Icons.access_time_filled_rounded, color: Theme.of(context).primaryColorDark, size: 35), // Static color
                         onPressed: _showModalBottomSheet
                     ),
                   ],
                 ),
-                const Divider(
-                  color: AppColors.lightGrey,
+                Divider(
+                  color: Theme.of(context).dividerColor,
                   // Customize the color as needed
                   thickness: 2.5, // Customize the thickness as needed
                 ),
@@ -99,7 +96,7 @@ class _ModePageState extends State<ModePage> {
                       future: _modeService.fetchModeList(startDate: startDate, endDate: endDate),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
+                          return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
                         } else if (snapshot.hasError) {
                           return const Center(child: Text("Error loading mood data!"));
                         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -116,8 +113,8 @@ class _ModePageState extends State<ModePage> {
                             Expanded(
                               child: FeelingChart(modeData: modeData, startDate: startDate!, endDate: endDate!),
                             ),
-                            const Divider(
-                              color: AppColors.lightGrey,
+                            Divider(
+                              color: Theme.of(context).dividerColor,
                               thickness: 2.5,
                             ),
                             SubTitle(text: LocalizationService().get('Motivation')),
@@ -158,7 +155,6 @@ class _ModePageState extends State<ModePage> {
                   Text(
                     LocalizationService().get('time_period'),
                     style: const TextStyle(
-                      color: AppColors.fontColor,
                       fontSize: AppFontSizes.small,
                       fontWeight: FontWeight.bold,
                     ),
@@ -171,8 +167,8 @@ class _ModePageState extends State<ModePage> {
                   ),
                 ],
               ),
-              const Divider(
-                color: AppColors.lightGrey,
+              Divider(
+                color: Theme.of(context).dividerColor,
                 // Customize the color as needed
                 thickness: 2.5, // Customize the thickness as needed
               ),
@@ -197,7 +193,6 @@ class _ModePageState extends State<ModePage> {
                       title: Text(
                           option.value,
                           style: const TextStyle(
-                              color: AppColors.fontColor,
                               fontSize: AppFontSizes.small
                           )),
                       onTap: () {
@@ -209,8 +204,8 @@ class _ModePageState extends State<ModePage> {
                     );
                   },
                   separatorBuilder: (context, index) {
-                    return const Divider(
-                      color: AppColors.lightGrey,
+                    return Divider(
+                      color: Theme.of(context).dividerColor,
                       thickness: 2.5,
                     );
                   },

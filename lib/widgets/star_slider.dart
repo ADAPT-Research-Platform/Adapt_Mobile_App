@@ -1,4 +1,4 @@
-import 'package:adapt/utils/app_colors.dart';
+
 import 'package:flutter/material.dart';
 
 class StarSlider extends StatefulWidget {
@@ -53,7 +53,7 @@ class _StarSliderState extends State<StarSlider> {
                 children: List.generate(widget.sliderLength, (index) {
                   return Icon(
                     Icons.star_rounded,
-                    color: index < _sliderValue ? AppColors.primaryYellow : AppColors.darkGrey,
+                    color: index < _sliderValue ? Theme.of(context).primaryColorLight : Theme.of(context).highlightColor,
                     size: starSize.clamp(0, 30),
                   );
                 }),

@@ -2,7 +2,6 @@ import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 
 import '../services/localization_service.dart';
-import '../utils/app_colors.dart';
 import 'hexagon_shape.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -27,9 +26,9 @@ class _AppNavigationBar extends State<BottomNavBar> {
     return Container(
       padding: const EdgeInsets.only(top: 4),
       margin: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
           color: Colors.transparent,
-          border: Border(top: BorderSide(color: AppColors.lightGrey, width: 2.5))
+          border: Border(top: BorderSide(color: Theme.of(context).dividerColor, width: 2.5))
       ),
       child: NavigationBar(
         key: bottomNavigator,
@@ -77,12 +76,12 @@ class _AppNavigationBar extends State<BottomNavBar> {
   Widget _buildHexagonButton(IconData icon, bool isSelected) {
     return HexagonShape(
         size: 65,
-        fillColor: isSelected ? AppColors.primaryYellow : AppColors.white,
-        strokeColor: AppColors.darkYellow,
+        fillColor: isSelected ? Theme.of(context).primaryColorLight : Theme.of(context).scaffoldBackgroundColor,
+        strokeColor: Theme.of(context).primaryColorDark,
         strokeWidth: 2.2,
         strokeRadius: 8,
         icon: icon,
-        iconColor: isSelected ? AppColors.white : AppColors.primaryYellow
+        iconColor: isSelected ? Theme.of(context).scaffoldBackgroundColor : Theme.of(context).primaryColorLight
     );
   }
 }

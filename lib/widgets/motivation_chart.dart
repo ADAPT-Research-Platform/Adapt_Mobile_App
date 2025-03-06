@@ -1,4 +1,3 @@
-import 'package:adapt/utils/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +25,7 @@ class MotivationChart extends StatelessWidget {
             )).toList(),
             isCurved: true,
             barWidth: 2,
-            color: AppColors.primaryYellow,
+            color: Theme.of(context).primaryColorLight,
             dotData: const FlDotData(show: false),
           ),
         ],

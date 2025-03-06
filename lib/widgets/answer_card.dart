@@ -1,4 +1,3 @@
-import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
@@ -31,7 +30,6 @@ class _AnswerCardState extends State<AnswerCard> {
                 Text(
                   'Module ${widget.answer.moduleId}: Chapter ${widget.answer.chapterIndex}',
                   style: const TextStyle(
-                    color: AppColors.fontColor, // Static text color
                     fontSize: AppFontSizes.small,
                     fontWeight: FontWeight.bold, // Static font size
                   ),
@@ -40,7 +38,6 @@ class _AnswerCardState extends State<AnswerCard> {
                 Text(
                   DateFormat('dd.MM.yyyy HH:mm:ss').format(widget.answer.timeStamp),
                   style: const TextStyle(
-                    color: AppColors.fontColor, // Static text color
                     fontSize: AppFontSizes.mini, // Static font size
                   ),
                 ),
@@ -59,7 +56,6 @@ class _AnswerCardState extends State<AnswerCard> {
                       Text(
                         '${entry.key}:', // Question key
                         style: const TextStyle(
-                          color: AppColors.fontColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -67,9 +63,6 @@ class _AnswerCardState extends State<AnswerCard> {
                       Expanded(
                         child: Text(
                           entry.value, // Answer text
-                          style: const TextStyle(
-                            color: AppColors.fontColor,
-                          ),
                         ),
                       ),
                     ],

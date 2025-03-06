@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:adapt/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
@@ -13,23 +12,17 @@ class ModuleGrid extends StatelessWidget {
 
   final List<String> moduleIdList;
   final double size;
-  final Color fillColor;
-  final Color strokeColor;
   final double strokeWidth;
   final double strokeRadius;
   final IconData icon;
-  final Color iconColor;
 
   ModuleGrid({
     super.key,
     required this.moduleIdList,
     required this.size,
-    this.fillColor = AppColors.primaryYellow,
-    this.strokeColor = AppColors.darkYellow,
     this.strokeWidth = 1.4,
     this.strokeRadius = 5,
     this.icon = Icons.play_arrow_rounded,
-    this.iconColor = AppColors.darkYellow,
   });
 
   @override
@@ -43,34 +36,37 @@ class ModuleGrid extends StatelessWidget {
           Positioned(
               top: size - (size + gapSize) * cos(pi / 6) - gapSize * 2,
               left: size,
-              child: _buildHexagonButton(0)),
+              child: _buildHexagonButton(context, 0)),
           Positioned(
               top: size * cos(pi / 3) + gapSize,
               left: size + size * cos(pi / 6) - gapSize,
-              child: _buildHexagonButton(1)),
+              child: _buildHexagonButton(context, 1)),
           Positioned(
               top: size + size * cos(pi / 3) - gapSize,
               left: size + size * cos(pi / 6) - gapSize,
-              child: _buildHexagonButton(2)),
+              child: _buildHexagonButton(context, 2)),
           Positioned(
               top: size + (size + gapSize) * cos(pi / 6) + gapSize * 2,
               left: size,
-              child: _buildHexagonButton(3)),
+              child: _buildHexagonButton(context, 3)),
           Positioned(
               top: size + size * cos(pi / 3) - gapSize,
               left: size - size * cos(pi / 6) + gapSize,
-              child: _buildHexagonButton(4)),
+              child: _buildHexagonButton(context, 4)),
           Positioned(
               top: size * cos(pi / 3) + gapSize,
               left: size - size * cos(pi / 6) + gapSize,
-              child: _buildHexagonButton(5)),
-          Positioned(top: size, left: size, child: _buildHexagonButton(6)),
+              child: _buildHexagonButton(context, 5)),
+          Positioned(
+              top: size,
+              left: size,
+              child: _buildHexagonButton(context, 6)),
         ],
       ),
     );
   }
 
-  Widget _buildHexagonButton(int index) {
+  Widget _buildHexagonButton(BuildContext context, int index) {
     bool isIndexAvailable = index >=0 && index < moduleIdList.length;
 
     return GestureDetector(
@@ -83,17 +79,17 @@ class ModuleGrid extends StatelessWidget {
         },
         child: HexagonShape(
             size: size,
-            fillColor: isIndexAvailable ? AppColors.primaryYellow : AppColors.lightGrey,
-            strokeColor: isIndexAvailable ? AppColors.darkYellow : AppColors.darkGrey,
+            fillColor: isIndexAvailable ? Theme.of(context).primaryColorLight : Theme.of(context).disabledColor,
+            strokeColor: isIndexAvailable ? Theme.of(context).primaryColorDark : Theme.of(context).highlightColor,
             strokeWidth: strokeWidth,
             strokeRadius: strokeRadius,
             icon: icon,
-            iconColor: isIndexAvailable ? AppColors.darkYellow : AppColors.darkGrey,
+            iconColor: isIndexAvailable ? Theme.of(context).primaryColorDark : Theme.of(context).highlightColor,
             iconSize: size / 1.5,
             iconText: Text(
               (index + 1).toString(),
               style: TextStyle(
-                color: isIndexAvailable ? AppColors.primaryYellow : AppColors.lightGrey,
+                color: isIndexAvailable ? Theme.of(context).primaryColorLight : Theme.of(context).disabledColor,
                 fontSize: size / 8,
               ),
             )
