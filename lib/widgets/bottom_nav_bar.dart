@@ -23,6 +23,9 @@ class _AppNavigationBar extends State<BottomNavBar> {
 
   @override
   Widget build(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    int cutoff = (deviceWidth / 30).toInt();
+
     return Container(
       padding: const EdgeInsets.only(top: 4),
       margin: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
@@ -46,27 +49,27 @@ class _AppNavigationBar extends State<BottomNavBar> {
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.home_rounded, true),
             icon: _buildHexagonButton(Icons.home_rounded, false),
-            label: LocalizationService().get('overview'),
+            label: truncate(cutoff, LocalizationService().get('overview')),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.book_rounded, true),
             icon: _buildHexagonButton(Icons.book_rounded, false),
-            label: LocalizationService().get('diary'),
+            label: truncate(cutoff, LocalizationService().get('diary')),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.emoji_emotions, true),
             icon: _buildHexagonButton(Icons.emoji_emotions, false),
-            label: LocalizationService().get('mood'),
+            label: truncate(cutoff, LocalizationService().get('mood')),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.account_box_rounded, true),
             icon: _buildHexagonButton(Icons.account_box_rounded, false),
-            label: LocalizationService().get('support'),
+            label: truncate(cutoff, LocalizationService().get('support')),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.settings, true),
             icon: _buildHexagonButton(Icons.settings, false),
-            label: LocalizationService().get('settings'),
+            label: truncate(cutoff, LocalizationService().get('settings')),
           ),
         ],
       ),
@@ -83,5 +86,9 @@ class _AppNavigationBar extends State<BottomNavBar> {
         icon: icon,
         iconColor: isSelected ? Theme.of(context).scaffoldBackgroundColor : Theme.of(context).primaryColorLight
     );
+  }
+
+  String truncate(int cutoff, String text) {
+    return text.length <= cutoff ? text : '${text.substring(0, cutoff)}...';
   }
 }

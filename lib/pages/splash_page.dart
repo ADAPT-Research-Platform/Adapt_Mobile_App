@@ -59,7 +59,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
               cols: (screenWidth / hexagonSize).roundToDouble().toInt(),
               size: hexagonSize,
               fillColor: Theme.of(context).primaryColorLight,
-              strokeColor: Colors.white,
+              strokeColor: Theme.of(context).scaffoldBackgroundColor,
               strokeWidth: 6,
             ),
           ),
