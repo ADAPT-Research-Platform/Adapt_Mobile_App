@@ -119,7 +119,9 @@ class _ChapterPageState extends State<ChapterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: MainTitle(
-            title: widget.section.chapterName,
+            title: widget.section.isExercise
+                ? '${LocalizationService().get('Chapter')} ${widget.section.chapterIndex}: ${LocalizationService().get('Exercise')}'
+                : '${LocalizationService().get('Chapter')} ${widget.section.chapterIndex}',
             leadingIcon: Icons.arrow_back_ios_rounded,
             onIconPressed: () {
               _updateSectionProgress();

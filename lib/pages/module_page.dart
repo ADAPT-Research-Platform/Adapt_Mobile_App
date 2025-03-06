@@ -63,10 +63,6 @@ class _ModulePageState extends State<ModulePage> {
                     itemCount: filteredChapters.length,
                     itemBuilder: (context, index) {
                       final chapter = filteredChapters[index];
-                      chapter.chapterName = chapter.isExercise
-                          ? '${LocalizationService().get('Chapter')} ${index + 1}: ${LocalizationService().get('Exercise')}'
-                          : '${LocalizationService().get('Chapter')} ${index + 1}';
-
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
                         child: ChapterCard(

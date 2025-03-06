@@ -8,7 +8,6 @@ class Chapter {
   final bool isExercise;
   final double progress;
   final int numOfComments;
-  String chapterName = "Unknown"; //Need to figure out this
 
   Chapter({
     required this.chapterId,
