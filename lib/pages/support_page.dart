@@ -9,11 +9,11 @@ import '../widgets/markdown_builders/header_builder.dart';
 import '../widgets/markdown_builders/right_align_text_builder.dart';
 import '../widgets/markdown_builders/underline_text_builder.dart';
 
-class ContactPage extends StatelessWidget {
+class SupportPage extends StatelessWidget {
   final log = Logger('ContactPage');
   final ChapterService _sectionService = ChapterService();
 
-  ContactPage({super.key});
+  SupportPage({super.key});
 
   @override
   Widget build(BuildContext context) {

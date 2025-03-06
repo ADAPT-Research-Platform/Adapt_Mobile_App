@@ -117,8 +117,6 @@ class ChapterService {
         throw HttpException(jsonResponse['message']);
       }
     } catch (e, stacktrace) {
-      print("Error: $e");
-      print("StackTrace: $stacktrace");
       log.severe('Error in Get Answers By Date', e, stacktrace);
       rethrow;
     }

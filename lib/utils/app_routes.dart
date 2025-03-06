@@ -8,7 +8,7 @@ class Routes {
   static const String routeOverview = 'route_overview';
   static const String routeDiary = 'route_diary';
   static const String routeMood = 'route_mood';
-  static const String routeContact = 'route_contact';
+  static const String routeSupport = 'route_support';
   static const String routeSettings = 'route_settings';
 
   //Module Routes (Nested)

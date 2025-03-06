@@ -8,7 +8,7 @@ class NotificationService {
   static final log = Logger('NotificationService');
 
   static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  static final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  static const FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
   static Future<void> onDidReceiveNotification(NotificationResponse notificationResponse) async {
     log.info("Notification received: \${notificationResponse.payload}");

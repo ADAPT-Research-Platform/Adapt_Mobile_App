@@ -7,10 +7,10 @@ import 'package:logging/logging.dart';
 import '../services/auth_service.dart';
 import '../utils/app_keys.dart';
 import '../widgets/bottom_nav_bar.dart';
-import 'contact_page.dart';
 import 'diary_page.dart';
 import 'mode_page.dart';
 import 'module_index_page.dart';
+import 'support_page.dart';
 
 class MainPage extends StatefulWidget {
   final Function(ThemeMode) onThemeChanged;
@@ -83,7 +83,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               ModuleIndexPage(reloadModePage: reloadModePage),
               const DiaryPage(),
               ModePage(shouldReload: shouldReloadModePage),
-              ContactPage(),
+              SupportPage(),
               SettingsPage(onThemeChanged: widget.onThemeChanged),
             ],
           ),
