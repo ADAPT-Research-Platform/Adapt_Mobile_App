@@ -70,8 +70,16 @@
   "update": "Aktualisieren",
   "delete": "Löschen",
   "appearance": "Erscheinungsbild",
+
   "language": "Sprache",
+  "german": "Deutsch",
+  "english": "Englisch",
+
   "theme": "Thema",
+  "system": "System",
+  "light": "Licht",
+  "dark": "Dunkel",
+
   "notifications": "Benachrichtigungen",
   "notification_time": "Benachrichtigungszeit",
   "mute_notifications": "Benachrichtigungen stummschalten",

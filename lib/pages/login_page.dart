@@ -63,15 +63,15 @@ class _LoginPageState extends State<LoginPage> {
                   cols: (screenWidth / hexagonSize).roundToDouble().toInt(),
                   size: hexagonSize,
                   fillColor: Theme.of(context).primaryColorLight,
-                  strokeColor: Colors.white,
+                  strokeColor: Theme.of(context).scaffoldBackgroundColor,
                   strokeWidth: 6,
                 ),
               ),
               Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.white, Colors.transparent],
-                    stops: [0.5, 1.0],
+                    colors: [Theme.of(context).scaffoldBackgroundColor, Colors.transparent],
+                    stops: const [0.5, 1.0],
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                   ),

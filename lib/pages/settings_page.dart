@@ -1,3 +1,5 @@
+import 'package:adapt/enums/language.dart';
+import 'package:adapt/enums/theme_type.dart';
 import 'package:adapt/services/session_manager.dart';
 import 'package:adapt/services/user_service.dart';
 import 'package:adapt/widgets/main_title.dart';
@@ -36,8 +38,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   bool _changePassword = false; // Toggle for the collapsible password fields
   // State variables for the appearance section
-  String _selectedLanguage = 'German'; // Default selected language
-  String _selectedTheme = 'System'; // Default selected theme
+  Language _selectedLanguage = Language.german; // Default selected language
+  ThemeType _selectedTheme = ThemeType.system; // Default selected theme
 
   // State variables for the notifications section
   bool _isNotificationSoundEnabled = true;
@@ -200,26 +202,27 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 10),
               Divider(color: Theme.of(context).dividerColor, thickness: 2.5),
               SubTitle(text: LocalizationService().get('Appearance')),
-              _buildRadioOption(LocalizationService().get('Language'), ['Deutch', 'English'], _selectedLanguage, (value) {
-                setState(() {
-                  _selectedLanguage = value!;
-                  String languageCode = _selectedLanguage == 'English' ? 'en' : 'de';
-                  LocalizationService().load(languageCode);
-                });
-              }),
-              _buildRadioOption(LocalizationService().get('Theme'), ['System', 'Light', 'Dark'], _selectedTheme, (value) {
-                setState(() {
-                  _selectedTheme = value!;
-                  if (value == 'Light') {
-                    widget.onThemeChanged(ThemeMode.light);
-                  } else if (value == 'Dark') {
-                    widget.onThemeChanged(ThemeMode.dark);
-                  } else {
-                    widget.onThemeChanged(ThemeMode.system);
-                  }
-                });
-              }),
-
+              _buildRadioOption<Language>(LocalizationService().get('Language'), Language.values, _selectedLanguage, (option) => option.value, (value) {
+                  setState(() {
+                    _selectedLanguage = value!;
+                    String languageCode = _selectedLanguage == Language.english ? 'en' : 'de';
+                    LocalizationService().load(languageCode);
+                  });
+                },
+              ),
+              _buildRadioOption<ThemeType>(LocalizationService().get('Theme'), ThemeType.values, _selectedTheme, (option) => option.value, (value) {
+                  setState(() {
+                    _selectedTheme = value!;
+                    if (value == ThemeType.light) {
+                      widget.onThemeChanged(ThemeMode.light);
+                    } else if (value == ThemeType.dark) {
+                      widget.onThemeChanged(ThemeMode.dark);
+                    } else {
+                      widget.onThemeChanged(ThemeMode.system);
+                    }
+                  });
+                },
+              ),
               Divider(color: Theme.of(context).dividerColor, thickness: 2.5),
               SubTitle(text: LocalizationService().get('Notifications')),
               Padding(
@@ -300,7 +303,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  //TODO: Move this to a separate widget later
   Widget _buildTextField(String label, TextEditingController controller, {bool enabled = true, bool obscureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,7 +330,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildRadioOption(String title, List<String> options, String selectedValue, Function(String?) onChanged) {
+  Widget _buildRadioOption<T>(String title, List<T> options, T selectedValue, String Function(T) getValue, void Function(T?) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -337,7 +339,6 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Text(
             title,
             style: const TextStyle(
-              //color: AppColors.fontColor,
               fontSize: AppFontSizes.small,
               fontWeight: FontWeight.bold,
             ),
@@ -348,15 +349,16 @@ class _SettingsPageState extends State<SettingsPage> {
           children: options.map((option) {
             return Row(
               children: [
-                Radio<String>(
+                Radio<T>(
                   value: option,
                   groupValue: selectedValue,
                   onChanged: onChanged,
                   activeColor: Colors.amber,
                 ),
-                Text(option,
-                    style: const TextStyle(
-                        fontSize: AppFontSizes.small)),
+                Text(
+                  getValue(option),
+                  style: const TextStyle(fontSize: AppFontSizes.small),
+                ),
               ],
             );
           }).toList(),

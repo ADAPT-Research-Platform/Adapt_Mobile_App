@@ -70,8 +70,16 @@
   "update": "Update",
   "delete": "Delete",
   "appearance": "Appearance",
+
   "language": "Language",
+  "german": "German",
+  "english": "English",
+
   "theme": "Theme",
+  "system": "System",
+  "light": "Light",
+  "dark": "Dark",
+
   "notifications": "Notifications",
   "notification_time": "Notification Time",
   "mute_notifications": "Mute Notifications",
