@@ -98,13 +98,13 @@ class ChapterCard extends StatelessWidget {
     final duration = DateTime.now().difference(timestamp);
 
     if (duration.inDays >= 1) {
-      return "${duration.inDays} Days Ago";
+      return "${duration.inDays} ${LocalizationService().get("days_ago")}";
     } else if (duration.inHours >= 1) {
-      return "${duration.inHours} Hrs Ago";
+      return "${duration.inHours} ${LocalizationService().get("hrs_ago")}";
     } else if (duration.inMinutes >= 1) {
-      return "${duration.inMinutes} Min Ago";
+      return "${duration.inMinutes} ${LocalizationService().get("min_ago")}";
     } else {
-      return "${duration.inSeconds} Sec Ago";
+      return "${duration.inSeconds} ${LocalizationService().get("sec_ago")}";
     }
   }
 }

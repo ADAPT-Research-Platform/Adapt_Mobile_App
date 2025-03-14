@@ -11,79 +11,28 @@ import '../widgets/snack_bar_shower.dart';
 class UserService {
   final log = Logger('UserService');
 
-  void addUser(String userName, String email, String password, String passwordConfirm) async {
-
-    if(userName.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'User name cannot be empty!');
-      return;
-    }
-
-    if(email.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'Email cannot be empty!');
-      return;
-    }
-
-    if(password.isEmpty){
-      SnackBarShower.warn(signupPageScaffold, 'Password cannot be empty!');
-      return;
-    }
-
-    // Validate passwords
-    if (password != passwordConfirm) {
-      SnackBarShower.warn(signupPageScaffold, 'Passwords don\'t match!');
-      return;
-    }
-
-    try {
-      final response = await SessionManager().client.post(
-            Uri.parse('${AppConfig.baseUrl}/users'),
-            headers: SessionManager().getHeaders(),
-            body: jsonEncode({
-              'username': userName,
-              'email': email,
-              'password': password,
-            }),
-          );
-
-      log.info('User Add Response: ${response.body}');
-      if (response.statusCode == 201) {
-        mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
-
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          SnackBarShower.info(loginPageScaffold, 'Signup Successful! Verify Email.');
-        });
-      } else {
-        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        SnackBarShower.error(signupPageScaffold, jsonResponse['message']);
-      }
-    } catch (e) {
-      log.severe('Error in User Adding', e);
-      SnackBarShower.error(signupPageScaffold, 'Internal App Error!');
-    }
-  }
-
   void updateUser(String userName, String currentPassword, String newPassword, String confirmNewPassword) async {
     if(userName.isEmpty){
-      SnackBarShower.warn(mainPageScaffold, 'User name cannot be empty!');
+      SnackBarShower.warn(mainPageScaffold, 'username_empty');
       return;
     }
 
     final sessionUser = await SessionManager().getSessionUser();
     if(userName == sessionUser!.userName && newPassword.isEmpty){
-      SnackBarShower.warn(mainPageScaffold, 'Nothing to update!');
+      SnackBarShower.warn(mainPageScaffold, 'nothing_to_update');
       return;
     }
 
     if(newPassword.isNotEmpty){ //Which means user has given a new password
 
       if(currentPassword.isEmpty){
-        SnackBarShower.warn(mainPageScaffold, 'Current password should be provided!');
+        SnackBarShower.warn(mainPageScaffold, 'current_password_required');
         return;
       }
 
       // Validate passwords
       if (newPassword != confirmNewPassword) {
-        SnackBarShower.warn(mainPageScaffold, 'Confirm New Passwords don\'t match!');
+        SnackBarShower.warn(mainPageScaffold, 'confirm_password_mismatch');
         return;
       }
     }
@@ -107,20 +56,20 @@ class UserService {
           user: sessionUser,
         ); // Extract the cookie value
 
-        SnackBarShower.info(mainPageScaffold, 'User Update Successful!');
+        SnackBarShower.info(mainPageScaffold, 'user_update_success');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       log.severe('Error in User Update', e);
-      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
+      SnackBarShower.error(mainPageScaffold, 'internal_app_error');
     }
   }
 
   void deleteUser(String currentPassword) async {
     if(currentPassword.isEmpty){
-      SnackBarShower.warn(mainPageScaffold, 'Password not provided!');
+      SnackBarShower.warn(mainPageScaffold, 'password_missing');
       return;
     }
 
@@ -141,7 +90,7 @@ class UserService {
         mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
         Future.delayed(const Duration(milliseconds: 1000), () {
-          SnackBarShower.info(loginPageScaffold, 'User Delete Successful!');
+          SnackBarShower.info(loginPageScaffold, 'user_delete_success');
         });
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -149,7 +98,7 @@ class UserService {
       }
     } catch (e) {
       log.severe('Error in User Delete', e);
-      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
+      SnackBarShower.error(mainPageScaffold, 'internal_app_error');
     }
   }
 }

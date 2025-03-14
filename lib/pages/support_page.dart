@@ -10,7 +10,7 @@ import '../widgets/markdown_builders/right_align_text_builder.dart';
 import '../widgets/markdown_builders/underline_text_builder.dart';
 
 class SupportPage extends StatelessWidget {
-  final log = Logger('ContactPage');
+  final log = Logger('SupportPage');
   final ChapterService _sectionService = ChapterService();
 
   SupportPage({super.key});
@@ -27,9 +27,9 @@ class SupportPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
           } else if (snapshot.hasError) {
-            return const Center(child: Text("Error loading content!"));
+            return Center(child: Text(LocalizationService().get("error_loading_support")));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No content available!"));
+            return Center(child: Text(LocalizationService().get("no_support")));
           }
 
           // Extract data

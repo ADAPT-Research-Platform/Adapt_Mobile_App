@@ -45,16 +45,16 @@ class ChapterService {
 
       log.info('Add/Update Answer Response: ${response.body}');
       if (response.statusCode == 200) {
-        SnackBarShower.info(mainPageScaffold, 'Answer Updated Successfully!');
+        SnackBarShower.info(mainPageScaffold, 'answer_update_success');
       } else if (response.statusCode == 201) {
-        SnackBarShower.info(mainPageScaffold, 'Answer Added Successfully!');
+        SnackBarShower.info(mainPageScaffold, 'answer_add_success');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       log.severe('Error in Answer Add/Update', e);
-      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
+      SnackBarShower.error(mainPageScaffold, 'internal_app_error');
     }
   }
 
@@ -144,7 +144,7 @@ class ChapterService {
       }
     } catch (e) {
       log.severe('Error in Update Progress: $e');
-      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
+      SnackBarShower.error(mainPageScaffold, 'internal_app_error');
     }
   }
 }

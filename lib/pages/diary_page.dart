@@ -49,9 +49,9 @@ class _DiaryPage extends State<DiaryPage> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
               } else if (snapshot.hasError) {
-                return const Center(child: Text("Error loading diary data!"));
+                return Center(child: Text(LocalizationService().get("error_loading_diary")));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text("No diary data available!"));
+                return Center(child: Text(LocalizationService().get("no_diary_details")));
               }
 
               final List<String> diaryDates = snapshot.data!;
@@ -144,9 +144,9 @@ class _DiaryPage extends State<DiaryPage> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
                       } else if (snapshot.hasError) {
-                        return const Center(child: Text("Error loading diary data!"));
+                        return Center(child: Text(LocalizationService().get("error_loading_diary_details")));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(child: Text("No diary data available!"));
+                        return Center(child: Text(LocalizationService().get("no_diary_details")));
                       }
 
                       final List<Comment> comments = snapshot.data![0];

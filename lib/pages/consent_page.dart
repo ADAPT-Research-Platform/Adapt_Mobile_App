@@ -33,9 +33,9 @@ class ConsentPage extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
             } else if (snapshot.hasError) {
-              return const Center(child: Text("Error loading content!"));
+              return Center(child: Text(LocalizationService().get("error_loading_consent")));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text("No content available!"));
+              return Center(child: Text(LocalizationService().get("no_consent")));
             }
 
             // Extract data

@@ -115,7 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
         pickedTime,
       );
 
-      SnackBarShower.info(settingPageScaffold, LocalizationService().get('Notification Scheduled at ') + pickedTime.format(context));
+      SnackBarShower.info(settingPageScaffold, "${LocalizationService().get('notification_schedule')} ${pickedTime.format(context)}");
     }
   }
 

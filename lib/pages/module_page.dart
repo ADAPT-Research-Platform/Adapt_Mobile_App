@@ -9,7 +9,7 @@ import '../services/module_service.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
 import '../widgets/main_title.dart';
-import '../widgets/section_card.dart';
+import '../widgets/chapter_card.dart';
 
 class ModulePage extends StatefulWidget {
   final String moduleId;
@@ -44,9 +44,9 @@ class _ModulePageState extends State<ModulePage> {
               child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark),
             );
           } else if (snapshot.hasError) {
-            return const Center(child: Text("Error loading chapters!"));
+            return Center(child: Text(LocalizationService().get("error_loading_chapters")));
           } else if (!snapshot.hasData || snapshot.data!.chapters.isEmpty) {
-            return const Center(child: Text("No chapters available!"));
+            return Center(child: Text(LocalizationService().get("no_chapters")));
           }
 
           final module = snapshot.data!;

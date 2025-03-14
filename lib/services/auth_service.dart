@@ -12,14 +12,14 @@ import '../utils/app_routes.dart';
 class AuthService {
   final log = Logger('AuthService');
 
-  void login(String userNameOrEmail, String password) async {
-    if(userNameOrEmail.isEmpty){
-      SnackBarShower.warn(loginPageScaffold, 'Username or Email not provided!');
+  void login(String userName, String password) async {
+    if(userName.isEmpty){
+      SnackBarShower.warn(loginPageScaffold, 'username_missing');
       return;
     }
 
     if(password.isEmpty){
-      SnackBarShower.warn(loginPageScaffold, 'Password not provided!');
+      SnackBarShower.warn(loginPageScaffold, 'password_missing');
       return;
     }
 
@@ -28,7 +28,7 @@ class AuthService {
             Uri.parse('${AppConfig.baseUrl}/auth/login'),
             headers: SessionManager().getHeaders(),
             body: jsonEncode({
-              'username': userNameOrEmail,
+              'username': userName,
               'password': password,
             }),
           );
@@ -52,11 +52,11 @@ class AuthService {
 
           // Add a short delay to wait until the next page is built
           Future.delayed(const Duration(milliseconds: 1000), () {
-            SnackBarShower.info(mainPageScaffold, 'Login successful!');
+            SnackBarShower.info(mainPageScaffold, 'login_success');
           });
         } else {
           log.severe('No cookies found in Login Response.');
-          SnackBarShower.error(loginPageScaffold, 'Login unsuccessful!');
+          SnackBarShower.error(loginPageScaffold, 'login_failure');
         }
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -64,7 +64,7 @@ class AuthService {
       }
     } catch (e) {
       log.severe('Error in Login', e);
-      SnackBarShower.error(loginPageScaffold, 'Internal App Error!');
+      SnackBarShower.error(loginPageScaffold, 'internal_app_error');
     }
 
     return null;
@@ -124,7 +124,7 @@ class AuthService {
         SessionManager().clearSessionInfo();
 
         Future.delayed(const Duration(milliseconds: 1000), () {
-          SnackBarShower.info(loginPageScaffold, 'Logout Successful!');
+          SnackBarShower.info(loginPageScaffold, 'logout_success');
         });
       } else {
         Future.delayed(const Duration(milliseconds: 1000), () {
@@ -135,7 +135,7 @@ class AuthService {
     } catch (e) {
       log.severe('Error in Logout', e);
       Future.delayed(const Duration(milliseconds: 1000), () {
-        SnackBarShower.error(loginPageScaffold, 'Internal App Error!');
+        SnackBarShower.error(loginPageScaffold, 'internal_app_error');
       });
     }
   }

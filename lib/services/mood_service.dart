@@ -33,16 +33,16 @@ class MoodService {
 
       log.info('Add/Update Mood Response: ${response.body}');
       if (response.statusCode == 200) {
-        SnackBarShower.info(mainPageScaffold, 'Mood Updated Successfully!');
+        SnackBarShower.info(mainPageScaffold, 'mood_update_success');
       }else if (response.statusCode == 201) {
-        SnackBarShower.info(mainPageScaffold, 'Mood Added Successfully!');
+        SnackBarShower.info(mainPageScaffold, 'mood_add_success');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       log.severe('Error in Mood Add/Update', e);
-      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
+      SnackBarShower.error(mainPageScaffold, 'internal_app_error');
     }
   }
 

@@ -25,14 +25,14 @@ class CommentService {
 
       log.info('Add Comment Response: ${response.body}');
       if (response.statusCode == 201) {
-        SnackBarShower.info(mainPageScaffold, 'Comment Added Successfully!');
+        SnackBarShower.info(mainPageScaffold, 'comment_add_success');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       log.severe('Error in Comment Add', e);
-      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
+      SnackBarShower.error(mainPageScaffold, 'internal_app_error');
     }
   }
 
@@ -49,14 +49,14 @@ class CommentService {
 
       log.info('Add Reply Response: ${response.body}');
       if (response.statusCode == 201) {
-        SnackBarShower.info(mainPageScaffold, 'Reply Added Successfully!');
+        SnackBarShower.info(mainPageScaffold, 'reply_add_success');
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(mainPageScaffold, jsonResponse['message']);
       }
     } catch (e) {
       log.severe('Error in Reply Add', e);
-      SnackBarShower.error(mainPageScaffold, 'Internal App Error!');
+      SnackBarShower.error(mainPageScaffold, 'internal_app_error');
     }
   }
 

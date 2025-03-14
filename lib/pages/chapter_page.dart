@@ -137,9 +137,9 @@ class _ChapterPageState extends State<ChapterPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
             } else if (snapshot.hasError) {
-              return const Center(child: Text("Error loading content!"));
+              return Center(child: Text(LocalizationService().get("error_loading_chapter_content")));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text("No content available!"));
+              return Center(child: Text(LocalizationService().get("no_chapter_content")));
             }
 
             // Extract data
@@ -197,9 +197,8 @@ class _ChapterPageState extends State<ChapterPage> {
                               Expanded(
                                   child: TaskButton(
                                     text: LocalizationService().get('Submit'),
-                                    onPressed: _submitAnswers,
-                                    backgroundColor: Theme.of(context).primaryColorDark,
                                     icon: Icons.question_answer_rounded,
+                                    onPressed: _submitAnswers,
                                   )
                               )
                             ]
@@ -259,9 +258,9 @@ class _ChapterPageState extends State<ChapterPage> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
                     } else if (snapshot.hasError) {
-                      return const Center(child: Text("Error loading comments!"));
+                      return Center(child: Text(LocalizationService().get("error_loading_comments")));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text("No comments available!"));
+                      return Center(child: Text(LocalizationService().get("no_comments")));
                     }
 
                     final List<Comment> comments = snapshot.data!;
