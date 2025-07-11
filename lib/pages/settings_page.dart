@@ -71,6 +71,9 @@ class _SettingsPageState extends State<SettingsPage> {
         _userNameController.text = sessionUser.userName;
       });
     }
+
+    _selectedTheme = await SessionManager().getSelectedThemeType();
+    _selectedLanguage = await SessionManager().getSelectedLanguage();
   }
 
   void _updateUser() async {
@@ -207,6 +210,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     _selectedLanguage = value!;
                     String languageCode = _selectedLanguage == Language.english ? 'en' : 'de';
                     LocalizationService().load(languageCode);
+
+                    SessionManager().setSelectedLanguage(_selectedLanguage);
                   });
                 },
               ),
@@ -220,6 +225,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     } else {
                       widget.onThemeChanged(ThemeMode.system);
                     }
+
+                    SessionManager().setSelectedThemeType(_selectedTheme);
                   });
                 },
               ),

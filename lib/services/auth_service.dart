@@ -133,7 +133,7 @@ class AuthService {
         });
       }
     } catch (e) {
-      log.severe('Error in Logout', e);
+      log.severe('Error in Logout', e.toString());
       Future.delayed(const Duration(milliseconds: 1000), () {
         SnackBarShower.error(loginPageScaffold, 'internal_app_error');
       });

@@ -4,6 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 
+import '../enums/language.dart';
+import '../enums/theme_type.dart';
 import '../models/user.dart';
 
 class SessionManager {
@@ -69,6 +71,26 @@ class SessionManager {
     }
 
     return _sessionCookie;
+  }
+
+  Future<ThemeType> getSelectedThemeType() async {
+      log.info('Getting selected Theme Type from secure storage');
+      return ThemeExtension.fromIndex(_secureStorage.read(key: "theme_type") as int);
+  }
+
+  void setSelectedThemeType(ThemeType themeType) async{
+    await _secureStorage.write(key: "theme_type", value: themeType.index as String);
+    log.info('Theme Type Saved');
+  }
+
+  Future<Language> getSelectedLanguage() async {
+    log.info('Getting selected Language from secure storage');
+    return LanguageExtension.fromIndex(_secureStorage.read(key: "language") as int);
+  }
+
+  void setSelectedLanguage(Language language) async{
+    await _secureStorage.write(key: "language", value: language.index as String);
+    log.info('Language Saved');
   }
 
   Map<String, String> getHeaders() {
