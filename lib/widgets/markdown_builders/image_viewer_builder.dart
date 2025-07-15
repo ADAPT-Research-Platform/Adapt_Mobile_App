@@ -17,11 +17,15 @@ class ImageViewerBuilder extends MarkdownElementBuilder {
     // Check if the element is an image
     if (element.attributes['src'] != null) {
       final imageName = element.attributes['src'];
-      final imageUrl = '${AppConfig.baseUrl}/uploads/$sectionFolderPath/$imageName';
+      final imageUrl = '${AppConfig.contentUrl}/$sectionFolderPath/$imageName';
 
       // Return an image widget with the updated URL
       return Image.network(
         imageUrl,
+        headers: const {
+          'Authorization': 'Bearer ${AppConfig.contentAccessToken}',
+          'Accept': 'application/vnd.github.v3.raw', // Get raw file content
+        },
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
           log.severe('Image loading error: $error URL: $imageUrl');

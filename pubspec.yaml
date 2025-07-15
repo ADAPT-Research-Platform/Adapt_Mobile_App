@@ -34,7 +34,7 @@ dependencies:
   flutter_polygon: ^0.3.0  # Check for the latest version
   flutter_markdown: ^0.7.3+1
   cupertino_icons: ^1.0.6
-  http: ^0.13.4
+  http: ^0.13.5
   table_calendar: ^3.0.8
   fl_chart: ^0.69.0
   youtube_player_flutter: ^8.0.0
