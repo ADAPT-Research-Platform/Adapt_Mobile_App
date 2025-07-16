@@ -11,11 +11,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 
+import '../models/checkbox_question.dart';
 import '../models/comment.dart';
 import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
 import '../widgets/comment_card.dart';
+import '../widgets/markdown_builders/checkbox_question_builder.dart';
 import '../widgets/markdown_builders/header_builder.dart';
 import '../widgets/markdown_builders/image_viewer_builder.dart';
 import '../widgets/markdown_builders/question_viewer_builder.dart';
@@ -43,6 +45,12 @@ class _ChapterPageState extends State<ChapterPage> {
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, String> _questions = {};
   final Map<String, String> _answers = {};
+
+  final Map<String, List<int>> _correctAnswersMap = {}; // Stores correct indices for each question
+  final Map<String, List<int>> _userSelectionsMap = {}; // Stores user's selected indices for each question
+
+  // Make _checkboxBuilder nullable and initialize it in initState
+  CheckboxQuestionViewerBuilder? _checkboxBuilder;
 
   double maxScrollPixels = 0.0;
 
@@ -98,11 +106,84 @@ class _ChapterPageState extends State<ChapterPage> {
     return ;
   }
 
+  void _onCheckboxChanged(String questionId, int index, bool isChecked) {
+    setState(() {
+      if (!_userSelectionsMap.containsKey(questionId)) {
+        _userSelectionsMap[questionId] = [];
+      }
+
+      // Safely access _checkboxBuilder, it's guaranteed to be not null here
+      // because we initialized it in initState and are only using it in methods
+      // that are called after initState or in build after its check.
+      final CheckboxQuestion? questionData = _checkboxBuilder!.questionDataMap[questionId]; // Use ! for non-null assertion
+
+      if (questionData != null && !questionData.multiple) {
+        _userSelectionsMap[questionId] = isChecked ? [index] : [];
+      } else {
+        if (isChecked) {
+          if (!_userSelectionsMap[questionId]!.contains(index)) {
+            _userSelectionsMap[questionId]!.add(index);
+          }
+        } else {
+          _userSelectionsMap[questionId]!.remove(index);
+        }
+        _userSelectionsMap[questionId]!.sort();
+      }
+    });
+  }
+
+  void _calculateCheckboxResults() {
+    print("--- Checkbox Question Results ---");
+    // Ensure _checkboxBuilder is not null before using it
+    if (_checkboxBuilder != null) {
+      _checkboxBuilder!.questionDataMap.forEach((questionId, questionData) {
+        final userSelections = _userSelectionsMap[questionId] ?? [];
+        final correctIndices = questionData.correctIndices;
+
+        final sortedCorrect = List<int>.from(correctIndices)..sort();
+        final sortedUser = List<int>.from(userSelections)..sort();
+
+        int correctCount = 0;
+        for (int userSelectedIdx in sortedUser) {
+          if (sortedCorrect.contains(userSelectedIdx)) {
+            correctCount++;
+          }
+        }
+
+        final String scoreText;
+        bool isFullyCorrect = false;
+
+        if (!questionData.multiple) {
+          isFullyCorrect = (sortedUser.length == 1 && sortedUser.first == sortedCorrect.first);
+          scoreText = isFullyCorrect ? "1/1" : "0/1";
+        } else {
+          isFullyCorrect = (correctCount == sortedCorrect.length) && (userSelections.length == correctCount);
+          scoreText = "$correctCount/${sortedCorrect.length}";
+        }
+
+        print("Question ID: $questionId");
+        print("  Question: ${questionData.question}");
+        print("  Your selections: ${userSelections.map((idx) => questionData.answers[idx]).toList()}");
+        print("  Correct answers: ${correctIndices.map((idx) => questionData.answers[idx]).toList()}");
+        print("  Score: $scoreText");
+        print("  Fully Correct: $isFullyCorrect");
+      });
+    } else {
+      print("Error: _checkboxBuilder was not initialized when trying to calculate results.");
+    }
+    print("-------------------------------");
+  }
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_updateMaxScrollPixels);
+
+    // Initialize the builder here, after super.initState()
+    _checkboxBuilder = CheckboxQuestionViewerBuilder(
+      _userSelectionsMap,
+      _onCheckboxChanged,
+    );
   }
 
   @override
@@ -124,6 +205,7 @@ class _ChapterPageState extends State<ChapterPage> {
                 : '${LocalizationService().get('Chapter')} ${widget.section.chapterIndex}',
             leadingIcon: Icons.arrow_back_ios_rounded,
             onIconPressed: () {
+              _calculateCheckboxResults();
               _updateSectionProgress();
               moduleNavigator.currentState!.pop(); //Go Backwards
             }),
@@ -150,6 +232,10 @@ class _ChapterPageState extends State<ChapterPage> {
               _answers.addAll(answer.text);
             }
 
+            if (_checkboxBuilder == null) {
+              log.severe("_checkboxBuilder not initialized!");
+            }
+
             return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Column(
@@ -165,7 +251,7 @@ class _ChapterPageState extends State<ChapterPage> {
                           controller: _scrollController,
                           child: MarkdownBody(
                             data: markdownContent,
-                            blockSyntaxes: [QuestionSyntax()],
+                            blockSyntaxes: [CheckboxQuestionSyntax(), QuestionSyntax(), ],
                             inlineSyntaxes: [UnderlineSyntax(), RightAlignSyntax()],
                             selectable: false,
                             builders: <String, MarkdownElementBuilder>{
@@ -173,6 +259,7 @@ class _ChapterPageState extends State<ChapterPage> {
                               'img': ImageViewerBuilder(widget.section.folderPath),
                               'h3': CenteredHeaderBuilder(),
                               'question': QuestionViewerBuilder(_questions, _answers, _controllers),
+                              'checkbox': _checkboxBuilder!,
                               "ul": UnderlineBuilder(),
                               'rl': RightAlignBuilder(),
                             },
