@@ -7,6 +7,7 @@ import 'package:markdown/markdown.dart' as md;
 import 'dart:convert';
 
 import '../../models/checkbox_question.dart';
+import '../../utils/app_font_sizes.dart';
 
 
 class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
@@ -43,47 +44,77 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
           _userSelectionsMap[questionData.id] = [];
         }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text(
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 8.0), // Margin around the entire question box
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0EBEB), // Use context to get Theme data
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: const Color(0xFFA08030), // Border color
+              width: 2.2, // Border width
+            ),
+          ),
+          padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0.0), // Padding inside the bordered box
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
                 questionData.question,
                 style: const TextStyle(
-                  fontSize: 16, // Adjust as needed
-                  fontWeight: FontWeight.bold,
+                  fontSize: AppFontSizes.small,
+                  fontWeight: FontWeight.bold, // Static font size
                 ),
               ),
-            ),
-            ...List.generate(questionData.answers.length, (index) {
-              final isSelected = _userSelectionsMap[questionData.id]!.contains(index);
+              // Use Column directly for answers to control spacing better
+              Column(
+                children: List.generate(questionData.answers.length, (index) {
+                  final isSelected = _userSelectionsMap[questionData.id]!.contains(index);
 
-              // Use RadioListTile if Multiple is false, otherwise CheckboxListTile
-              if (!questionData.multiple) {
-                return RadioListTile<int>(
-                  title: Text(questionData.answers[index]),
-                  value: index,
-                  groupValue: isSelected ? index : null, // If selected, group value is this index
-                  onChanged: (int? newValue) {
-                    // When radio button is selected, clear previous selections and add new one
-                    onCheckboxChanged(questionData.id, newValue!, true);
-                  },
-                  dense: true,
-                );
-              } else {
-                return CheckboxListTile(
-                  title: Text(questionData.answers[index]),
-                  value: isSelected,
-                  onChanged: (bool? newValue) {
-                    onCheckboxChanged(questionData.id, index, newValue ?? false);
-                  },
-                  dense: true,
-                );
-              }
-            }),
-            const SizedBox(height: 16),
-          ],
+                  // Define the common fill color property resolver
+                  final WidgetStateProperty<Color?> fillColorResolver =
+                  WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return const Color(0xFFFEC63D);
+                    }
+                    return null;
+                  });
+
+                  if (!questionData.multiple) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 0.0), // Reduced vertical spacing between answers
+                      child: RadioListTile<int>(
+                        title: Text(questionData.answers[index]),
+                        value: index,
+                        groupValue: isSelected ? index : null,
+                        onChanged: (int? newValue) {
+                          onCheckboxChanged(questionData.id, newValue!, true);
+                        },
+                        dense: true,
+                        // Align the radio button to the start (left)
+                        controlAffinity: ListTileControlAffinity.leading,
+                        fillColor: fillColorResolver, // Apply custom fill color
+                      ),
+                    );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 0.0), // Reduced vertical spacing between answers
+                      child: CheckboxListTile(
+                        title: Text(questionData.answers[index]),
+                        value: isSelected,
+                        onChanged: (bool? newValue) {
+                          onCheckboxChanged(questionData.id, index, newValue ?? false);
+                        },
+                        dense: true,
+                        // Align the checkbox to the start (left)
+                        controlAffinity: ListTileControlAffinity.leading,
+                        fillColor: fillColorResolver,
+                      ),
+                    );
+                  }
+                }),
+              ),
+            ],
+          ),
         );
       } catch (e) {
         log.severe("Error parsing Checkbox Question JSON: $e");
@@ -101,12 +132,7 @@ class CheckboxQuestionSyntax extends md.BlockSyntax {
   final log = Logger('CheckboxQuestionSyntax');
 
   CheckboxQuestionSyntax();
-  // Regex to match `[checkbox]{` followed by a multi-line JSON block.
-  // It's crucial to correctly capture the JSON block.
-  // This regex looks for `[checkbox]{`, then non-greedy capture of any characters,
-  // then `}`, and then ensures there's a line break or end of file.
-  // The `(?:.|\n)` part allows it to match across multiple lines.
-  // We will then parse this captured content as JSON.
+
   @override
   RegExp get pattern => RegExp(r'^\[checkbox\]\s*(\{.*)', dotAll: true);
 
