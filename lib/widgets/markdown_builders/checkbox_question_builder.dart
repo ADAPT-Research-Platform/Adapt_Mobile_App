@@ -108,34 +108,36 @@ class CheckboxQuestionSyntax extends md.BlockSyntax {
   // The `(?:.|\n)` part allows it to match across multiple lines.
   // We will then parse this captured content as JSON.
   @override
-  RegExp get pattern => RegExp(
-    r'^\[checkbox\](\{[\s\S]+?\})\s*$',
-    multiLine: true,
-  );
+  RegExp get pattern => RegExp(r'^\[checkbox\]\s*(\{.*)', dotAll: true);
 
   @override
   md.Node? parse(md.BlockParser parser) {
-    final match = pattern.firstMatch(parser.current.content);
+    final buffer = StringBuffer();
+    if (parser.current.content.trim().startsWith('[checkbox]')) {
+      // Consume the [checkbox] line
+      final firstLine = parser.current.content;
+      parser.advance();
 
-    if (match != null) {
-      final String fullMatch = match.group(0)!; // The entire matched block (e.g., [checkbox]{...})
-      final String jsonContent = match.group(1)!; // The content inside the curly braces
+      buffer.write(firstLine.replaceFirst('[checkbox]', '').trim());
 
-      // We need to consume all lines that are part of this JSON block.
-      // A simple `parser.advance()` might not be enough if the JSON spans multiple lines.
-      // However, the `pattern` for BlockSyntax already consumes the entire matched block.
-      // So, `parser.advance()` effectively consumes the lines making up the block.
-      parser.advance(); // Consume the entire matched block
+      while (!parser.isDone) {
+        final line = parser.current.content;
+        buffer.writeln(line);
+        if (line.trim().endsWith('}')) {
+          parser.advance();
+          break;
+        }
+        parser.advance();
+      }
 
-      final md.Element el = md.Element('p', [
-        // Create a custom element to hold the JSON string
+      final jsonContent = buffer.toString();
+
+      return md.Element('p', [
         md.Element('checkbox', [
           md.UnparsedContent(jsonContent),
-        ]),
+        ])
       ]);
-      return el;
     }
-    log.warning("Checkbox BlockSyntax: Pattern not matched for line: '${parser.current.content}'");
     return null;
   }
 }
