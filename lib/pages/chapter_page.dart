@@ -47,7 +47,8 @@ class _ChapterPageState extends State<ChapterPage> {
   final Map<String, String> _answers = {};
 
   final Map<String, List<int>> _correctAnswersMap = {}; // Stores correct indices for each question
-  final Map<String, List<int>> _userSelectionsMap = {}; // Stores user's selected indices for each question
+  final ValueNotifier<Map<String, List<int>>> _userSelectionsNotifier =
+      ValueNotifier({});
 
   // Make _checkboxBuilder nullable and initialize it in initState
   CheckboxQuestionViewerBuilder? _checkboxBuilder;
@@ -71,16 +72,18 @@ class _ChapterPageState extends State<ChapterPage> {
 
   void _updateSectionProgress() {
     // For exercises use different strategy. Percentage means how many questions have answered
-    if(widget.section.isExercise){
+    if (widget.section.isExercise) {
       // Count total number of questions
       int totalQuestions = _questions.length;
 
       // Count the number of valid answers (non-null and non-empty)
-      int validAnswers = _answers.values.where((answer) => answer.isNotEmpty).length;
+      int validAnswers =
+          _answers.values.where((answer) => answer.isNotEmpty).length;
 
       double exerciseProgress = (validAnswers / totalQuestions) * 100;
-      _chapterService.updateProgress(widget.section.chapterId, exerciseProgress);
-      return ;
+      _chapterService.updateProgress(
+          widget.section.chapterId, exerciseProgress);
+      return;
     }
 
     // For reading section use different strategy. How much the user maximum scrolled so far
@@ -96,40 +99,44 @@ class _ChapterPageState extends State<ChapterPage> {
 
     // Calculate percentage based on visible + scrolled content
     final double visibleScrolledContent = maxScrollPixels + viewportHeight;
-    final double percentage = (visibleScrolledContent / totalContentHeight) * 100;
+    final double percentage =
+        (visibleScrolledContent / totalContentHeight) * 100;
 
     // Clamp percentage between 0 and 100
     double readingProgress = percentage.clamp(0, 100);
-    if(readingProgress > widget.section.progress){
+    if (readingProgress > widget.section.progress) {
       _chapterService.updateProgress(widget.section.chapterId, readingProgress);
     }
-    return ;
+    return;
   }
 
   void _onCheckboxChanged(String questionId, int index, bool isChecked) {
-    setState(() {
-      if (!_userSelectionsMap.containsKey(questionId)) {
-        _userSelectionsMap[questionId] = [];
-      }
+    final newSelections =
+        Map<String, List<int>>.from(_userSelectionsNotifier.value);
 
-      // Safely access _checkboxBuilder, it's guaranteed to be not null here
-      // because we initialized it in initState and are only using it in methods
-      // that are called after initState or in build after its check.
-      final CheckboxQuestion? questionData = _checkboxBuilder!.questionDataMap[questionId]; // Use ! for non-null assertion
+    if (!newSelections.containsKey(questionId)) {
+      newSelections[questionId] = [];
+    }
 
-      if (questionData != null && !questionData.multiple) {
-        _userSelectionsMap[questionId] = isChecked ? [index] : [];
-      } else {
-        if (isChecked) {
-          if (!_userSelectionsMap[questionId]!.contains(index)) {
-            _userSelectionsMap[questionId]!.add(index);
-          }
-        } else {
-          _userSelectionsMap[questionId]!.remove(index);
+    // Safely access _checkboxBuilder, it's guaranteed to be not null here
+    // because we initialized it in initState and are only using it in methods
+    // that are called after initState or in build after its check.
+    final CheckboxQuestion? questionData =
+        _checkboxBuilder!.questionDataMap[questionId]; // Use ! for non-null assertion
+
+    if (questionData != null && !questionData.multiple) {
+      newSelections[questionId] = isChecked ? [index] : [];
+    } else {
+      if (isChecked) {
+        if (!newSelections[questionId]!.contains(index)) {
+          newSelections[questionId]!.add(index);
         }
-        _userSelectionsMap[questionId]!.sort();
+      } else {
+        newSelections[questionId]!.remove(index);
       }
-    });
+      newSelections[questionId]!.sort();
+    }
+    _userSelectionsNotifier.value = newSelections;
   }
 
   void _calculateCheckboxResults() {
@@ -137,7 +144,7 @@ class _ChapterPageState extends State<ChapterPage> {
     // Ensure _checkboxBuilder is not null before using it
     if (_checkboxBuilder != null) {
       _checkboxBuilder!.questionDataMap.forEach((questionId, questionData) {
-        final userSelections = _userSelectionsMap[questionId] ?? [];
+        final userSelections = _userSelectionsNotifier.value[questionId] ?? [];
         final correctIndices = questionData.correctIndices;
 
         final sortedCorrect = List<int>.from(correctIndices)..sort();
@@ -154,22 +161,27 @@ class _ChapterPageState extends State<ChapterPage> {
         bool isFullyCorrect = false;
 
         if (!questionData.multiple) {
-          isFullyCorrect = (sortedUser.length == 1 && sortedUser.first == sortedCorrect.first);
+          isFullyCorrect = (sortedUser.length == 1 &&
+              sortedUser.first == sortedCorrect.first);
           scoreText = isFullyCorrect ? "1/1" : "0/1";
         } else {
-          isFullyCorrect = (correctCount == sortedCorrect.length) && (userSelections.length == correctCount);
+          isFullyCorrect = (correctCount == sortedCorrect.length) &&
+              (userSelections.length == correctCount);
           scoreText = "$correctCount/${sortedCorrect.length}";
         }
 
         print("Question ID: $questionId");
         print("  Question: ${questionData.question}");
-        print("  Your selections: ${userSelections.map((idx) => questionData.answers[idx]).toList()}");
-        print("  Correct answers: ${correctIndices.map((idx) => questionData.answers[idx]).toList()}");
+        print(
+            "  Your selections: ${userSelections.map((idx) => questionData.answers[idx]).toList()}");
+        print(
+            "  Correct answers: ${correctIndices.map((idx) => questionData.answers[idx]).toList()}");
         print("  Score: $scoreText");
         print("  Fully Correct: $isFullyCorrect");
       });
     } else {
-      print("Error: _checkboxBuilder was not initialized when trying to calculate results.");
+      print(
+          "Error: _checkboxBuilder was not initialized when trying to calculate results.");
     }
     print("-------------------------------");
   }
@@ -181,7 +193,7 @@ class _ChapterPageState extends State<ChapterPage> {
 
     // Initialize the builder here, after super.initState()
     _checkboxBuilder = CheckboxQuestionViewerBuilder(
-      _userSelectionsMap,
+      _userSelectionsNotifier,
       _onCheckboxChanged,
     );
   }
@@ -193,6 +205,7 @@ class _ChapterPageState extends State<ChapterPage> {
     }
     _scrollController.dispose();
     _commentTextController.dispose();
+    _userSelectionsNotifier.dispose();
     super.dispose();
   }
 
