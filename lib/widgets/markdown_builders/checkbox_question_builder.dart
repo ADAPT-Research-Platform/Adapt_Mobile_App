@@ -15,20 +15,22 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
 
   // These maps now store CheckboxQuestionData objects directly
   final Map<String, CheckboxQuestion> _questionDataMap = {};
-  final Map<String, List<int>> _userSelectionsMap; // Stores user's selected indices
+  final ValueNotifier<Map<String, List<int>>>
+      _userSelectionsNotifier; // Stores user's selected indices
   final Function(String, int, bool) onCheckboxChanged; // Callback for state updates
 
   CheckboxQuestionViewerBuilder(
-      this._userSelectionsMap,
-      this.onCheckboxChanged,
-      ) {
+    this._userSelectionsNotifier,
+    this.onCheckboxChanged,
+  ) {
     // You might want to clear _questionDataMap on load if new content
     // is always replacing old. Or ensure IDs are unique.
   }
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    if (element.tag == 'checkbox') { // Changed tag to 'checkbox'
+    if (element.tag == 'checkbox') {
+      // Changed tag to 'checkbox'
       try {
         final jsonContent = element.children!.first.textContent;
         final Map<String, dynamic> rawJson = jsonDecode(jsonContent);
@@ -40,85 +42,92 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
 
         // Initialize user selections for this question if not already present
         // When loading, these should be empty, so the user starts fresh.
-        if (!_userSelectionsMap.containsKey(questionData.id)) {
-          _userSelectionsMap[questionData.id] = [];
+        if (!_userSelectionsNotifier.value.containsKey(questionData.id)) {
+          _userSelectionsNotifier.value[questionData.id] = [];
         }
 
-        return Container(
-          margin: const EdgeInsets.symmetric(vertical: 8.0), // Margin around the entire question box
-          decoration: BoxDecoration(
-            color: const Color(0xFFF0EBEB), // Use context to get Theme data
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: const Color(0xFFA08030), // Border color
-              width: 2.2, // Border width
-            ),
-          ),
-          padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0.0), // Padding inside the bordered box
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                questionData.question,
-                style: const TextStyle(
-                  fontSize: AppFontSizes.small,
-                  fontWeight: FontWeight.bold, // Static font size
+        return ValueListenableBuilder<Map<String, List<int>>>(
+            valueListenable: _userSelectionsNotifier,
+            builder: (context, userSelections, child) {
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0EBEB),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFFA08030),
+                    width: 2.2,
+                  ),
                 ),
-              ),
-              // Use Column directly for answers to control spacing better
-              Column(
-                children: List.generate(questionData.answers.length, (index) {
-                  final isSelected = _userSelectionsMap[questionData.id]!.contains(index);
-
-                  // Define the common fill color property resolver
-                  final WidgetStateProperty<Color?> fillColorResolver =
-                  WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return const Color(0xFFFEC63D);
-                    }
-                    return null;
-                  });
-
-                  if (!questionData.multiple) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 0.0), // Reduced vertical spacing between answers
-                      child: RadioListTile<int>(
-                        title: Text(questionData.answers[index]),
-                        value: index,
-                        groupValue: isSelected ? index : null,
-                        onChanged: (int? newValue) {
-                          onCheckboxChanged(questionData.id, newValue!, true);
-                        },
-                        dense: true,
-                        // Align the radio button to the start (left)
-                        controlAffinity: ListTileControlAffinity.leading,
-                        fillColor: fillColorResolver, // Apply custom fill color
+                padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      questionData.question,
+                      style: const TextStyle(
+                        fontSize: AppFontSizes.small,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 0.0), // Reduced vertical spacing between answers
-                      child: CheckboxListTile(
-                        title: Text(questionData.answers[index]),
-                        value: isSelected,
-                        onChanged: (bool? newValue) {
-                          onCheckboxChanged(questionData.id, index, newValue ?? false);
-                        },
-                        dense: true,
-                        // Align the checkbox to the start (left)
-                        controlAffinity: ListTileControlAffinity.leading,
-                        fillColor: fillColorResolver,
-                      ),
-                    );
-                  }
-                }),
-              ),
-            ],
-          ),
-        );
+                    ),
+                    Column(
+                      children: List.generate(questionData.answers.length,
+                          (index) {
+                        final isSelected =
+                            userSelections[questionData.id]!.contains(index);
+
+                        final WidgetStateProperty<Color?> fillColorResolver =
+                            WidgetStateProperty.resolveWith((states) {
+                          if (states.contains(WidgetState.selected)) {
+                            return const Color(0xFFFEC63D);
+                          }
+                          return null;
+                        });
+
+                        if (!questionData.multiple) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 0.0),
+                            child: RadioListTile<int>(
+                              title: Text(questionData.answers[index]),
+                              value: index,
+                              groupValue: isSelected ? index : null,
+                              onChanged: (int? newValue) {
+                                onCheckboxChanged(
+                                    questionData.id, newValue!, true);
+                              },
+                              dense: true,
+                              controlAffinity:
+                                  ListTileControlAffinity.leading,
+                              fillColor: fillColorResolver,
+                            ),
+                          );
+                        } else {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 0.0),
+                            child: CheckboxListTile(
+                              title: Text(questionData.answers[index]),
+                              value: isSelected,
+                              onChanged: (bool? newValue) {
+                                onCheckboxChanged(questionData.id, index,
+                                    newValue ?? false);
+                              },
+                              dense: true,
+                              controlAffinity:
+                                  ListTileControlAffinity.leading,
+                              fillColor: fillColorResolver,
+                            ),
+                          );
+                        }
+                      }),
+                    ),
+                  ],
+                ),
+              );
+            });
       } catch (e) {
         log.severe("Error parsing Checkbox Question JSON: $e");
-        return Text('Error loading question: ${e.toString()}'); // Provide feedback
+        return Text(
+            'Error loading question: ${e.toString()}'); // Provide feedback
       }
     }
     return null;
