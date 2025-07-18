@@ -14,22 +14,20 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
 
   // These maps now store CheckboxQuestionData objects directly
   final Map<String, CheckboxQuestion> _questionDataMap = {};
-  final ValueNotifier<Map<String, List<int>>>
-      _userSelectionsNotifier; // Stores user's selected indices
+  final Map<String, List<int>> _userSelectionsMap; // Stores user's selected indices
   final Function(String, int, bool) onCheckboxChanged; // Callback for state updates
 
   CheckboxQuestionViewerBuilder(
-    this._userSelectionsNotifier,
-    this.onCheckboxChanged,
-  ) {
+      this._userSelectionsMap,
+      this.onCheckboxChanged,
+      ) {
     // You might want to clear _questionDataMap on load if new content
     // is always replacing old. Or ensure IDs are unique.
   }
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    if (element.tag == 'checkbox') {
-      // Changed tag to 'checkbox'
+    if (element.tag == 'checkbox') { // Changed tag to 'checkbox'
       try {
         final jsonContent = element.children!.first.textContent;
         final Map<String, dynamic> rawJson = jsonDecode(jsonContent);
@@ -41,60 +39,52 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
 
         // Initialize user selections for this question if not already present
         // When loading, these should be empty, so the user starts fresh.
-        if (!_userSelectionsNotifier.value.containsKey(questionData.id)) {
-          _userSelectionsNotifier.value[questionData.id] = [];
+        if (!_userSelectionsMap.containsKey(questionData.id)) {
+          _userSelectionsMap[questionData.id] = [];
         }
 
-        return ValueListenableBuilder<Map<String, List<int>>>(
-            valueListenable: _userSelectionsNotifier,
-            builder: (context, userSelections, child) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(
-                      questionData.question,
-                      style: const TextStyle(
-                        fontSize: 16, // Adjust as needed
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  ...List.generate(questionData.answers.length, (index) {
-                    final isSelected =
-                        userSelections[questionData.id]!.contains(index);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                questionData.question,
+                style: const TextStyle(
+                  fontSize: 16, // Adjust as needed
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ...List.generate(questionData.answers.length, (index) {
+              final isSelected = _userSelectionsMap[questionData.id]!.contains(index);
 
-                    // Use RadioListTile if Multiple is false, otherwise CheckboxListTile
-                    if (!questionData.multiple) {
-                      return RadioListTile<int>(
-                        title: Text(questionData.answers[index]),
-                        value: index,
-                        groupValue: isSelected
-                            ? index
-                            : null, // If selected, group value is this index
-                        onChanged: (int? newValue) {
-                          // When radio button is selected, clear previous selections and add new one
-                          onCheckboxChanged(questionData.id, newValue!, true);
-                        },
-                        dense: true,
-                      );
-                    } else {
-                      return CheckboxListTile(
-                        title: Text(questionData.answers[index]),
-                        value: isSelected,
-                        onChanged: (bool? newValue) {
-                          onCheckboxChanged(
-                              questionData.id, index, newValue ?? false);
-                        },
-                        dense: true,
-                      );
-                    }
-                  }),
-                  const SizedBox(height: 16),
-                ],
-              );
-            });
+              // Use RadioListTile if Multiple is false, otherwise CheckboxListTile
+              if (!questionData.multiple) {
+                return RadioListTile<int>(
+                  title: Text(questionData.answers[index]),
+                  value: index,
+                  groupValue: isSelected ? index : null, // If selected, group value is this index
+                  onChanged: (int? newValue) {
+                    // When radio button is selected, clear previous selections and add new one
+                    onCheckboxChanged(questionData.id, newValue!, true);
+                  },
+                  dense: true,
+                );
+              } else {
+                return CheckboxListTile(
+                  title: Text(questionData.answers[index]),
+                  value: isSelected,
+                  onChanged: (bool? newValue) {
+                    onCheckboxChanged(questionData.id, index, newValue ?? false);
+                  },
+                  dense: true,
+                );
+              }
+            }),
+            const SizedBox(height: 16),
+          ],
+        );
       } catch (e) {
         log.severe("Error parsing Checkbox Question JSON: $e");
         return Text('Error loading question: ${e.toString()}'); // Provide feedback
