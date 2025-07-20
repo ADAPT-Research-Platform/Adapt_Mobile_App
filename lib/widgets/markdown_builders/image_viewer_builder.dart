@@ -14,17 +14,15 @@ class ImageViewerBuilder extends MarkdownElementBuilder {
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
-    // Check if the element is an image
     if (element.attributes['src'] != null) {
       final imageName = element.attributes['src'];
       final imageUrl = '${AppConfig.contentUrl}/$sectionFolderPath/$imageName';
 
-      // Return an image widget with the updated URL
       return Image.network(
         imageUrl,
-        headers: const {
+        headers: {
           'Authorization': 'Bearer ${AppConfig.contentAccessToken}',
-          'Accept': 'application/vnd.github.v3.raw', // Get raw file content
+          'Accept': 'application/vnd.github.v3.raw',
         },
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {

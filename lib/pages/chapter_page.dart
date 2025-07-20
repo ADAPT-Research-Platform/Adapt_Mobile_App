@@ -19,6 +19,7 @@ import '../utils/app_keys.dart';
 import '../utils/score_store.dart';
 import '../widgets/comment_card.dart';
 import '../widgets/markdown_builders/checkbox_question_builder.dart';
+import '../widgets/markdown_builders/conditional_text_builder.dart';
 import '../widgets/markdown_builders/header_builder.dart';
 import '../widgets/markdown_builders/image_viewer_builder.dart';
 import '../widgets/markdown_builders/question_viewer_builder.dart';
@@ -54,6 +55,7 @@ class _ChapterPageState extends State<ChapterPage> {
 
   // Make _checkboxBuilder nullable and initialize it in initState
   CheckboxQuestionViewerBuilder? _checkboxBuilder;
+  late final ScoreStore _scoreStore;
 
   double maxScrollPixels = 0.0;
 
@@ -187,10 +189,10 @@ class _ChapterPageState extends State<ChapterPage> {
         print("  Fully Correct: $isFullyCorrect");
       });
 
-      final store = ScoreStore();
-      store.setScore('M${widget.moduleId}C${widget.section.chapterIndex}S', totalScore);
-      final score = store.getScore('M${widget.moduleId}C${widget.section.chapterIndex}S');
-      print("Total score for M${widget.moduleId}C${widget.section.chapterIndex}S: $score");
+      _scoreStore.setScore('M${widget.moduleId}C${widget.section.chapterIndex}S', totalScore);
+      final score = _scoreStore.getScore('M${widget.moduleId}C${widget.section.chapterIndex}S');
+      print("ChapterPage: Score set for M${widget.moduleId}C${widget.section.chapterIndex}S: $totalScore"); // Debug print
+      print("ChapterPage: Score retrieved from store: $score"); // Debug print
     } else {
       print(
           "Error: _checkboxBuilder was not initialized when trying to calculate results.");
@@ -208,6 +210,8 @@ class _ChapterPageState extends State<ChapterPage> {
       _userSelectionsNotifier,
       _onCheckboxChanged,
     );
+
+    _scoreStore = ScoreStore(); // shared instance
   }
 
   @override
@@ -251,6 +255,7 @@ class _ChapterPageState extends State<ChapterPage> {
 
             // Extract data
             final String markdownContent = snapshot.data![0];
+            print('ChapterPage: Markdown Content: \n$markdownContent'); // Debug print
 
             if (widget.section.isExercise && snapshot.data![1] != null) {
               Answer answer = snapshot.data![1];
@@ -276,7 +281,7 @@ class _ChapterPageState extends State<ChapterPage> {
                           controller: _scrollController,
                           child: MarkdownBody(
                             data: markdownContent,
-                            blockSyntaxes: [CheckboxQuestionSyntax(), QuestionSyntax(), ],
+                            blockSyntaxes: [CheckboxQuestionSyntax(), QuestionSyntax(), ConditionalTextSyntax()],
                             inlineSyntaxes: [UnderlineSyntax(), RightAlignSyntax()],
                             selectable: false,
                             builders: <String, MarkdownElementBuilder>{
@@ -287,6 +292,7 @@ class _ChapterPageState extends State<ChapterPage> {
                               'checkbox': _checkboxBuilder!,
                               "ul": UnderlineBuilder(),
                               'rl': RightAlignBuilder(),
+                              'if': ConditionalTextBuilder(_scoreStore),
                             },
                           ),
                         ),
