@@ -70,7 +70,7 @@ class _ModulePageState extends State<ModulePage> {
                           onPressed: () {
                             moduleNavigator.currentState!.pushNamed(
                               Routes.routeSections,
-                              arguments: chapter,
+                              arguments: {'section': chapter, 'moduleId': widget.moduleId},
                             );
                           },
                         ),

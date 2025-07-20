@@ -16,6 +16,7 @@ import '../models/comment.dart';
 import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
+import '../utils/score_store.dart';
 import '../widgets/comment_card.dart';
 import '../widgets/markdown_builders/checkbox_question_builder.dart';
 import '../widgets/markdown_builders/header_builder.dart';
@@ -27,8 +28,9 @@ import '../widgets/task_button.dart';
 
 class ChapterPage extends StatefulWidget {
   final Chapter section;
+  final String moduleId;
 
-  const ChapterPage({super.key, required this.section});
+  const ChapterPage({super.key, required this.section, required this.moduleId});
 
   @override
   _ChapterPageState createState() => _ChapterPageState();
@@ -141,6 +143,7 @@ class _ChapterPageState extends State<ChapterPage> {
 
   void _calculateCheckboxResults() {
     print("--- Checkbox Question Results ---");
+    int totalScore = 0;
     // Ensure _checkboxBuilder is not null before using it
     if (_checkboxBuilder != null) {
       _checkboxBuilder!.questionDataMap.forEach((questionId, questionData) {
@@ -170,6 +173,10 @@ class _ChapterPageState extends State<ChapterPage> {
           scoreText = "$correctCount/${sortedCorrect.length}";
         }
 
+        if (isFullyCorrect) {
+          totalScore++;
+        }
+
         print("Question ID: $questionId");
         print("  Question: ${questionData.question}");
         print(
@@ -179,6 +186,11 @@ class _ChapterPageState extends State<ChapterPage> {
         print("  Score: $scoreText");
         print("  Fully Correct: $isFullyCorrect");
       });
+
+      final store = ScoreStore();
+      store.setScore('M${widget.moduleId}C${widget.section.chapterIndex}S', totalScore);
+      final score = store.getScore('M${widget.moduleId}C${widget.section.chapterIndex}S');
+      print("Total score for M${widget.moduleId}C${widget.section.chapterIndex}S: $score");
     } else {
       print(
           "Error: _checkboxBuilder was not initialized when trying to calculate results.");
