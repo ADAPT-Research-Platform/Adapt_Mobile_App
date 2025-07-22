@@ -145,57 +145,43 @@ class _ChapterPageState extends State<ChapterPage> {
 
   void _calculateCheckboxResults() {
     print("--- Checkbox Question Results ---");
-    int totalScore = 0;
-    // Ensure _checkboxBuilder is not null before using it
+    double totalScore = 0;  // Use double if points can be fractional
+
     if (_checkboxBuilder != null) {
       _checkboxBuilder!.questionDataMap.forEach((questionId, questionData) {
         final userSelections = _userSelectionsNotifier.value[questionId] ?? [];
         final correctIndices = questionData.correctIndices;
 
-        final sortedCorrect = List<int>.from(correctIndices)..sort();
-        final sortedUser = List<int>.from(userSelections)..sort();
+        double questionScore = 0;
 
-        int correctCount = 0;
-        for (int userSelectedIdx in sortedUser) {
-          if (sortedCorrect.contains(userSelectedIdx)) {
-            correctCount++;
+        for (int selectedIdx in userSelections) {
+          final answer = questionData.answers[selectedIdx];  // Answer object
+
+          if (answer.points != 0) {
+            // Add the points associated with the answer
+            questionScore += answer.points.toDouble();
+          } else if (correctIndices.contains(selectedIdx)) {
+            // No explicit points but is a correct answer → add 1 point
+            questionScore += 1;
           }
+          // else no points added for incorrect answers without points
         }
 
-        final String scoreText;
-        bool isFullyCorrect = false;
-
-        if (!questionData.multiple) {
-          isFullyCorrect = (sortedUser.length == 1 &&
-              sortedUser.first == sortedCorrect.first);
-          scoreText = isFullyCorrect ? "1/1" : "0/1";
-        } else {
-          isFullyCorrect = (correctCount == sortedCorrect.length) &&
-              (userSelections.length == correctCount);
-          scoreText = "$correctCount/${sortedCorrect.length}";
-        }
-
-        if (isFullyCorrect) {
-          totalScore++;
-        }
+        totalScore += questionScore;
 
         print("Question ID: $questionId");
         print("  Question: ${questionData.question}");
-        print(
-            "  Your selections: ${userSelections.map((idx) => questionData.answers[idx]).toList()}");
-        print(
-            "  Correct answers: ${correctIndices.map((idx) => questionData.answers[idx]).toList()}");
-        print("  Score: $scoreText");
-        print("  Fully Correct: $isFullyCorrect");
+        print("  Your selections: ${userSelections.map((idx) => questionData.answers[idx].text).toList()}");
+        print("  Correct answers: ${correctIndices.map((idx) => questionData.answers[idx].text).toList()}");
+        print("  Question Score: $questionScore");
       });
 
-      _scoreStore.setScore('M${widget.moduleId}C${widget.section.chapterIndex}S', totalScore);
+      _scoreStore.setScore('M${widget.moduleId}C${widget.section.chapterIndex}S', totalScore.toInt());
       final score = _scoreStore.getScore('M${widget.moduleId}C${widget.section.chapterIndex}S');
-      print("ChapterPage: Score set for M${widget.moduleId}C${widget.section.chapterIndex}S: $totalScore"); // Debug print
-      print("ChapterPage: Score retrieved from store: $score"); // Debug print
+      print("ChapterPage: Score set for M${widget.moduleId}C${widget.section.chapterIndex}S: $totalScore");
+      print("ChapterPage: Score retrieved from store: $score");
     } else {
-      print(
-          "Error: _checkboxBuilder was not initialized when trying to calculate results.");
+      print("Error: _checkboxBuilder was not initialized when trying to calculate results.");
     }
     print("-------------------------------");
   }

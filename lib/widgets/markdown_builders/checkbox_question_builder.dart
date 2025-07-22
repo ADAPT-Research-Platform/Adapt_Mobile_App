@@ -84,20 +84,24 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
                           return null;
                         });
 
+                        final CheckBoxAnswer answer = questionData.answers[index];
+
                         if (!questionData.multiple) {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 0.0),
                             child: RadioListTile<int>(
-                              title: Text(questionData.answers[index]),
+                              title: Text(answer.text),
                               value: index,
-                              groupValue: isSelected ? index : null,
+                              groupValue: userSelections[questionData.id]?.isNotEmpty == true
+                                  ? userSelections[questionData.id]![0]
+                                  : null,
                               onChanged: (int? newValue) {
-                                onCheckboxChanged(
-                                    questionData.id, newValue!, true);
+                                if (newValue != null) {
+                                  onCheckboxChanged(questionData.id, newValue, true);
+                                }
                               },
                               dense: true,
-                              controlAffinity:
-                                  ListTileControlAffinity.leading,
+                              controlAffinity: ListTileControlAffinity.leading,
                               fillColor: fillColorResolver,
                             ),
                           );
@@ -105,15 +109,13 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 0.0),
                             child: CheckboxListTile(
-                              title: Text(questionData.answers[index]),
+                              title: Text(answer.text),
                               value: isSelected,
                               onChanged: (bool? newValue) {
-                                onCheckboxChanged(questionData.id, index,
-                                    newValue ?? false);
+                                onCheckboxChanged(questionData.id, index, newValue ?? false);
                               },
                               dense: true,
-                              controlAffinity:
-                                  ListTileControlAffinity.leading,
+                              controlAffinity: ListTileControlAffinity.leading,
                               fillColor: fillColorResolver,
                             ),
                           );
@@ -143,36 +145,49 @@ class CheckboxQuestionSyntax extends md.BlockSyntax {
   CheckboxQuestionSyntax();
 
   @override
-  RegExp get pattern => RegExp(r'^\[checkbox\]\s*(\{.*)', dotAll: true);
+  RegExp get pattern => RegExp(r'^\[checkbox\]');
 
   @override
   md.Node? parse(md.BlockParser parser) {
-    final buffer = StringBuffer();
-    if (parser.current.content.trim().startsWith('[checkbox]')) {
-      // Consume the [checkbox] line
-      final firstLine = parser.current.content;
-      parser.advance();
-
-      buffer.write(firstLine.replaceFirst('[checkbox]', '').trim());
-
-      while (!parser.isDone) {
-        final line = parser.current.content;
-        buffer.writeln(line);
-        if (line.trim().endsWith('}')) {
-          parser.advance();
-          break;
-        }
-        parser.advance();
-      }
-
-      final jsonContent = buffer.toString();
-
-      return md.Element('p', [
-        md.Element('checkbox', [
-          md.UnparsedContent(jsonContent),
-        ])
-      ]);
+    if (!parser.current.content.trim().startsWith('[checkbox]')) {
+      return null;
     }
-    return null;
+
+    // Consume the [checkbox] line and remove the tag
+    var firstLine = parser.current.content;
+    parser.advance();
+
+    // Start buffer with JSON start
+    final buffer = StringBuffer();
+    // Remove "[checkbox]" and any whitespace before JSON start
+    final startJson = firstLine.replaceFirst('[checkbox]', '').trim();
+    buffer.write(startJson);
+
+    // Brace count to ensure we read full JSON object (handles nested braces)
+    int braceCount = 0;
+    for (var char in startJson.split('')) {
+      if (char == '{') braceCount++;
+      else if (char == '}') braceCount--;
+    }
+
+    // Keep reading lines until braceCount == 0 (JSON object complete)
+    while (!parser.isDone && braceCount > 0) {
+      final line = parser.current.content;
+      buffer.writeln(line);
+
+      for (var char in line.split('')) {
+        if (char == '{') braceCount++;
+        else if (char == '}') braceCount--;
+      }
+      parser.advance();
+    }
+
+    final jsonContent = buffer.toString().trim();
+
+    return md.Element('p', [
+      md.Element('checkbox', [
+        md.UnparsedContent(jsonContent),
+      ])
+    ]);
   }
 }
