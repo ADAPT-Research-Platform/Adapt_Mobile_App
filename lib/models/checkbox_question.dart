@@ -28,13 +28,27 @@ class CheckboxQuestion {
   });
 
   factory CheckboxQuestion.fromJson(Map<String, dynamic> json) {
+    final rawAnswers = json['Answers'];
+    final List<CheckBoxAnswer> parsedAnswers = [];
+
+    if (rawAnswers is List) {
+      if (rawAnswers.isNotEmpty && rawAnswers.first is String) {
+        // Case: ["Option A", "Option B"]
+        parsedAnswers.addAll(
+          rawAnswers.map((e) => CheckBoxAnswer(text: e as String, points: 0)),
+        );
+      } else if (rawAnswers.first is Map<String, dynamic>) {
+        // Case: [{"text": "...", "points": ...}]
+        parsedAnswers.addAll(
+          rawAnswers.map((e) => CheckBoxAnswer.fromJson(e as Map<String, dynamic>)),
+        );
+      }
+    }
+
     return CheckboxQuestion(
       id: json['Id'] as String? ?? '',
       question: json['Question'] as String? ?? '',
-      answers: (json['Answers'] as List<dynamic>?)
-          ?.map((e) => CheckBoxAnswer.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-          [],
+      answers: parsedAnswers,
       correctIndices: (json['Correct'] as List<dynamic>?)
           ?.map((e) => e as int)
           .toList() ??
@@ -42,4 +56,5 @@ class CheckboxQuestion {
       multiple: json['Multiple'] as bool? ?? false,
     );
   }
+
 }
