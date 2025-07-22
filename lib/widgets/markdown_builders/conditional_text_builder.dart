@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
 
@@ -39,30 +40,39 @@ class ConditionalTextBuilder extends MarkdownElementBuilder {
     required ScoreStore scoreStore,
   }) {
     int? score = scoreStore.getScore(key);
-    print('ConditionalText: Key: $key, Condition: $condition, Score: $score'); // Debug print
-
-    if (score == null) return false; // key missing => hide block
-
-    final match = RegExp(r'(==|>=|<=|>|<)\s*(\d+)').firstMatch(condition);
-    if (match == null) {
-      print('ConditionalText: Invalid condition format: $condition'); // Debug print
-      return false;
+    if (kDebugMode) {
+      print('ConditionalText: Key: $key, Condition: $condition, Score: $score');
     }
 
-    final operator = match.group(1)!;
-    final value = int.parse(match.group(2)!);
+    if (score == null) return false;
 
-    bool result;
-    switch (operator) {
-      case '==': result = score == value; break;
-      case '>=': result = score >= value; break;
-      case '<=': result = score <= value; break;
-      case '>':  result = score > value; break;
-      case '<':  result = score < value; break;
-      default:   result = false; break;
+    // Split multiple conditions by comma
+    final conditions = condition.split(',').map((c) => c.trim());
+
+    for (final cond in conditions) {
+      final match = RegExp(r'(==|>=|<=|>|<)\s*(\d+)').firstMatch(cond);
+      if (match == null) {
+        print('ConditionalText: Invalid condition format: "$cond"');
+        return false; // if any condition is invalid, we fail the block
+      }
+
+      final operator = match.group(1)!;
+      final value = int.parse(match.group(2)!);
+
+      bool isValid;
+      switch (operator) {
+        case '==': isValid = score == value; break;
+        case '>=': isValid = score >= value; break;
+        case '<=': isValid = score <= value; break;
+        case '>':  isValid = score > value; break;
+        case '<':  isValid = score < value; break;
+        default:   isValid = false; break;
+      }
+
+      if (!isValid) return false; // all conditions must be true
     }
-    print('ConditionalText: Result: $result'); // Debug print
-    return result;
+
+    return true; // all conditions passed
   }
 }
 
