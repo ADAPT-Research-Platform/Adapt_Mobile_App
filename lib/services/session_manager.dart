@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
@@ -13,6 +14,7 @@ class SessionManager {
 
   // Singleton instance for centralized access
   static final SessionManager _instance = SessionManager._internal();
+
   factory SessionManager() => _instance;
 
   late http.Client client;
@@ -23,15 +25,22 @@ class SessionManager {
   User? _sessionUser;
 
   // Secure storage instance
-  final _secureStorage = const FlutterSecureStorage();
+  final _secureStorage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+  );
 
   SessionManager._internal() {
     client = http.Client();
   }
 
-  void setSessionInfo({required User user, String? cookie}) async{
+  void setSessionInfo({required User user, String? cookie}) async {
     _sessionUser = user;
-    await _secureStorage.write(key: sessionUserKey, value: jsonEncode(user.toJson()));
+    await _secureStorage.write(
+      key: sessionUserKey,
+      value: jsonEncode(user.toJson()),
+    );
 
     if (cookie != null) {
       _sessionCookie = cookie;
@@ -41,7 +50,7 @@ class SessionManager {
     log.info('Session Info Updated');
   }
 
-  void clearSessionInfo() async{
+  void clearSessionInfo() async {
     _sessionUser = null;
     await _secureStorage.delete(key: sessionUserKey);
 
@@ -52,12 +61,25 @@ class SessionManager {
   }
 
   Future<User?> getSessionUser() async {
-    if(_sessionUser == null){
-      final userJson = await _secureStorage.read(key: sessionUserKey);
-      log.info('Session User got from secure storage');
-      if (userJson != null) {
-        final Map<String, dynamic> userMap = jsonDecode(userJson);
-        _sessionUser =  User.parse(userMap);
+    if (_sessionUser == null) {
+      try {
+        final userJson = await _secureStorage.read(key: sessionUserKey);
+        log.info('Session User got from secure storage');
+        if (userJson != null) {
+          final Map<String, dynamic> userMap = jsonDecode(userJson);
+          _sessionUser = User.parse(userMap);
+        }
+      } catch (e) {
+        if (e is PlatformException &&
+            e.code == 'read' &&
+            e.message != null &&
+            e.message!.contains('BadPaddingException')) {
+          log.warning(
+              'BadPaddingException while reading session user. Deleting session_user key.');
+          await _secureStorage.delete(key: sessionUserKey);
+        } else {
+          log.severe('Unhandled exception while reading session user: $e');
+        }
       }
     }
 
@@ -65,9 +87,22 @@ class SessionManager {
   }
 
   Future<String?> getSessionCookie() async {
-    if(_sessionCookie == null){
+    if (_sessionCookie == null) {
       log.info('Session Cookie got from secure storage');
-      _sessionCookie = await _secureStorage.read(key: sessionCookieKey);
+      try {
+        _sessionCookie = await _secureStorage.read(key: sessionCookieKey);
+      } catch (e) {
+        if (e is PlatformException &&
+            e.code == 'read' &&
+            e.message != null &&
+            e.message!.contains('BadPaddingException')) {
+          log.warning(
+              'BadPaddingException while reading session cookie. Deleting session_cookie key.');
+          await _secureStorage.delete(key: sessionCookieKey);
+        } else {
+          log.severe('Unhandled exception while reading session cookie: $e');
+        }
+      }
     }
 
     return _sessionCookie;
@@ -75,7 +110,7 @@ class SessionManager {
 
   Future<ThemeType> getSelectedThemeType() async {
       log.info('Getting selected Theme Type from secure storage');
-      return ThemeExtension.fromIndex(_secureStorage.read(key: "theme_type") as int);
+      return ThemeExtension.fromIndex(await _secureStorage.read(key: "theme_type") as int);
   }
 
   void setSelectedThemeType(ThemeType themeType) async{
@@ -85,7 +120,7 @@ class SessionManager {
 
   Future<Language> getSelectedLanguage() async {
     log.info('Getting selected Language from secure storage');
-    return LanguageExtension.fromIndex(_secureStorage.read(key: "language") as int);
+    return LanguageExtension.fromIndex(await _secureStorage.read(key: "language") as int);
   }
 
   void setSelectedLanguage(Language language) async{
