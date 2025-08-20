@@ -25,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isChecked = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -120,11 +121,21 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 10),
                       TextField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           labelText: LocalizationService().get('Password'),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6.0),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: _obscurePassword
+                                ? Icon(Icons.visibility_off, color: Theme.of(context).primaryColorDark, size: 25)
+                                : Icon(Icons.visibility, color: Theme.of(context).primaryColorDark, size: 25),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
                           ),
                         ),
                       ),
