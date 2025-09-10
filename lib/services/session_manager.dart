@@ -114,7 +114,7 @@ class SessionManager {
   }
 
   void setSelectedThemeType(ThemeType themeType) async{
-    await _secureStorage.write(key: "theme_type", value: themeType.index as String);
+    await _secureStorage.write(key: "theme_type", value: themeType.index.toString());
     log.info('Theme Type Saved');
   }
 
@@ -124,7 +124,7 @@ class SessionManager {
   }
 
   void setSelectedLanguage(Language language) async{
-    await _secureStorage.write(key: "language", value: language.index as String);
+    await _secureStorage.write(key: "language", value: language.index.toString());
     log.info('Language Saved');
   }
 
