@@ -110,7 +110,7 @@ class SessionManager {
 
   Future<ThemeType> getSelectedThemeType() async {
       log.info('Getting selected Theme Type from secure storage');
-      return ThemeExtension.fromIndex(await _secureStorage.read(key: "theme_type") as int);
+      return ThemeExtension.fromIndex(int.parse(await _secureStorage.read(key: "theme_type") ?? '0'));
   }
 
   void setSelectedThemeType(ThemeType themeType) async{
@@ -120,7 +120,7 @@ class SessionManager {
 
   Future<Language> getSelectedLanguage() async {
     log.info('Getting selected Language from secure storage');
-    return LanguageExtension.fromIndex(await _secureStorage.read(key: "language") as int);
+    return LanguageExtension.fromIndex(int.parse(await _secureStorage.read(key: "language") ?? '0'));
   }
 
   void setSelectedLanguage(Language language) async{
