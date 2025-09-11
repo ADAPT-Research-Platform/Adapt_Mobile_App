@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../services/chapter_service.dart';
 import '../services/localization_service.dart';
@@ -48,6 +49,16 @@ class SupportPage extends StatelessWidget {
                           builders: <String, MarkdownElementBuilder>{
                             'h3': CenteredHeaderBuilder()
                           },
+                          onTapLink: (text, href, title) async {
+                            if (href == null) return;
+
+                            final Uri uri = Uri.parse(href);
+
+                            await launchUrl(
+                              uri,
+                              mode: LaunchMode.platformDefault, // Leaves the decision of how to launch the URL to the platform
+                            );
+                          }
                         ),
                       ),
                   ),
