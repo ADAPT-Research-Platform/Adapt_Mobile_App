@@ -5,6 +5,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
 
+import '../../services/localization_service.dart';
 import '../../utils/app_font_sizes.dart';
 
 class QuestionViewerBuilder extends MarkdownElementBuilder {
@@ -49,9 +50,9 @@ class QuestionViewerBuilder extends MarkdownElementBuilder {
               TextField(
                 controller: controllers[questionKey],
                 maxLines: null, // Makes the TextField multiline
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Write your answer here',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  hintText: LocalizationService().get("hint_text_for_questions"),
                 ),
               ),
               const SizedBox(height: 16),

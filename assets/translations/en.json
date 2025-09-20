@@ -132,5 +132,7 @@
   "no_support": "No support page available!",
 
   "internal_server_error": "Internal Server Error!",
-  "internal_app_error": "Internal App Error!"
+  "internal_app_error": "Internal App Error!",
+
+  "hint_text_for_questions": "Write your answer here..."
 }
