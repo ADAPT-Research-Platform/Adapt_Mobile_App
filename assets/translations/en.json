@@ -89,6 +89,8 @@
   "notification_schedule": "Notification Scheduled at",
   "mute_notifications": "Mute Notifications",
   "notification_sound": "Notification Sound",
+  "notification_title": "Time to log your Mood and Motivation",
+  "notification_text": "Don't forget to log your mood and motivation for today!",
   "set_time" : "Set Time",
   "scheduled_time" : "Scheduled Time",
   "logout": "Logout",

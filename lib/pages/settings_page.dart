@@ -113,8 +113,8 @@ class _SettingsPageState extends State<SettingsPage> {
       // Schedule the notification with the selected time
       await NotificationService.updateScheduledTime(
         1,
-        LocalizationService().get("Time to log your Mood and Motivation"),
-        LocalizationService().get("Don't forget to log your mood and motivation for today!"),
+        LocalizationService().get("notification_title"),
+        LocalizationService().get("notification_text"),
         pickedTime,
       );
 

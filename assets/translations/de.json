@@ -89,6 +89,8 @@
   "notification_schedule": "Benachrichtigung geplant um",
   "mute_notifications": "Benachrichtigungen stummschalten",
   "notification_sound": "Benachrichtigungston",
+  "notification_title": "Zeit, Ihre Stimmung und Motivation zu protokollieren",
+  "notification_text": "Vergessen Sie nicht, Ihre Stimmung und Motivation für heute zu protokollieren!",
   "set_time": "Zeit einstellen",
   "scheduled_time": "Geplante Zeit",
   "logout": "Abmelden",
