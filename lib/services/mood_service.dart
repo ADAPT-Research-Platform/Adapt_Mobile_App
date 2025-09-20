@@ -79,4 +79,18 @@ class MoodService {
       rethrow;
     }
   }
+
+  Future<bool> hasMoodBeenLoggedToday() async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    try {
+      final moods = await fetchModeList(startDate: startOfDay, endDate: endOfDay);
+      return moods.isNotEmpty;
+    } catch (e) {
+      log.severe('Error checking if mood was logged today', e);
+      return false;
+    }
+  }
 }

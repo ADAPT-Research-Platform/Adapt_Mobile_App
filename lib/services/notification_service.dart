@@ -78,23 +78,7 @@ class NotificationService {
     final now = tz.TZDateTime.now(tz.local);
 
     // Calculate the scheduled time
-    final scheduledTime = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      time.hour,
-      time.minute,
-    ).isBefore(now)
-        ? tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day + 1,
-      time.hour,
-      time.minute,
-    )
-        : tz.TZDateTime(
+    var scheduledTime = tz.TZDateTime(
       tz.local,
       now.year,
       now.month,
@@ -102,6 +86,10 @@ class NotificationService {
       time.hour,
       time.minute,
     );
+
+    if (scheduledTime.isBefore(now) || scheduledTime.isAtSameMomentAs(now)) {
+      scheduledTime = scheduledTime.add(const Duration(days: 1));
+    }
 
     // Save the scheduled time to secure storage
     await secureStorage.write(key: 'daily_notification_time', value: '${time.hour}:${time.minute}');
@@ -138,5 +126,10 @@ class NotificationService {
 
     // Reschedule with the new time
     await scheduleDailyNotification(id, title, body, newTime);
+  }
+
+  static Future<void> cancelNotification(int id) async {
+    await flutterLocalNotificationsPlugin.cancel(id);
+    log.info('Notification with id: $id canceled');
   }
 }

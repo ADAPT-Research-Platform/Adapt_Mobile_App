@@ -117,6 +117,8 @@ class _OverviewPageState extends State<OverviewPage> {
                           _modeService.saveMode(_selectedFeeling, _selectedMotivation);
 
                           widget.reloadModePage();
+                          // Cancel the notification for today
+                          NotificationService.cancelNotification(1);
                           // Schedule a notification for the next day
                           NotificationService.scheduleDailyNotification(
                             1,

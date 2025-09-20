@@ -9,6 +9,7 @@ import 'package:adapt/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
+import 'package:adapt/services/mood_service.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import '../../pages/login_page.dart';
@@ -26,6 +27,9 @@ void main() async {
   });
 
   await NotificationService.init();
+  if (await MoodService().hasMoodBeenLoggedToday()) {
+    NotificationService.cancelNotification(1);
+  }
   tz.initializeTimeZones();
 
   // Load default language (German)
