@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'package:logging/logging.dart';
 
 import '../enums/language.dart';
@@ -32,7 +35,15 @@ class SessionManager {
   );
 
   SessionManager._internal() {
-    client = http.Client();
+    if(kDebugMode){
+      //TODO: Remove this when solving the issue with intermediate CAs in backend
+      HttpClient httpClient = HttpClient()
+        ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+      client = IOClient(httpClient);
+    }else{
+      client = http.Client();
+    }
   }
 
   void setSessionInfo({required User user, String? cookie}) async {

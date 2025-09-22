@@ -39,7 +39,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown, // Optional if you want only `portraitUp`
   ]).then((_) {
-    HttpOverrides.global = MyHttpOverrides(); // TODO: Remove this later
     runApp(const MyApp());
   });
 }
@@ -90,14 +89,5 @@ class _MyAppState extends State<MyApp> {
               );
           }
         });
-  }
-}
-
-// TODO: This is only for testing purposes. Need Remove this
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
