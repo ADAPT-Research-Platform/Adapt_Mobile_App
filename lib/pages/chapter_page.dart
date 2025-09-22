@@ -241,7 +241,6 @@ class _ChapterPageState extends State<ChapterPage> {
 
             // Extract data
             final String markdownContent = snapshot.data![0];
-            print('ChapterPage: Markdown Content: \n$markdownContent'); // Debug print
 
             if (widget.section.isExercise && snapshot.data![1] != null) {
               Answer answer = snapshot.data![1];

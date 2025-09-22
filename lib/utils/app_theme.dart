@@ -5,9 +5,9 @@ class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     primaryColorLight: const Color(0xFFFEC63D), // primaryYellow
-    primaryColorDark: const Color(0xFFA08030),  // darkYellow
+    primaryColorDark: const Color(0xFFA08030), // paleYellow
 
-    indicatorColor: const Color(0XFFFFE04A),    // paleYellow
+    tabBarTheme: const TabBarThemeData(indicatorColor: Color(0XFFFFE04A)),
     scaffoldBackgroundColor: const Color(0xFFFFFFFF),
     cardColor: const Color(0xFFF0EBEB),
     highlightColor: const Color(0xFFD1C8C8),    // Dark Grey
@@ -21,9 +21,9 @@ class AppTheme {
   static final ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     primaryColorLight: const Color(0xFFFEC63D), // primaryYellow
-    primaryColorDark: const Color(0xFFA08030),  // darkYellow
+    primaryColorDark: const Color(0xFFA08030),
 
-    indicatorColor: const Color(0XFFFCA932),
+    tabBarTheme: const TabBarThemeData(indicatorColor: Color(0XFFFCA932)),
     scaffoldBackgroundColor: const Color(0xFF464646),
     cardColor: const Color(0xFF404040),
     highlightColor: const Color(0xFF343434),    // Dark Grey

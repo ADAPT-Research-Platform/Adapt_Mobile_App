@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -166,8 +165,9 @@ class CheckboxQuestionSyntax extends md.BlockSyntax {
     // Brace count to ensure we read full JSON object (handles nested braces)
     int braceCount = 0;
     for (var char in startJson.split('')) {
-      if (char == '{') braceCount++;
-      else if (char == '}') braceCount--;
+      if (char == '{') {
+        braceCount++;
+      } else if (char == '}') braceCount--;
     }
 
     // Keep reading lines until braceCount == 0 (JSON object complete)
@@ -176,8 +176,9 @@ class CheckboxQuestionSyntax extends md.BlockSyntax {
       buffer.writeln(line);
 
       for (var char in line.split('')) {
-        if (char == '{') braceCount++;
-        else if (char == '}') braceCount--;
+        if (char == '{') {
+          braceCount++;
+        } else if (char == '}') braceCount--;
       }
       parser.advance();
     }

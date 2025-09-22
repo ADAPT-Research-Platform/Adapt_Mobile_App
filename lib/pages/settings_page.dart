@@ -381,7 +381,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       value: currentValue,
       onChanged: onChanged,
-      activeColor: Theme.of(context).primaryColorLight,
+      activeThumbColor: Theme.of(context).primaryColorLight,
     );
   }
 
