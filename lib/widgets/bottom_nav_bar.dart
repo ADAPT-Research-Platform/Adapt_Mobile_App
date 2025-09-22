@@ -20,15 +20,19 @@ class BottomNavBar extends StatefulWidget {
 
 class _AppNavigationBar extends State<BottomNavBar> {
   int currentPageIndex = 0;
+  double margin = 8.0;
+
+  double _getMaxLabelWidth(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+    return (deviceWidth - (margin * 2)) / 5.5;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final deviceWidth = MediaQuery.of(context).size.width;
-    int cutoff = (deviceWidth / 30).toInt();
 
     return Container(
       padding: const EdgeInsets.only(top: 4),
-      margin: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+      margin: EdgeInsets.fromLTRB(margin, 0.0, margin, margin),
       decoration: BoxDecoration(
           color: Colors.transparent,
           border: Border(top: BorderSide(color: Theme.of(context).dividerColor, width: 2.5))
@@ -49,27 +53,27 @@ class _AppNavigationBar extends State<BottomNavBar> {
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.home_rounded, true),
             icon: _buildHexagonButton(Icons.home_rounded, false),
-            label: truncate(cutoff, LocalizationService().get('overview')),
+            label: truncate(LocalizationService().get('overview')),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.book_rounded, true),
             icon: _buildHexagonButton(Icons.book_rounded, false),
-            label: truncate(cutoff, LocalizationService().get('diary')),
+            label: truncate(LocalizationService().get('diary')),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.emoji_emotions, true),
             icon: _buildHexagonButton(Icons.emoji_emotions, false),
-            label: truncate(cutoff, LocalizationService().get('mood')),
+            label: truncate(LocalizationService().get('mood')),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.account_box_rounded, true),
             icon: _buildHexagonButton(Icons.account_box_rounded, false),
-            label: truncate(cutoff, LocalizationService().get('support')),
+            label: truncate(LocalizationService().get('support')),
           ),
           NavigationDestination(
             selectedIcon: _buildHexagonButton(Icons.settings, true),
             icon: _buildHexagonButton(Icons.settings, false),
-            label: truncate(cutoff, LocalizationService().get('settings')),
+            label: truncate(LocalizationService().get('settings')),
           ),
         ],
       ),
@@ -88,7 +92,35 @@ class _AppNavigationBar extends State<BottomNavBar> {
     );
   }
 
-  String truncate(int cutoff, String text) {
-    return text.length <= cutoff ? text : '${text.substring(0, cutoff)}...';
+  String truncate(String text) {
+    double maxWidth = _getMaxLabelWidth(context);
+
+    final textPainter = TextPainter(
+      text: TextSpan(text: text),
+      maxLines: 1,
+      textDirection: TextDirection.ltr,
+      textScaler: MediaQuery.textScalerOf(context), // Use textScalerOf for modern Flutter
+    )..layout(minWidth: 0, maxWidth: maxWidth);
+
+    if (textPainter.didExceedMaxLines || textPainter.width > maxWidth) {
+      // Find the position to truncate
+      int endIndex = text.length - 1;
+      while (endIndex > 0) {
+        final truncatedText = '${text.substring(0, endIndex)}..';
+        final tempPainter = TextPainter(
+          text: TextSpan(text: truncatedText),
+          maxLines: 1,
+          textDirection: TextDirection.ltr,
+          textScaler: MediaQuery.textScalerOf(context),
+        )..layout(minWidth: 0, maxWidth: maxWidth);
+
+        if (tempPainter.width < maxWidth) {
+          return truncatedText;
+        }
+        endIndex--;
+      }
+      return "..."; // Fallback if even "..." is too long
+    }
+    return text;
   }
 }
