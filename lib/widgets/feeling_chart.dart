@@ -82,12 +82,10 @@ class FeelingChart extends StatelessWidget {
                     return const SizedBox.shrink();
                   }
 
-                  final IconData iconData = _getIconForFeeling(currentFeeling);
-
                   return Padding( // Optional: Add some padding around the icon
                     padding: const EdgeInsets.only(right: 0.0), // Example: padding to the right of the icon
                     child: Icon(
-                      iconData,
+                      currentFeeling.iconData,
                       size: 24, // Adjust the size as needed
                       color: Theme.of(context).primaryColorDark, // Use a theme color or a specific color
                     ),
@@ -145,23 +143,6 @@ class FeelingChart extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  IconData _getIconForFeeling(Feeling feeling) {
-    switch (feeling) {
-      case Feeling.happy:
-        return Icons.sentiment_satisfied_alt;
-      case Feeling.sad:
-        return Icons.sentiment_dissatisfied;
-      case Feeling.angry:
-        return Icons.sentiment_very_dissatisfied;
-      case Feeling.tired:
-        return Icons.sentiment_neutral;
-      case Feeling.none:
-        return Icons.help_outline;
-      default:
-        return Icons.error_outline;
-    }
   }
 }
 

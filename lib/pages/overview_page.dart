@@ -89,10 +89,10 @@ class _OverviewPageState extends State<OverviewPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildFeelingIcon(Feeling.happy, Icons.sentiment_satisfied_alt),
-                          _buildFeelingIcon(Feeling.sad, Icons.sentiment_dissatisfied),
-                          _buildFeelingIcon(Feeling.angry, Icons.sentiment_very_dissatisfied),
-                          _buildFeelingIcon(Feeling.tired, Icons.sentiment_neutral),
+                          _buildFeelingIcon(Feeling.happy),
+                          _buildFeelingIcon(Feeling.sad),
+                          _buildFeelingIcon(Feeling.angry),
+                          _buildFeelingIcon(Feeling.tired),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -139,7 +139,7 @@ class _OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  Widget _buildFeelingIcon(Feeling feeling, IconData icon) {
+  Widget _buildFeelingIcon(Feeling feeling) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -149,7 +149,7 @@ class _OverviewPageState extends State<OverviewPage> {
       child: Column(
         children: [
           Icon(
-            icon,
+            feeling.iconData,
             color: _selectedFeeling == feeling ? Theme.of(context).primaryColorLight : Theme.of(context).highlightColor,
             size: 40,
           ),

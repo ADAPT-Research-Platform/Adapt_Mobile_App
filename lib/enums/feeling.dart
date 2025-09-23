@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import '../services/localization_service.dart';
 
 enum Feeling {
@@ -21,8 +22,7 @@ extension FeelingExtension on Feeling {
       case Feeling.tired:
         return LocalizationService().get('tired');
       case Feeling.none:
-      default:
-        return '';
+      return '';
     }
   }
 
@@ -33,4 +33,20 @@ extension FeelingExtension on Feeling {
 
   /// Get index from enum
   int get index => Feeling.values.indexOf(this);
+
+  /// Gets the corresponding IconData for the feeling.
+  IconData get iconData {
+    switch (this) {
+      case Feeling.happy:
+        return Icons.sentiment_satisfied_alt;
+      case Feeling.sad:
+        return Icons.sentiment_dissatisfied;
+      case Feeling.angry:
+        return Icons.sentiment_very_dissatisfied;
+      case Feeling.tired:
+        return Icons.sentiment_neutral;
+      case Feeling.none:
+        return Icons.horizontal_rule;
+    }
+  }
 }
