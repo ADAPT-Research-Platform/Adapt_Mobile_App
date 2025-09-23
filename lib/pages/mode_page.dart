@@ -65,33 +65,41 @@ class _ModePageState extends State<ModePage> {
             child: Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Keeps IconButton to the right
-                  crossAxisAlignment: CrossAxisAlignment.center, // Aligns items vertically in the center of the Row
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Column for the two Text widgets
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start, // Aligns text to the start (left) of the Column
-                      mainAxisSize: MainAxisSize.min, // Makes the Column only as tall as its children
-                      children: [
-                        Text(
-                          selectedOption.value,
-                          style: const TextStyle(
-                            fontSize: AppFontSizes.small,
-                            fontWeight: FontWeight.bold,
+                    Expanded( //Wrap the Column in Expanded
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            selectedOption.value,
+                            style: const TextStyle(
+                              fontSize: AppFontSizes.small,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis, // <--- Add ellipsis for overflow
                           ),
-                        ),
-                        //const SizedBox(height: 2), // Optional: Adds a small space between the two texts
-                        Text('${startDate.toString().substring(0, 10)} \u2013 ${endDate.toString().substring(0, 10)}',
-                          style: const TextStyle(
-                            fontSize: AppFontSizes.mini, // You might want to adjust this size
-                            // color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.7), // Optional: make it slightly less prominent
+                          const SizedBox(height: 2),
+                          Text(
+                            '${startDate.toString().substring(0, 10)} \u2013 ${endDate.toString().substring(0, 10)}',
+                            style: const TextStyle(
+                              fontSize: AppFontSizes.mini,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis, // Add ellipsis (optional)
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.access_time_filled_rounded, color: Theme.of(context).primaryColorDark, size: 35), // Static color
-                        onPressed: _showModalBottomSheet
+                      icon: Icon(
+                        Icons.access_time_filled_rounded,
+                        color: Theme.of(context).primaryColorDark,
+                        size: 35,
+                      ),
+                      onPressed: _showModalBottomSheet,
                     ),
                   ],
                 ),
