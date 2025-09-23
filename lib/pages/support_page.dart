@@ -1,3 +1,4 @@
+import 'package:adapt/widgets/markdown_builders/markdown_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
@@ -44,6 +45,7 @@ class SupportPage extends StatelessWidget {
                     child: SingleChildScrollView(
                         child: MarkdownBody(
                           data: markdownContent,
+                          styleSheet: MarkdownStyles.getMarkdownStyleSheet(context),
                           inlineSyntaxes: [UnderlineSyntax(), RightAlignSyntax()],
                           selectable: false,
                           builders: <String, MarkdownElementBuilder>{

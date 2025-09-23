@@ -22,6 +22,7 @@ import '../widgets/markdown_builders/checkbox_question_builder.dart';
 import '../widgets/markdown_builders/conditional_text_builder.dart';
 import '../widgets/markdown_builders/header_builder.dart';
 import '../widgets/markdown_builders/image_viewer_builder.dart';
+import '../widgets/markdown_builders/markdown_styles.dart';
 import '../widgets/markdown_builders/question_viewer_builder.dart';
 import '../widgets/markdown_builders/underline_text_builder.dart';
 import '../widgets/markdown_builders/video_viewer_builder.dart';
@@ -266,6 +267,7 @@ class _ChapterPageState extends State<ChapterPage> {
                           controller: _scrollController,
                           child: MarkdownBody(
                             data: markdownContent,
+                            styleSheet: MarkdownStyles.getMarkdownStyleSheet(context),
                             blockSyntaxes: [CheckboxQuestionSyntax(), QuestionSyntax(), ConditionalTextSyntax()],
                             inlineSyntaxes: [UnderlineSyntax(), RightAlignSyntax()],
                             selectable: false,
