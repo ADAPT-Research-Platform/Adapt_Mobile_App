@@ -67,17 +67,30 @@ class FeelingChart extends StatelessWidget {
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           leftTitles: AxisTitles(
-            axisNameSize: 20,
+            //axisNameSize: 10, // Adjust if needed for icon size
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 50,
-              interval: 1, // Show all feeling values
-              getTitlesWidget: (value, _) {
+              reservedSize: 28, // You might need to adjust this based on your icon size and padding
+              interval: 1,      // Assuming you want an icon for each feeling index
+              getTitlesWidget: (value, meta) { // meta parameter provides additional info like appliedTextStyle
                 final int index = value.toInt();
                 if (index >= 0 && index < Feeling.values.length) {
-                  return Text(
-                    Feeling.values[index].value, // Get the label from the enum
-                    style: const TextStyle(fontSize: 10),
+                  final Feeling currentFeeling = Feeling.values[index];
+
+                  // Skip 'Feeling.none' if you don't want to show it on the axis
+                  if (currentFeeling == Feeling.none) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final IconData iconData = _getIconForFeeling(currentFeeling);
+
+                  return Padding( // Optional: Add some padding around the icon
+                    padding: const EdgeInsets.only(right: 0.0), // Example: padding to the right of the icon
+                    child: Icon(
+                      iconData,
+                      size: 24, // Adjust the size as needed
+                      color: Theme.of(context).primaryColorDark, // Use a theme color or a specific color
+                    ),
                   );
                 }
                 return const SizedBox.shrink(); // Return empty for invalid indices
@@ -132,6 +145,23 @@ class FeelingChart extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData _getIconForFeeling(Feeling feeling) {
+    switch (feeling) {
+      case Feeling.happy:
+        return Icons.sentiment_satisfied_alt;
+      case Feeling.sad:
+        return Icons.sentiment_dissatisfied;
+      case Feeling.angry:
+        return Icons.sentiment_very_dissatisfied;
+      case Feeling.tired:
+        return Icons.sentiment_neutral;
+      case Feeling.none:
+        return Icons.help_outline;
+      default:
+        return Icons.error_outline;
+    }
   }
 }
 
