@@ -56,83 +56,110 @@ class _OverviewPageState extends State<OverviewPage> {
 
           final moduleIdList = snapshot.data!;
 
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SubTitle(text: LocalizationService().get('Modules')),
-                  ModuleGrid(
-                    moduleIdList: moduleIdList,
-                    size: MediaQuery.of(context).size.width / 4, // Adjust dynamically
-                  ),
-                  Divider(
-                    color: Theme.of(context).dividerColor,
-                    thickness: 2.5,
-                  ),
-                  //Expanded(child: Container()),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SubTitle(text: LocalizationService().get('everyday_questions')),
-                      const SizedBox(height: 10),
-                      Text(
-                        LocalizationService().get('im_feeling_today'),
-                        style: const TextStyle(
-                          fontSize: AppFontSizes.small,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Feeling Selector Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final totalHeight = constraints.maxHeight;
+
+              // Reserve bottom section (e.g., 40% of screen) + some padding for nav bar
+              final reservedBottomHeight = totalHeight * 0.4 + 16.0;
+
+              // Remaining height for ModuleGrid
+              final availableTopHeight = totalHeight - reservedBottomHeight;
+
+              // Derive module size dynamically from available height
+              final moduleSize = availableTopHeight * 0.2; // since grid uses size*3
+              print("totalHeight: $totalHeight, reservedBottomHeight: $reservedBottomHeight, availableTopHeight: $availableTopHeight, moduleSize: $moduleSize");
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  children: [
+                    // Modules section (shrinks if needed)
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: Column(
                         children: [
-                          _buildFeelingIcon(Feeling.happy),
-                          _buildFeelingIcon(Feeling.sad),
-                          _buildFeelingIcon(Feeling.angry),
-                          _buildFeelingIcon(Feeling.tired),
+                          SubTitle(text: LocalizationService().get('Modules')),
+                          Expanded(
+                            child: ModuleGrid(
+                              moduleIdList: moduleIdList,
+                              // shrink relative to height instead of width
+                              //size: moduleSize,
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      Text(
-                        LocalizationService().get('im_motivated_today'),
-                        style: const TextStyle(
-                          fontSize: AppFontSizes.small,
-                        ),
-                      ),
-                      StarSlider(
-                        sliderLength: MoodService.maxMotivation,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedMotivation = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      TaskButton(
-                        text: LocalizationService().get('Submit'),
-                        onPressed: () {
-                          _modeService.saveMode(_selectedFeeling, _selectedMotivation);
+                    ),
 
-                          widget.reloadModePage();
-                          // Cancel the notification for today
-                          NotificationService.cancelNotification(1);
-                          // Schedule a notification for the next day
-                          NotificationService.scheduleDailyNotification(
-                            1,
-                            "Time to log your Mood and Motivation",
-                            "Don't forget to log your mood and motivation for today!",
-                            TimeOfDay.now(),
-                          );
-                        },
+                    Divider(
+                      color: Theme.of(context).dividerColor,
+                      thickness: 2.5,
+                    ),
+
+                    // Everyday questions section (reserve min height)
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight * 0.4, // at least 35% of screen
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+                      child: Padding( // <--- Wrap the Column with Padding
+                        padding: const EdgeInsets.only(bottom: 16.0), // <--- Add your desired bottom padding here
+                        child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SubTitle(text: LocalizationService().get('everyday_questions')),
+                          Text(
+                            LocalizationService().get('im_feeling_today'),
+                            style: const TextStyle(fontSize: AppFontSizes.small),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildFeelingIcon(Feeling.happy),
+                              _buildFeelingIcon(Feeling.sad),
+                              _buildFeelingIcon(Feeling.angry),
+                              _buildFeelingIcon(Feeling.tired),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            LocalizationService().get('im_motivated_today'),
+                            style: const TextStyle(fontSize: AppFontSizes.small),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          StarSlider(
+                            sliderLength: MoodService.maxMotivation,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedMotivation = value;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          TaskButton(
+                            text: LocalizationService().get('Submit'),
+                            onPressed: () {
+                              _modeService.saveMode(_selectedFeeling, _selectedMotivation);
+                              widget.reloadModePage();
+                              NotificationService.cancelNotification(1);
+                              NotificationService.scheduleDailyNotification(
+                                1,
+                                "Time to log your Mood and Motivation",
+                                "Don't forget to log your mood and motivation for today!",
+                                TimeOfDay.now(),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    )
+                    ),
+                  ],
+                ),
+              );
+            },
           );
         },
       ),
@@ -140,27 +167,31 @@ class _OverviewPageState extends State<OverviewPage> {
   }
 
   Widget _buildFeelingIcon(Feeling feeling) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedFeeling = _selectedFeeling == feeling ? Feeling.none : feeling;
-        });
-      },
-      child: Column(
-        children: [
-          Icon(
-            feeling.iconData,
-            color: _selectedFeeling == feeling ? Theme.of(context).primaryColorLight : Theme.of(context).highlightColor,
-            size: 40,
+    return Flexible(
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedFeeling = _selectedFeeling == feeling ? Feeling.none : feeling;
+            });
+          },
+          child: Column(
+            children: [
+              Icon(
+                feeling.iconData,
+                color: _selectedFeeling == feeling ? Theme.of(context).primaryColorLight : Theme.of(context).highlightColor,
+                size: 40,
+              ),
+              Text(
+                feeling.value,
+                style: TextStyle(
+                  color: _selectedFeeling == feeling ? Theme.of(context).primaryColorDark : Theme.of(context).textTheme.displayLarge?.color,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
           ),
-          Text(
-            feeling.value,
-            style: TextStyle(
-              color: _selectedFeeling == feeling ? Theme.of(context).primaryColorDark : Theme.of(context).textTheme.displayLarge?.color,
-            ),
-          ),
-        ],
-      ),
+        )
     );
   }
 }
