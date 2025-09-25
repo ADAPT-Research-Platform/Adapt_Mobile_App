@@ -115,7 +115,13 @@ class _ModulePageState extends State<ModulePage> {
           value: filter,
           label: SizedBox(
             width: 70,
-            child: Center(child: Text(filter.value)),
+            child: Center(
+                child: Text(
+                    filter.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis
+                )
+            ),
           ),
         );
       }).toList(),

@@ -20,6 +20,8 @@ class SubTitle extends StatelessWidget {
           fontSize: AppFontSizes.medium, // Static font size
           fontWeight: FontWeight.bold, // Static font weight
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
