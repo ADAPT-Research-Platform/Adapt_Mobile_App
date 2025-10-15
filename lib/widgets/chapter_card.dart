@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/chapter.dart';
 import '../services/localization_service.dart';
+import '../utils/time_formatter.dart';
 import '../utils/app_font_sizes.dart';
 
 class ChapterCard extends StatelessWidget {
@@ -51,7 +52,7 @@ class ChapterCard extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Text(
-                    timeAgo(chapter.timeStamp),
+                    formatTimeAgo(chapter.timeStamp),
                     textAlign: TextAlign.end,
                     style: const TextStyle(
                       fontSize: AppFontSizes.mini,
@@ -123,19 +124,5 @@ class ChapterCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String timeAgo(DateTime timestamp) {
-    final duration = DateTime.now().difference(timestamp);
-
-    if (duration.inDays >= 1) {
-      return "${duration.inDays} ${LocalizationService().get("days_ago")}";
-    } else if (duration.inHours >= 1) {
-      return "${duration.inHours} ${LocalizationService().get("hrs_ago")}";
-    } else if (duration.inMinutes >= 1) {
-      return "${duration.inMinutes} ${LocalizationService().get("min_ago")}";
-    } else {
-      return "${duration.inSeconds} ${LocalizationService().get("sec_ago")}";
-    }
   }
 }

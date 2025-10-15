@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 
 import '../models/answer.dart';
 import '../utils/app_font_sizes.dart';
+import '../utils/time_formatter.dart';
 
 class AnswerCard extends StatefulWidget {
   final Answer answer;
@@ -36,7 +37,7 @@ class _AnswerCardState extends State<AnswerCard> {
                 ),
                 const Spacer(),
                 Text(
-                  DateFormat('dd.MM.yyyy HH:mm:ss').format(widget.answer.timeStamp),
+                  formatTimeAgoShort(widget.answer.timeStamp),
                   style: const TextStyle(
                     fontSize: AppFontSizes.mini, // Static font size
                   ),

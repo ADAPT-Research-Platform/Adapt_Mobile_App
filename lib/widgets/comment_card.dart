@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import '../models/comment.dart';
 import '../services/comment_service.dart';
 import '../services/localization_service.dart';
+import '../utils/time_formatter.dart';
 import '../utils/app_font_sizes.dart';
 
 class CommentCard extends StatefulWidget {
@@ -59,7 +60,7 @@ class _CommentCardState extends State<CommentCard> {
                 ),
                 const Spacer(),
                 Text(
-                  DateFormat('dd.MM.yyyy HH:mm:ss').format(widget.comment.timeStamp),
+                  formatTimeAgoShort(widget.comment.timeStamp),
                   style: const TextStyle(
                     fontSize: AppFontSizes.mini, // Static font size
                   ),
