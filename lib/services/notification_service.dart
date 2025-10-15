@@ -115,9 +115,16 @@ class NotificationService {
     );
   }
 
-  static Future<String?> getScheduledTime() async {
+  static Future<TimeOfDay> getScheduledTime() async {
     // Retrieve the stored time
-    return await secureStorage.read(key: 'daily_notification_time');
+    final storedTime = await secureStorage.read(key: 'daily_notification_time');
+
+    if(storedTime == null) {
+      return const TimeOfDay(hour: 8, minute: 0); //Set Default Schedule Time as 08:00 AM
+    } else {
+      final parts = storedTime.split(':');
+      return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    }
   }
 
   static Future<void> updateScheduledTime(int id, String title, String body, TimeOfDay newTime) async {

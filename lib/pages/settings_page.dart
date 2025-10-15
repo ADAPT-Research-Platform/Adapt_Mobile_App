@@ -86,15 +86,13 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadNotificationTime() async {
-    // Load the stored notification time
-    final storedTime = await NotificationService.getScheduledTime();
-    if (storedTime != null) {
-      final parts = storedTime.split(':');
+    // This method from your service gets the saved time
+    final TimeOfDay time = await NotificationService.getScheduledTime();
+
+    // Use setState to update the UI once the time is fetched
+    if (mounted) {
       setState(() {
-        _selectedNotificationTime = TimeOfDay(
-          hour: int.parse(parts[0]),
-          minute: int.parse(parts[1]),
-        );
+        _selectedNotificationTime = time;
       });
     }
   }
