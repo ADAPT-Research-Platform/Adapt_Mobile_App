@@ -27,6 +27,8 @@ class TaskButton extends StatelessWidget {
         style: const TextStyle(
           fontSize: AppFontSizes.small,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis
       ),
       style: ElevatedButton.styleFrom(
         minimumSize: Size(screenWidth / 2, 50), // Full-width button
