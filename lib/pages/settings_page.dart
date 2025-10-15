@@ -232,63 +232,63 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               Divider(color: Theme.of(context).dividerColor, thickness: 2.5),
               SubTitle(text: LocalizationService().get('Notifications')),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      LocalizationService().get('notification_time'),
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.small,
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8.0), // Consistent padding
+                dense: true, // Makes the tile vertically compact, like SwitchListTile
+                title: Text(
+                  LocalizationService().get('scheduled_time'),
+                  style: const TextStyle(fontSize: AppFontSizes.small),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis
+                ),
+                trailing: ElevatedButton(
+                  onPressed: _selectedNotificationTime == null ? null : _pickNotificationTime,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColorLight,
+                    foregroundColor: Theme.of(context).primaryColorDark,
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: _selectedNotificationTime == null
+                    // Show a loading indicator while fetching
+                    ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.0,
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                    )
+                    // Show the time once it's loaded
+                    : Text(
+                      _selectedNotificationTime!.format(context),
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColorDark,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10
                       ),
                     ),
-                    TextButton(
-                      onPressed: _pickNotificationTime,
-                      child: Text(
-                        LocalizationService().get('set_time'),
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColorDark,
-                            fontWeight: FontWeight.bold
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
-              // Display Scheduled Time
-              if (_selectedNotificationTime != null) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.schedule_rounded, color: Theme.of(context).primaryColorLight),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${LocalizationService().get('scheduled_time')}: ${_selectedNotificationTime!.format(context)}',
-                        style: const TextStyle(
-                          fontSize: AppFontSizes.mini,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
               _buildSwitchOption(
                   LocalizationService().get('mute_notifications'),
                   _isMuteNotifications, (value) {
-                setState(() {
-                  _isMuteNotifications = value;
-                });
-              }),
+                    setState(() {
+                      _isMuteNotifications = value;
+                    });
+                  }
+              ),
               _buildSwitchOption(
                   LocalizationService().get('notification_sound'),
                   _isNotificationSoundEnabled, (value) {
-                setState(() {
-                  _isNotificationSoundEnabled = value;
-                });
-              }),
+                    setState(() {
+                      _isNotificationSoundEnabled = value;
+                    });
+                  }
+              ),
               Divider(
                 color: Theme.of(context).dividerColor,
                 thickness: 2.5,
@@ -317,7 +317,6 @@ class _SettingsPageState extends State<SettingsPage> {
         Text(
           label,
           style: const TextStyle(
-            //color: AppColors.fontColor,
             fontSize: AppFontSizes.small,
             fontWeight: FontWeight.bold,
           ),
@@ -331,8 +330,10 @@ class _SettingsPageState extends State<SettingsPage> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6.0),
             ),
+            isDense: true,
           ),
         ),
+
       ],
     );
   }
@@ -351,24 +352,33 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: options.map((option) {
-            return Row(
-              children: [
-                Radio<T>(
-                  value: option,
-                  groupValue: selectedValue,
-                  onChanged: onChanged,
-                  activeColor: Colors.amber,
-                ),
-                Text(
-                  getValue(option),
-                  style: const TextStyle(fontSize: AppFontSizes.small),
-                ),
-              ],
-            );
-          }).toList(),
+        Padding(
+          padding: const EdgeInsets.only(left: 0.0), // Indent the radio options slightly
+          child: Wrap(
+            spacing: 0.0,
+            runSpacing: 0.0,
+            alignment: WrapAlignment.start, // Align children to the start
+            children: options.map((option) {
+              return Row(
+                mainAxisSize: MainAxisSize.min, // Crucial for Wrap to calculate child size correctly
+                children: [
+                  Radio<T>(
+                    value: option,
+                    groupValue: selectedValue,
+                    onChanged: onChanged,
+                    activeColor: Theme.of(context).primaryColorLight,
+                  ),
+                  Flexible( // Use Flexible to allow the text to wrap if it's extremely long
+                    child: Text(
+                      getValue(option),
+                      style: const TextStyle(fontSize: AppFontSizes.small),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -382,6 +392,8 @@ class _SettingsPageState extends State<SettingsPage> {
       value: currentValue,
       onChanged: onChanged,
       activeThumbColor: Theme.of(context).primaryColorLight,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
+      dense: true,
     );
   }
 
