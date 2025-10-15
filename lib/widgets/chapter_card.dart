@@ -31,63 +31,94 @@ class ChapterCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title and Period Row
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  chapter.isExercise
-                  ? '${LocalizationService().get('Chapter')} ${chapter.chapterIndex}: ${LocalizationService().get('Exercise')}'
-                  : '${LocalizationService().get('Chapter')} ${chapter.chapterIndex}',
-                  style: const TextStyle(
-                    fontSize: AppFontSizes.small,
-                    fontWeight: FontWeight.bold, // Static font size
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    chapter.isExercise
+                        ? '${LocalizationService().get('Chapter')} ${chapter.chapterIndex}: ${LocalizationService().get('Exercise')}'
+                        : '${LocalizationService().get('Chapter')} ${chapter.chapterIndex}',
+                    style: const TextStyle(
+                      fontSize: AppFontSizes.small,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Text(
-                  timeAgo(chapter.timeStamp),
-                  style: const TextStyle(
-                    fontSize: AppFontSizes.mini,
+                const SizedBox(width: 16), // This SizedBox provides a guaranteed minimum space between the two texts.
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    timeAgo(chapter.timeStamp),
+                    textAlign: TextAlign.end,
+                    style: const TextStyle(
+                      fontSize: AppFontSizes.mini,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 4),
             Text(
               chapter.title,
               style: const TextStyle(
                 fontSize: AppFontSizes.mini,
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 8),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.access_time_filled_rounded, color: Theme.of(context).primaryColorDark),
-                    const SizedBox(width: 4),
-                    Text("${chapter.progress.round()}% ${LocalizationService().get('Progress')}",
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.mini,
+                Expanded(
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 12.0,
+                    runSpacing: 4.0,
+
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.access_time_filled_rounded,
+                            color: Theme.of(context).primaryColorDark,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "${chapter.progress.round()}% ${LocalizationService().get('Progress')}",
+                            style: const TextStyle(
+                              fontSize: AppFontSizes.mini,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 8),
-                Row(
-                  children: [
-                    Icon(Icons.list_alt_rounded, color: Theme.of(context).primaryColorDark),
-                    const SizedBox(width: 4),
-                    Text("${chapter.numOfComments} ${LocalizationService().get('Comments')}",
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.mini,
+
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.list_alt_rounded,
+                            color: Theme.of(context).primaryColorDark,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "${chapter.numOfComments} ${LocalizationService().get('Comments')}",
+                            style: const TextStyle(
+                              fontSize: AppFontSizes.mini,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
-            ),
+            )
           ],
         ),
       ),
