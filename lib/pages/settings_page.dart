@@ -101,8 +101,32 @@ class _SettingsPageState extends State<SettingsPage> {
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: _selectedNotificationTime ?? TimeOfDay.now(),
-      initialEntryMode: TimePickerEntryMode.inputOnly
+      initialEntryMode: TimePickerEntryMode.inputOnly,
+
+      // Use a builder to wrap the picker in a custom Theme
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            timePickerTheme: TimePickerThemeData(
+              dayPeriodTextColor: Theme.of(context).primaryColorDark, // AM/PM color
+              hourMinuteTextColor: Theme.of(context).primaryColorDark, // Main time text color
+              backgroundColor: Theme.of(context).cardColor,
+              dialHandColor: Theme.of(context).primaryColorLight,
+              entryModeIconColor: Theme.of(context).primaryColorDark,
+            ),
+
+            textButtonTheme: TextButtonThemeData(
+              style: ButtonStyle(
+                foregroundColor: WidgetStateProperty.all(Theme.of(context).primaryColorDark),
+              ),
+            ),
+          ),
+
+          child: child!,
+        );
+      },
     );
+
     if (pickedTime != null) {
       setState(() {
         _selectedNotificationTime = pickedTime;
