@@ -38,7 +38,7 @@ class _OverviewPageState extends State<OverviewPage> {
     super.initState();
     _modulesIdFuture = _moduleService.fetchModuleIdList(); // Initialize the Future
 
-    NotificationService.updateMoodScheduledTime();
+    NotificationService.scheduleNextMoodNotification();
   }
 
   @override

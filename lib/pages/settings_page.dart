@@ -74,6 +74,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
     _selectedTheme = await SessionManager().getSelectedThemeType();
     _selectedLanguage = await SessionManager().getSelectedLanguage();
+    _isNotificationSoundEnabled = await NotificationService.getBool(NotificationService.notificationSoundKey);
+    _isMuteNotifications = await NotificationService.getBool(NotificationService.notificationMuteKey);
   }
 
   void _updateUser() async {
@@ -133,7 +135,7 @@ class _SettingsPageState extends State<SettingsPage> {
       });
 
       // Schedule the notification with the selected time
-      await NotificationService.updateMoodScheduledTime(newScheduledTime: pickedTime);
+      await NotificationService.updateMoodScheduledTime(pickedTime);
 
       SnackBarShower.info(settingPageScaffold, "${LocalizationService().get('notification_schedule')} ${pickedTime.format(context)}");
     }
@@ -292,19 +294,21 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               _buildSwitchOption(
                   LocalizationService().get('mute_notifications'),
-                  _isMuteNotifications, (value) {
+                  _isMuteNotifications,
+                  (value) {
                     setState(() {
-                      _isMuteNotifications = value;
-                      NotificationService.toggleMuteNotifications(_isMuteNotifications);
+                      _isMuteNotifications = !_isMuteNotifications;
+                      NotificationService.toggleMuteNotifications();
                     });
                   }
               ),
               _buildSwitchOption(
                   LocalizationService().get('notification_sound'),
-                  _isNotificationSoundEnabled, (value) {
+                  _isNotificationSoundEnabled,
+                  (value) {
                     setState(() {
-                      _isNotificationSoundEnabled = value;
-                      NotificationService.updateMoodScheduledTime(isSoundEnabled: _isMuteNotifications);
+                      _isNotificationSoundEnabled = !_isNotificationSoundEnabled;
+                      NotificationService.toggleSoundNotifications();
                     });
                   }
               ),
