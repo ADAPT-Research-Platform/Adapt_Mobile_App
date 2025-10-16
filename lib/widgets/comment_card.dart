@@ -118,12 +118,14 @@ class _CommentCardState extends State<CommentCard> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         const SizedBox(width: 24), // Placeholder to align the title center
-                                        Text(
-                                          "${LocalizationService().get('reply_to')} ${widget.comment.commentUserName}",
-                                          style: const TextStyle(
-                                            fontSize: AppFontSizes.small,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                        Expanded(
+                                          child: Text(
+                                            "${LocalizationService().get('reply_to')} ${widget.comment.commentUserName}",
+                                            style: const TextStyle(
+                                              fontSize: AppFontSizes.small,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          )
                                         ),
                                         IconButton(
                                           icon: const Icon(Icons.close_rounded),

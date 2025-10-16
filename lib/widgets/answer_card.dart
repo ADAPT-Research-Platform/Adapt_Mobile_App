@@ -26,16 +26,32 @@ class _AnswerCardState extends State<AnswerCard> {
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Module ${widget.answer.moduleId}: Chapter ${widget.answer.chapterIndex}',
-                  style: const TextStyle(
-                    fontSize: AppFontSizes.small,
-                    fontWeight: FontWeight.bold, // Static font size
+                Expanded(
+                  child: Wrap(
+                    spacing: 4.0,
+                    runSpacing: 4.0,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        'Module ${widget.answer.moduleId}:',
+                        style: const TextStyle(
+                          fontSize: AppFontSizes.small,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Chapter ${widget.answer.chapterIndex}',
+                        style: const TextStyle(
+                          fontSize: AppFontSizes.small,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Text(
                   formatTimeAgoShort(widget.answer.timeStamp),
                   style: const TextStyle(
