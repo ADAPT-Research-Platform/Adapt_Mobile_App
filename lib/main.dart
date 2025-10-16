@@ -27,9 +27,6 @@ void main() async {
   });
 
   await NotificationService.init();
-  if (await MoodService().hasMoodBeenLoggedToday()) {
-    NotificationService.cancelNotification(1);
-  }
   tz.initializeTimeZones();
 
   // Load default language (German)

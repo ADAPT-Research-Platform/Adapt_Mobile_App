@@ -37,6 +37,8 @@ class _OverviewPageState extends State<OverviewPage> {
   void initState() {
     super.initState();
     _modulesIdFuture = _moduleService.fetchModuleIdList(); // Initialize the Future
+
+    NotificationService.updateMoodScheduledTime();
   }
 
   @override
@@ -58,18 +60,6 @@ class _OverviewPageState extends State<OverviewPage> {
 
           return LayoutBuilder(
             builder: (context, constraints) {
-              final totalHeight = constraints.maxHeight;
-
-              // Reserve bottom section (e.g., 40% of screen) + some padding for nav bar
-              final reservedBottomHeight = totalHeight * 0.4 + 16.0;
-
-              // Remaining height for ModuleGrid
-              final availableTopHeight = totalHeight - reservedBottomHeight;
-
-              // Derive module size dynamically from available height
-              final moduleSize = availableTopHeight * 0.2; // since grid uses size*3
-              print("totalHeight: $totalHeight, reservedBottomHeight: $reservedBottomHeight, availableTopHeight: $availableTopHeight, moduleSize: $moduleSize");
-
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
@@ -143,13 +133,6 @@ class _OverviewPageState extends State<OverviewPage> {
                             onPressed: () {
                               _modeService.saveMode(_selectedFeeling, _selectedMotivation);
                               widget.reloadModePage();
-                              NotificationService.cancelNotification(1);
-                              NotificationService.scheduleDailyNotification(
-                                1,
-                                "Time to log your Mood and Motivation",
-                                "Don't forget to log your mood and motivation for today!",
-                                TimeOfDay.now(),
-                              );
                             },
                           ),
                         ],

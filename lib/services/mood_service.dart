@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:adapt/services/notification_service.dart';
 import 'package:adapt/services/session_manager.dart';
 import 'package:logging/logging.dart';
 
@@ -34,8 +35,10 @@ class MoodService {
       log.info('Add/Update Mood Response: ${response.body}');
       if (response.statusCode == 200) {
         SnackBarShower.info(mainPageScaffold, 'mood_update_success');
+        NotificationService.updateMoodLastSubmitTime();
       }else if (response.statusCode == 201) {
         SnackBarShower.info(mainPageScaffold, 'mood_add_success');
+        NotificationService.updateMoodLastSubmitTime();
       } else {
         final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         SnackBarShower.error(mainPageScaffold, jsonResponse['message']);

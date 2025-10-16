@@ -133,12 +133,7 @@ class _SettingsPageState extends State<SettingsPage> {
       });
 
       // Schedule the notification with the selected time
-      await NotificationService.updateScheduledTime(
-        1,
-        LocalizationService().get("notification_title"),
-        LocalizationService().get("notification_text"),
-        pickedTime,
-      );
+      await NotificationService.updateMoodScheduledTime(newScheduledTime: pickedTime);
 
       SnackBarShower.info(settingPageScaffold, "${LocalizationService().get('notification_schedule')} ${pickedTime.format(context)}");
     }
@@ -300,6 +295,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   _isMuteNotifications, (value) {
                     setState(() {
                       _isMuteNotifications = value;
+                      NotificationService.toggleMuteNotifications(_isMuteNotifications);
                     });
                   }
               ),
@@ -308,6 +304,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   _isNotificationSoundEnabled, (value) {
                     setState(() {
                       _isNotificationSoundEnabled = value;
+                      NotificationService.updateMoodScheduledTime(isSoundEnabled: _isMuteNotifications);
                     });
                   }
               ),
