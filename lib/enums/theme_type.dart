@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../services/localization_service.dart';
 
 enum ThemeType {
@@ -16,8 +18,17 @@ extension ThemeExtension on ThemeType {
         return LocalizationService().get('light');
       case ThemeType.dark:
         return LocalizationService().get('dark');
-      default:
-        return LocalizationService().get('system');
+      }
+  }
+
+  ThemeMode get mode {
+    switch (this) {
+      case ThemeType.light:
+        return ThemeMode.light;
+      case ThemeType.dark:
+        return ThemeMode.dark;
+      case ThemeType.system:
+        return ThemeMode.system;
     }
   }
 

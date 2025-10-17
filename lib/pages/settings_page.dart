@@ -16,7 +16,7 @@ import '../widgets/sub_title.dart';
 import '../widgets/task_button.dart';
 
 class SettingsPage extends StatefulWidget {
-  final Function(ThemeMode) onThemeChanged;
+  final Function(ThemeType) onThemeChanged;
 
   const SettingsPage({super.key, required this.onThemeChanged});
 
@@ -233,14 +233,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildRadioOption<ThemeType>(LocalizationService().get('Theme'), ThemeType.values, _selectedTheme, (option) => option.value, (value) {
                   setState(() {
                     _selectedTheme = value!;
-                    if (value == ThemeType.light) {
-                      widget.onThemeChanged(ThemeMode.light);
-                    } else if (value == ThemeType.dark) {
-                      widget.onThemeChanged(ThemeMode.dark);
-                    } else {
-                      widget.onThemeChanged(ThemeMode.system);
-                    }
-
+                    widget.onThemeChanged(_selectedTheme);
                     SessionManager().setSelectedThemeType(_selectedTheme);
                   });
                 },

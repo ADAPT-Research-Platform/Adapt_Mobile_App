@@ -1,3 +1,4 @@
+import 'package:adapt/enums/theme_type.dart';
 import 'package:adapt/pages/consent_page.dart';
 import 'package:adapt/pages/splash_page.dart';
 import 'package:adapt/services/localization_service.dart';
@@ -53,11 +54,22 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ThemeMode _themeMode = ThemeMode.system; // or start with ThemeMode.light/dark
+  ThemeType _themeType = ThemeType.system; // default until loaded
 
-  void setThemeMode(ThemeMode mode) {
+  @override
+  void initState() {
+    super.initState();
+    _loadThemeType();
+  }
+
+  Future<void> _loadThemeType() async {
+    final themeType = await SessionManager().getSelectedThemeType();
+    setThemeType(themeType);
+  }
+
+  void setThemeType(ThemeType type) {
     setState(() {
-      _themeMode = mode;
+      _themeType = type;
     });
   }
 
@@ -68,14 +80,14 @@ class _MyAppState extends State<MyApp> {
         title: 'ADAPT',
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: _themeMode, // Switches between light and dark themes
+        themeMode: _themeType.mode, // Switches between light and dark themes
         debugShowCheckedModeBanner: false,
         navigatorKey: mainNavigator,
         onGenerateRoute: (settings) {
           switch (settings.name) {
             case Routes.routeMain:
               return MaterialPageRoute(
-                builder: (context) => MainPage(onThemeChanged: setThemeMode),
+                builder: (context) => MainPage(onThemeChanged: setThemeType),
               );
             case Routes.routeLogin:
               return MaterialPageRoute(

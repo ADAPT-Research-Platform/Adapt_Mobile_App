@@ -4,6 +4,7 @@ import 'package:adapt/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
+import '../enums/theme_type.dart';
 import '../services/auth_service.dart';
 import '../utils/app_keys.dart';
 import '../widgets/bottom_nav_bar.dart';
@@ -13,7 +14,7 @@ import 'module_index_page.dart';
 import 'support_page.dart';
 
 class MainPage extends StatefulWidget {
-  final Function(ThemeMode) onThemeChanged;
+  final Function(ThemeType) onThemeChanged;
 
   const MainPage({super.key, required this.onThemeChanged});
 
