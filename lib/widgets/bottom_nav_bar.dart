@@ -44,9 +44,12 @@ class _AppNavigationBar extends State<BottomNavBar> {
           widget.onDestinationSelected(index);
           setState(() {
             if(currentPageIndex == 0 && index == 0){
-              moduleNavigator.currentState!.pushNamed(Routes.routeOverview);
+              //Going back all the way back to overview page
+              while(moduleNavigator.currentState!.canPop()){
+                moduleNavigator.currentState!.pop();
+              }
             }
-
+            
             currentPageIndex = index;
           });
         },
