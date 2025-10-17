@@ -2,7 +2,6 @@ import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 
 import '../services/localization_service.dart';
-import '../utils/app_routes.dart';
 import 'hexagon_shape.dart';
 
 class BottomNavBar extends StatefulWidget {

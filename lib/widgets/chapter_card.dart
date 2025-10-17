@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/chapter.dart';
 import '../services/localization_service.dart';
-import '../utils/time_formatter.dart';
 import '../utils/app_font_sizes.dart';
+import '../utils/time_formatter.dart';
 
 class ChapterCard extends StatelessWidget {
   final Chapter chapter;

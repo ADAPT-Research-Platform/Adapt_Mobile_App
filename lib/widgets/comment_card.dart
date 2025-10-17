@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 
 import '../models/comment.dart';
 import '../services/comment_service.dart';
 import '../services/localization_service.dart';
-import '../utils/time_formatter.dart';
 import '../utils/app_font_sizes.dart';
+import '../utils/time_formatter.dart';
 
 class CommentCard extends StatefulWidget {
   final Comment comment;

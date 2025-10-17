@@ -8,8 +8,8 @@ import '../services/localization_service.dart';
 import '../services/module_service.dart';
 import '../utils/app_keys.dart';
 import '../utils/app_routes.dart';
-import '../widgets/main_title.dart';
 import '../widgets/chapter_card.dart';
+import '../widgets/main_title.dart';
 
 class ModulePage extends StatefulWidget {
   final String moduleId;
