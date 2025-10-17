@@ -2,6 +2,7 @@ import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 
 import '../services/localization_service.dart';
+import '../utils/app_routes.dart';
 import 'hexagon_shape.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -42,6 +43,10 @@ class _AppNavigationBar extends State<BottomNavBar> {
         onDestinationSelected: (index) {
           widget.onDestinationSelected(index);
           setState(() {
+            if(currentPageIndex == 0 && index == 0){
+              moduleNavigator.currentState!.pushNamed(Routes.routeOverview);
+            }
+
             currentPageIndex = index;
           });
         },
