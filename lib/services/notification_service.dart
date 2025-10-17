@@ -91,8 +91,6 @@ class NotificationService {
     log.info("Notification tapped: ${notificationResponse.id}");
 
     scheduleNextMoodNotification();
-    
-    bottomNavigator.currentState!.pushNamedAndRemoveUntil(Routes.routeOverview, (route) => false);
   }
 
   static Future<void> scheduleNextMoodNotification() async {
