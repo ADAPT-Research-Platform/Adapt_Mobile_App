@@ -73,7 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     _selectedTheme = await SessionManager().getSelectedThemeType();
-    _selectedLanguage = await SessionManager().getSelectedLanguage();
+    _selectedLanguage = LocalizationService().getSelectedLanguage();
   }
 
   void _updateUser() async {
@@ -225,10 +225,7 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildRadioOption<Language>(LocalizationService().get('Language'), Language.values, _selectedLanguage, (option) => option.value, (value) {
                   setState(() {
                     _selectedLanguage = value!;
-                    String languageCode = _selectedLanguage == Language.english ? 'en' : 'de';
-                    LocalizationService().load(languageCode);
-
-                    SessionManager().setSelectedLanguage(_selectedLanguage);
+                    LocalizationService().load(_selectedLanguage);
                     NotificationService.scheduleNextMoodNotification();
                   });
                 },

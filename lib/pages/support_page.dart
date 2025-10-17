@@ -1,3 +1,4 @@
+import 'package:adapt/enums/language.dart';
 import 'package:adapt/widgets/markdown_builders/markdown_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -23,7 +24,7 @@ class SupportPage extends StatelessWidget {
       appBar: MainTitle(title: LocalizationService().get('support')),
       body: FutureBuilder<List<dynamic>>(
         future: Future.wait([
-          _sectionService.fetchChapterContent('pages/contacts/content_${LocalizationService().currentLanguage}.md'),
+          _sectionService.fetchChapterContent('pages/contacts/content_${LocalizationService().getSelectedLanguage().code}.md'),
         ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

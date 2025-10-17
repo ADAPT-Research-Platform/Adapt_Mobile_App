@@ -2,6 +2,7 @@ import 'package:adapt/pages/consent_page.dart';
 import 'package:adapt/pages/splash_page.dart';
 import 'package:adapt/services/localization_service.dart';
 import 'package:adapt/services/notification_service.dart';
+import 'package:adapt/services/session_manager.dart';
 import 'package:adapt/utils/app_keys.dart';
 import 'package:adapt/utils/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../../pages/login_page.dart';
 import '../../pages/main_page.dart';
 import '../../utils/app_routes.dart';
+import 'enums/language.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +26,8 @@ void main() async {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
 
+  // Initialize Services
+  await LocalizationService().init();
   await NotificationService.init();
 
   //Timezone Initialization
@@ -32,9 +36,6 @@ void main() async {
   //TODO: Need to Initialize Timezone Dynamically
   // final timeZoneName = await FlutterNativeTimezone.getLocalTimezone(); // get device timezone
   // tz.setLocalLocation(tz.getLocation(timeZoneName)); // set tz.local correctly
-
-  // Load default language (German)
-  await LocalizationService().load('de');
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

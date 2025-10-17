@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:adapt/enums/language.dart';
 import 'package:adapt/models/answer.dart';
 import 'package:adapt/models/chapter.dart';
 import 'package:adapt/services/chapter_service.dart';
@@ -227,7 +228,7 @@ class _ChapterPageState extends State<ChapterPage> {
             }),
         body: FutureBuilder<List<dynamic>>(
           future: Future.wait([
-            _chapterService.fetchChapterContent('${widget.section.folderPath}/content_${LocalizationService().currentLanguage}.md'),
+            _chapterService.fetchChapterContent('${widget.section.folderPath}/content_${LocalizationService().getSelectedLanguage().code}.md'),
             if (widget.section.isExercise)
               _chapterService.fetchAnswerByChapterId(widget.section.chapterId),
           ]),

@@ -129,16 +129,6 @@ class SessionManager {
     log.info('Theme Type Saved');
   }
 
-  Future<Language> getSelectedLanguage() async {
-    log.info('Getting selected Language from secure storage');
-    return LanguageExtension.fromIndex(int.parse(await _secureStorage.read(key: "language") ?? '0'));
-  }
-
-  void setSelectedLanguage(Language language) async{
-    await _secureStorage.write(key: "language", value: language.index.toString());
-    log.info('Language Saved');
-  }
-
   Map<String, String> getHeaders() {
     if (_sessionCookie != null) {
       return {

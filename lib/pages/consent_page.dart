@@ -1,3 +1,4 @@
+import 'package:adapt/enums/language.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
@@ -27,7 +28,7 @@ class ConsentPage extends StatelessWidget {
             }),
         body: FutureBuilder<List<dynamic>>(
           future: Future.wait([
-            _sectionService.fetchChapterContent('pages/consent/content_${LocalizationService().currentLanguage}.md'),
+            _sectionService.fetchChapterContent('pages/consent/content_${LocalizationService().getSelectedLanguage().code}.md'),
           ]),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

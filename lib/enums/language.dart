@@ -13,9 +13,16 @@ extension LanguageExtension on Language {
         return LocalizationService().get('german');
       case Language.english:
         return LocalizationService().get('english');
-      default:
-        return LocalizationService().get('german');
-    }
+      }
+  }
+
+  String get code {
+    switch (this) {
+      case Language.german:
+        return 'de';
+      case Language.english:
+        return 'en';
+      }
   }
 
   /// Get enum from index
