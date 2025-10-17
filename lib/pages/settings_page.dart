@@ -74,8 +74,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
     _selectedTheme = await SessionManager().getSelectedThemeType();
     _selectedLanguage = await SessionManager().getSelectedLanguage();
-    _isNotificationSoundEnabled = await NotificationService.getBool(NotificationService.notificationSoundKey);
-    _isMuteNotifications = await NotificationService.getBool(NotificationService.notificationMuteKey);
   }
 
   void _updateUser() async {
@@ -231,6 +229,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     LocalizationService().load(languageCode);
 
                     SessionManager().setSelectedLanguage(_selectedLanguage);
+                    NotificationService.scheduleNextMoodNotification();
                   });
                 },
               ),
@@ -297,8 +296,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   _isMuteNotifications,
                   (value) {
                     setState(() {
-                      _isMuteNotifications = !_isMuteNotifications;
-                      NotificationService.toggleMuteNotifications();
+                      _isMuteNotifications = value;
+                      NotificationService.toggleMuteNotifications(value);
                     });
                   }
               ),
@@ -307,8 +306,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   _isNotificationSoundEnabled,
                   (value) {
                     setState(() {
-                      _isNotificationSoundEnabled = !_isNotificationSoundEnabled;
-                      NotificationService.toggleSoundNotifications();
+                      _isNotificationSoundEnabled = value;
+                      NotificationService.toggleSoundNotifications(value);
                     });
                   }
               ),

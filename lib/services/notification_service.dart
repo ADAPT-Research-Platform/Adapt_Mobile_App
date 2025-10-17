@@ -1,15 +1,16 @@
+import 'package:adapt/utils/app_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logging/logging.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../utils/app_routes.dart';
 import 'localization_service.dart';
 
 class NotificationService {
   static final log = Logger('NotificationService');
 
-  static const int moodNotifyId = 1;
   static const TimeOfDay moodNotifyDefaultTime = TimeOfDay(hour: 8, minute: 0);
 
   static const String dailyNotificationTimeKey = 'daily_notification_time';
@@ -43,8 +44,13 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
 
-    await setBool(notificationMuteKey, false);
-    await setBool(notificationSoundKey, true);
+    if(!await secureStorage.containsKey(key: notificationMuteKey)){
+      await setBool(notificationMuteKey, false);
+    }
+
+    if(!await secureStorage.containsKey(key: notificationSoundKey)){
+      await setBool(notificationSoundKey, true);
+    }
   }
 
   static Future<void> updateMoodScheduledTime(TimeOfDay newScheduledTime) async {
@@ -61,56 +67,63 @@ class NotificationService {
     scheduleNextMoodNotification();
   }
 
-  static Future<void> toggleMuteNotifications() async {
-    await setBool(notificationMuteKey, !await getBool(notificationMuteKey));
+  static Future<void> toggleMuteNotifications(bool value) async {
+    await setBool(notificationMuteKey, value);
 
-    if (await getBool(notificationMuteKey)) {
+    if (value) {
       await flutterLocalNotificationsPlugin.cancelAll();
-      log.info('All notifications muted.');
+      log.info('All notifications muted');
     } else {
       scheduleNextMoodNotification();
-      log.info('Notifications unmuted and rescheduled.');
+      log.info('Notifications unmuted and rescheduled');
     }
   }
 
-  static Future<void> toggleSoundNotifications() async {
-    await setBool(notificationSoundKey, !await getBool(notificationSoundKey));
-    log.info('Notification Sound Enable: ${await getBool(notificationSoundKey)}');
+  static Future<void> toggleSoundNotifications(bool value) async {
+    await setBool(notificationSoundKey, value);
+    log.info('Notification Sound Enable: $value');
 
     // If sound is disabled)
     scheduleNextMoodNotification();
   }
 
   static Future<void> onDidReceiveNotification(NotificationResponse notificationResponse) async {
-    log.info("Notification received: ${notificationResponse.id} ${notificationResponse.payload}");
-    if(notificationResponse.id == moodNotifyId){
-      scheduleNextMoodNotification();
-    }
+    log.info("Notification tapped: ${notificationResponse.id}");
+
+    scheduleNextMoodNotification();
+    
+    bottomNavigator.currentState!.pushNamedAndRemoveUntil(Routes.routeOverview, (route) => false);
   }
 
   static Future<void> scheduleNextMoodNotification() async {
+    final pNotifications = await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+    for (final pNotification in pNotifications) {
+      await flutterLocalNotificationsPlugin.cancel(pNotification.id);
+      log.info('Cancelled pending notification with ID: ${pNotification.id}');
+    }
+
     _scheduleNextNotification(
-        moodNotifyId,
         LocalizationService().get("notification_title"),
-        LocalizationService().get("notification_text"),
-        await getBool(notificationSoundKey)
+        LocalizationService().get("notification_text")
     );
   }
 
   //---------------------------- Private Methods -----------------------------//
-  static Future<void> _scheduleNextNotification(int id, String title, String body, bool isSoundEnabled) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
-    log.info('Notification with id: $id canceled');
+  static Future<void> _scheduleNextNotification(String title, String body) async {
+    if (await getBool(notificationMuteKey)) return;
 
-    final tz.TZDateTime scheduledTime = await _getNextNotificationTime();
-    log.info('Next Notification Scheduled time: $scheduledTime');
+    final tz.TZDateTime sTime = await _getNextNotificationTime();
+
+    // Generate a unique ID based on the date (e.g., 20251017).
+    final int uniqueId = int.parse('${sTime.year}${sTime.month.toString().padLeft(2, '0')}${sTime.day.toString().padLeft(2, '0')}');
+    log.info('Scheduling Next Notification ID: $uniqueId Time: $sTime');
 
     // Schedule the notification
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      id,
+      uniqueId,
       title,
       body,
-      scheduledTime,
+      sTime,
       NotificationDetails(
         android: AndroidNotificationDetails(
           'adapt_notification_channel_id',
@@ -118,10 +131,10 @@ class NotificationService {
           channelDescription: 'Notifications that trigger daily at scheduled time',
           importance: Importance.max,
           priority: Priority.high,
-          playSound: isSoundEnabled
+          playSound: await getBool(notificationSoundKey)
         ),
         iOS: DarwinNotificationDetails(
-            presentSound: isSoundEnabled
+            presentSound: await getBool(notificationSoundKey)
         )
       ),
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
@@ -130,8 +143,9 @@ class NotificationService {
   }
 
   static Future<tz.TZDateTime> _getNextNotificationTime() async {
-    final lastSubmittedTime = await getLastSubmittedTime(tz.local);
+    final lastSubmittedTime = await getLastSubmittedTime();
     final scheduledTime = await getScheduledTime();
+    log.info('Last Submitted Time: $lastSubmittedTime Scheduled Time: $scheduledTime');
 
     final now = tz.TZDateTime.now(tz.local);
 
@@ -190,14 +204,14 @@ class NotificationService {
   }
 
   // Retrieve DateTime safely
-  static Future<tz.TZDateTime?> getLastSubmittedTime(tz.Location location) async {
+  static Future<tz.TZDateTime?> getLastSubmittedTime() async {
     final storedTime = await secureStorage.read(key: lastSubmittedTimeKey);
 
     if (storedTime == null) return null;
 
     try {
       final dt = DateTime.parse(storedTime);
-      return tz.TZDateTime.from(dt, location);
+      return tz.TZDateTime.from(dt, tz.local);
     } catch (_) {
       return null;
     }
