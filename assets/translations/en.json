@@ -24,6 +24,7 @@
   "exercises" : "Exercises",
   "readings" : "Readings",
   "all" : "All",
+  "next" : "Next",
 
   "progress" : "Progress",
   "comment" : "Comment",
@@ -66,6 +67,8 @@
   "months_ago": "months ago",
   "year_ago": "1 year ago",
   "years_ago": "years ago",
+
+  "press_back_again_to_exit": "Press back again to exit",
 
   "this_month" : "This Month",
   "this_year" : "This Year",

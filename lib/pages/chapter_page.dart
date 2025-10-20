@@ -4,8 +4,11 @@ import 'dart:math';
 import 'package:adapt/enums/language.dart';
 import 'package:adapt/models/answer.dart';
 import 'package:adapt/models/chapter.dart';
+import 'package:adapt/models/module.dart';
 import 'package:adapt/services/chapter_service.dart';
 import 'package:adapt/services/comment_service.dart';
+import 'package:adapt/services/module_service.dart';
+import 'package:adapt/utils/app_routes.dart';
 import 'package:adapt/widgets/main_title.dart';
 import 'package:adapt/widgets/markdown_builders/right_align_text_builder.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +49,8 @@ class _ChapterPageState extends State<ChapterPage> {
   final TextEditingController _commentTextController = TextEditingController();
   final ChapterService _chapterService = ChapterService();
   final CommentService _commentService = CommentService();
+  final ModuleService _moduleService = ModuleService();
+  Chapter? _nextChapter;
 
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, String> _questions = {};
@@ -192,6 +197,7 @@ class _ChapterPageState extends State<ChapterPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_updateMaxScrollPixels);
+    _loadNextChapter();
 
     // Initialize the builder here, after super.initState()
     _checkboxBuilder = CheckboxQuestionViewerBuilder(
@@ -200,6 +206,20 @@ class _ChapterPageState extends State<ChapterPage> {
     );
 
     _scoreStore = ScoreStore(); // shared instance
+  }
+
+  Future<void> _loadNextChapter() async {
+    try {
+      Module module = await _moduleService.fetchModuleById(widget.moduleId);
+      int currentIndex = module.chapters.indexWhere((c) => c.chapterId == widget.section.chapterId);
+      if (currentIndex != -1 && currentIndex < module.chapters.length - 1) {
+        setState(() {
+          _nextChapter = module.chapters[currentIndex + 1];
+        });
+      }
+    } catch (e) {
+      log.severe('Error loading next chapter: $e');
+    }
   }
 
   @override
@@ -221,6 +241,18 @@ class _ChapterPageState extends State<ChapterPage> {
                 ? '${LocalizationService().get('Chapter')} ${widget.section.chapterIndex}: ${LocalizationService().get('Exercise')}'
                 : '${LocalizationService().get('Chapter')} ${widget.section.chapterIndex}',
             leadingIcon: Icons.arrow_back_ios_rounded,
+            actions: [
+              if (_nextChapter != null)
+                TextButton(
+                  onPressed: () {
+                    moduleNavigator.currentState!.pushReplacementNamed(
+                      Routes.routeSections,
+                      arguments: {'section': _nextChapter, 'moduleId': widget.moduleId},
+                    );
+                  },
+                  child: Text(LocalizationService().get('next'), style: TextStyle(color: Theme.of(context).primaryColorDark, fontSize: AppFontSizes.small),),
+                ),
+            ],
             onIconPressed: () {
               _calculateCheckboxResults();
               _updateSectionProgress();

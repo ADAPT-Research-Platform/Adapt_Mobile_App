@@ -5,12 +5,14 @@ class MainTitle extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final IconData? leadingIcon;
   final VoidCallback? onIconPressed;
+  final List<Widget>? actions;
 
   const MainTitle({
     super.key,
     required this.title,
     this.leadingIcon,
     this.onIconPressed,
+    this.actions,
   });
 
   @override
@@ -44,6 +46,7 @@ class MainTitle extends StatelessWidget implements PreferredSizeWidget {
             fontWeight: FontWeight.bold, // Static font weight
           ),
         ),
+        actions: actions,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2.0), // Adjust the height if needed
           child: Container(

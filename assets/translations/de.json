@@ -24,6 +24,7 @@
   "exercises": "Übungen",
   "readings": "Infotexte",
   "all": "Alle",
+  "next": "Nächste",
 
   "progress": "Fortschritt",
   "comment": "Kommentar",
@@ -66,6 +67,8 @@
   "months_ago": "vor Monaten",
   "year_ago": "vor 1 Jahr",
   "years_ago": "vor Jahren",
+
+  "press_back_again_to_exit": "Zum Beenden erneut drücken",
 
   "this_month": "Dieser Monat",
   "this_year": "Dieses Jahr",
