@@ -15,11 +15,15 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
   final ValueNotifier<Map<String, CheckboxQuestion>> _userSelectionsNotifier;
   final Map<String, Set<int>> previousAnswers;
   final Function(String, int, bool) onCheckboxChanged;
+  final Color cardColor;
+  final Color borderColor;
 
   CheckboxQuestionViewerBuilder(
     this._userSelectionsNotifier,
     this.previousAnswers,
-    this.onCheckboxChanged
+    this.onCheckboxChanged,
+    this.cardColor,
+    this.borderColor
   );
 
   @override
@@ -48,10 +52,10 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
               return Container(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF0EBEB),
+                  color: cardColor,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: const Color(0xFFA08030),
+                    color: borderColor,
                     width: 2.2,
                   ),
                 ),

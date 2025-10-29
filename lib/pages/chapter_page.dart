@@ -274,7 +274,9 @@ class _ChapterPageState extends State<ChapterPage> {
                               'checkbox': CheckboxQuestionViewerBuilder(
                                   _userSelectionsNotifier,
                                   previousAnswers,
-                                  _onCheckboxChanged
+                                  _onCheckboxChanged,
+                                  Theme.of(context).cardColor,
+                                  Theme.of(context).primaryColorLight
                               ),
                               'ul': UnderlineBuilder(),
                               'rl': RightAlignBuilder(),
