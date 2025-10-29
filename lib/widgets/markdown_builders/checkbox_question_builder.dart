@@ -5,26 +5,22 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
 
+import '../../models/checkbox_answer.dart';
 import '../../models/checkbox_question.dart';
 import '../../utils/app_font_sizes.dart';
-
 
 class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
   final log = Logger('CheckboxQuestionViewerBuilder');
 
-  // These maps now store CheckboxQuestionData objects directly
-  final Map<String, CheckboxQuestion> _questionDataMap = {};
-  final ValueNotifier<Map<String, List<int>>>
-      _userSelectionsNotifier; // Stores user's selected indices
-  final Function(String, int, bool) onCheckboxChanged; // Callback for state updates
+  final ValueNotifier<Map<String, CheckboxQuestion>> _userSelectionsNotifier;
+  final Map<String, Set<int>> previousAnswers;
+  final Function(String, int, bool) onCheckboxChanged;
 
   CheckboxQuestionViewerBuilder(
     this._userSelectionsNotifier,
-    this.onCheckboxChanged,
-  ) {
-    // You might want to clear _questionDataMap on load if new content
-    // is always replacing old. Or ensure IDs are unique.
-  }
+    this.previousAnswers,
+    this.onCheckboxChanged
+  );
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
@@ -36,16 +32,17 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
 
         final CheckboxQuestion questionData = CheckboxQuestion.fromJson(rawJson);
 
-        // Store the parsed question data for later reference (e.g., for scoring)
-        _questionDataMap[questionData.id] = questionData;
-
         // Initialize user selections for this question if not already present
         // When loading, these should be empty, so the user starts fresh.
         if (!_userSelectionsNotifier.value.containsKey(questionData.id)) {
-          _userSelectionsNotifier.value[questionData.id] = [];
+          if(previousAnswers.containsKey(questionData.id)){
+            questionData.selectedAnswers = previousAnswers[questionData.id]!;
+          }
+
+          _userSelectionsNotifier.value[questionData.id] = questionData;
         }
 
-        return ValueListenableBuilder<Map<String, List<int>>>(
+        return ValueListenableBuilder<Map<String, CheckboxQuestion>>(
             valueListenable: _userSelectionsNotifier,
             builder: (context, userSelections, child) {
               return Container(
@@ -69,57 +66,71 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Column(
-                      children: List.generate(questionData.answers.length,
-                          (index) {
-                        final isSelected =
-                            userSelections[questionData.id]!.contains(index);
-
-                        final WidgetStateProperty<Color?> fillColorResolver =
-                            WidgetStateProperty.resolveWith((states) {
-                          if (states.contains(WidgetState.selected)) {
-                            return const Color(0xFFFEC63D);
-                          }
-                          return null;
-                        });
-
-                        final CheckBoxAnswer answer = questionData.answers[index];
-
-                        if (!questionData.multiple) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 0.0),
-                            child: RadioListTile<int>(
-                              title: Text(answer.text),
-                              value: index,
-                              groupValue: userSelections[questionData.id]?.isNotEmpty == true
-                                  ? userSelections[questionData.id]![0]
-                                  : null,
-                              onChanged: (int? newValue) {
-                                if (newValue != null) {
-                                  onCheckboxChanged(questionData.id, newValue, true);
-                                }
-                              },
-                              dense: true,
-                              controlAffinity: ListTileControlAffinity.leading,
-                              fillColor: fillColorResolver,
-                            ),
-                          );
-                        } else {
+                    if (questionData.multiple)
+                      Column(
+                        children: List.generate(questionData.answers.length, (index) {
+                          final isSelected = userSelections[questionData.id]!.selectedAnswers.contains(index);
+                          final WidgetStateProperty<Color?> fillColorResolver =
+                          WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.selected)) {
+                              return const Color(0xFFFEC63D);
+                            }
+                            return null;
+                          });
+                          final CheckBoxAnswer answer = questionData.answers[index];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 0.0),
                             child: CheckboxListTile(
                               title: Text(answer.text),
                               value: isSelected,
                               onChanged: (bool? newValue) {
-                                onCheckboxChanged(questionData.id, index, newValue ?? false);
+                                onCheckboxChanged(questionData.id, index, newValue!);
                               },
                               dense: true,
                               controlAffinity: ListTileControlAffinity.leading,
                               fillColor: fillColorResolver,
                             ),
                           );
-                        }
-                      }),
+                        }),
+                      )
+                    else
+                      RadioGroup<int>(
+                        groupValue: userSelections[questionData.id]!.selectedAnswers.isEmpty
+                            ? null : userSelections[questionData.id]!.selectedAnswers.first,
+                        onChanged: (int? newValue) {
+                          if (newValue != null) {
+                            onCheckboxChanged(questionData.id, newValue, true);
+                          }
+                        },
+                        child: Column(
+                          children: List.generate(userSelections[questionData.id]!.answers.length, (index) {
+                            final WidgetStateProperty<Color?> fillColorResolver =
+                            WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.selected)) {
+                                return const Color(0xFFFEC63D);
+                              }
+                              return null;
+                            });
+                            final CheckBoxAnswer answer = questionData.answers[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 0.0),
+                              child: RadioListTile<int>(
+                                title: Text(answer.text),
+                                value: index,
+                                dense: true,
+                                controlAffinity: ListTileControlAffinity.leading,
+                                fillColor: fillColorResolver,
+                              ),
+                            );
+                          }),
+                        ),
+                      )
+                    ,
+                    Text(
+                      "Score: ${questionData.score}",
+                      style: const TextStyle(
+                        fontSize: AppFontSizes.mini,
+                      ),
                     ),
                   ],
                 ),
@@ -127,15 +138,11 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
             });
       } catch (e) {
         log.severe("Error parsing Checkbox Question JSON: $e");
-        return Text(
-            'Error loading question: ${e.toString()}'); // Provide feedback
+        return Text('Error loading question: ${e.toString()}');
       }
     }
     return null;
   }
-
-  // Getter to access the parsed question data for scoring
-  Map<String, CheckboxQuestion> get questionDataMap => _questionDataMap;
 }
 
 class CheckboxQuestionSyntax extends md.BlockSyntax {

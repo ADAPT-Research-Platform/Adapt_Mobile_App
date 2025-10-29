@@ -10,7 +10,9 @@ import '../../utils/score_store.dart';
 class ConditionalTextBuilder extends MarkdownElementBuilder {
   final ScoreStore scoreStore;
 
-  ConditionalTextBuilder(this.scoreStore);
+  ConditionalTextBuilder(
+      this.scoreStore
+  );
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
@@ -26,25 +28,38 @@ class ConditionalTextBuilder extends MarkdownElementBuilder {
 
     if (key == null || condition == null) return const SizedBox.shrink();
 
-    if (evaluateScoreCondition(
-        key: key, condition: condition, scoreStore: scoreStore)) {
-      return Wrap(children: [Text(element.textContent)]);
-    } else {
-      return const SizedBox.shrink();
-    }
+    // 2. Return a FutureBuilder to handle the async operation
+    return FutureBuilder<bool>(
+      future: evaluateScoreCondition(key: key, condition: condition),
+      builder: (context, snapshot) {
+        // If the future is running or has an error, show nothing
+        if (snapshot.connectionState != ConnectionState.done || snapshot.hasError) {
+          return const SizedBox.shrink();
+        }
+
+        // Check the result of the future
+        final bool shouldShow = snapshot.data ?? false;
+
+        if (shouldShow) {
+          // If the condition is met, show the text
+          return Wrap(children: [Text(element.textContent)]);
+        } else {
+          // Otherwise, show nothing
+          return const SizedBox.shrink();
+        }
+      },
+    );
   }
 
-  bool evaluateScoreCondition({
+  Future<bool> evaluateScoreCondition({
     required String key,
-    required String condition,
-    required ScoreStore scoreStore,
-  }) {
-    int? score = scoreStore.getScore(key);
+    required String condition
+  }) async {
+    int score = await scoreStore.getChapterScore(key);
+
     if (kDebugMode) {
       print('ConditionalText: Key: $key, Condition: $condition, Score: $score');
     }
-
-    if (score == null) return false;
 
     // Split multiple conditions by comma
     final conditions = condition.split(',').map((c) => c.trim());
@@ -52,7 +67,7 @@ class ConditionalTextBuilder extends MarkdownElementBuilder {
     for (final cond in conditions) {
       final match = RegExp(r'(==|>=|<=|>|<)\s*(\d+)').firstMatch(cond);
       if (match == null) {
-        print('ConditionalText: Invalid condition format: "$cond"');
+        //print('ConditionalText: Invalid condition format: "$cond"');
         return false; // if any condition is invalid, we fail the block
       }
 
@@ -80,7 +95,7 @@ class ConditionalTextSyntax extends md.BlockSyntax {
   @override
   bool canParse(md.BlockParser parser) {
     final line = parser.current.content;
-    print('ConditionalTextSyntax: canParse called for: "$line"');
+    //print('ConditionalTextSyntax: canParse called for: "$line"');
     // Check if line starts with [if] optionally followed by {
     return RegExp(r'^\[if\]\s*\{?$').hasMatch(line);
   }
@@ -88,7 +103,7 @@ class ConditionalTextSyntax extends md.BlockSyntax {
 
   @override
   md.Node? parse(md.BlockParser parser) {
-    print('ConditionalTextSyntax: parse method called.'); // Debug print
+    //print('ConditionalTextSyntax: parse method called.'); // Debug print
     // Consume the "[if]" line.
     parser.advance();
 
@@ -143,10 +158,10 @@ class ConditionalTextSyntax extends md.BlockSyntax {
     if (errorMessage == null) { // Only try to decode if no previous errors
       try {
         jsonData = json.decode(jsonConfigLine!);
-        print('ConditionalTextSyntax: JSON parsed successfully: $jsonData'); // Debug print
+        //print('ConditionalTextSyntax: JSON parsed successfully: $jsonData'); // Debug print
       } catch (e) {
         errorMessage = 'Invalid JSON: $jsonConfigLine - Error: $e';
-        print('ConditionalTextSyntax: JSON parsing failed: $errorMessage'); // Debug print
+        //print('ConditionalTextSyntax: JSON parsing failed: $errorMessage'); // Debug print
       }
     }
 
@@ -166,7 +181,7 @@ class ConditionalTextSyntax extends md.BlockSyntax {
     final element = md.Element('if', children); // Pass children directly
 
     if (errorMessage != null) {
-      print('ConditionalTextSyntax: Returning error element: $errorMessage'); // Debug print
+      //print('ConditionalTextSyntax: Returning error element: $errorMessage'); // Debug print
       element.attributes['is_error'] = 'true';
       element.attributes['error_message'] = errorMessage;
       // Children are already set in the constructor, no need to clear

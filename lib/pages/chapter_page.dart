@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 
+import '../models/checkbox_answer.dart';
 import '../models/checkbox_question.dart';
 import '../models/comment.dart';
 import '../services/localization_service.dart';
@@ -56,13 +57,11 @@ class _ChapterPageState extends State<ChapterPage> {
   final Map<String, String> _questions = {};
   final Map<String, String> _answers = {};
 
-  final Map<String, List<int>> _correctAnswersMap = {}; // Stores correct indices for each question
-  final ValueNotifier<Map<String, List<int>>> _userSelectionsNotifier =
-      ValueNotifier({});
+  final ValueNotifier<Map<String, CheckboxQuestion>> _userSelectionsNotifier = ValueNotifier({});
 
   // Make _checkboxBuilder nullable and initialize it in initState
-  CheckboxQuestionViewerBuilder? _checkboxBuilder;
   late final ScoreStore _scoreStore;
+  late final String chapterKey = "M${widget.moduleId}C${widget.section.chapterIndex}";
 
   double maxScrollPixels = 0.0;
 
@@ -88,12 +87,10 @@ class _ChapterPageState extends State<ChapterPage> {
       int totalQuestions = _questions.length;
 
       // Count the number of valid answers (non-null and non-empty)
-      int validAnswers =
-          _answers.values.where((answer) => answer.isNotEmpty).length;
+      int validAnswers = _answers.values.where((answer) => answer.isNotEmpty).length;
 
       double exerciseProgress = (validAnswers / totalQuestions) * 100;
-      _chapterService.updateProgress(
-          widget.section.chapterId, exerciseProgress);
+      _chapterService.updateProgress(widget.section.chapterId, exerciseProgress);
       return;
     }
 
@@ -110,8 +107,7 @@ class _ChapterPageState extends State<ChapterPage> {
 
     // Calculate percentage based on visible + scrolled content
     final double visibleScrolledContent = maxScrollPixels + viewportHeight;
-    final double percentage =
-        (visibleScrolledContent / totalContentHeight) * 100;
+    final double percentage = (visibleScrolledContent / totalContentHeight) * 100;
 
     // Clamp percentage between 0 and 100
     double readingProgress = percentage.clamp(0, 100);
@@ -122,75 +118,47 @@ class _ChapterPageState extends State<ChapterPage> {
   }
 
   void _onCheckboxChanged(String questionId, int index, bool isChecked) {
-    final newSelections =
-        Map<String, List<int>>.from(_userSelectionsNotifier.value);
+    final newSelections = Map<String, CheckboxQuestion>.from(_userSelectionsNotifier.value);
+    final CheckboxQuestion? questionData = _userSelectionsNotifier.value[questionId];
 
-    if (!newSelections.containsKey(questionId)) {
-      newSelections[questionId] = [];
-    }
-
-    // Safely access _checkboxBuilder, it's guaranteed to be not null here
-    // because we initialized it in initState and are only using it in methods
-    // that are called after initState or in build after its check.
-    final CheckboxQuestion? questionData =
-        _checkboxBuilder!.questionDataMap[questionId]; // Use ! for non-null assertion
-
-    if (questionData != null && !questionData.multiple) {
-      newSelections[questionId] = isChecked ? [index] : [];
-    } else {
-      if (isChecked) {
-        if (!newSelections[questionId]!.contains(index)) {
-          newSelections[questionId]!.add(index);
+    if(questionData != null){
+      if(questionData.multiple){
+        if (isChecked) {
+          questionData.selectedAnswers.add(index);
+        } else {
+          questionData.selectedAnswers.remove(index);
         }
-      } else {
-        newSelections[questionId]!.remove(index);
+      }else{
+        questionData.selectedAnswers.clear();
+        questionData.selectedAnswers.add(index);
       }
-      newSelections[questionId]!.sort();
+
+      log.info("$chapterKey = ${questionData.selectedAnswers}");
+      _userSelectionsNotifier.value = newSelections;
     }
-    _userSelectionsNotifier.value = newSelections;
   }
 
-  void _calculateCheckboxResults() {
-    print("--- Checkbox Question Results ---");
-    double totalScore = 0;  // Use double if points can be fractional
+  void _saveCurrentAnswersAndScore() {
+    final newSelections = _userSelectionsNotifier.value;
 
-    if (_checkboxBuilder != null) {
-      _checkboxBuilder!.questionDataMap.forEach((questionId, questionData) {
-        final userSelections = _userSelectionsNotifier.value[questionId] ?? [];
-        final correctIndices = questionData.correctIndices;
-
-        double questionScore = 0;
-
-        for (int selectedIdx in userSelections) {
-          final answer = questionData.answers[selectedIdx];  // Answer object
-
-          if (answer.points != 0) {
-            // Add the points associated with the answer
-            questionScore += answer.points.toDouble();
-          } else if (correctIndices.contains(selectedIdx)) {
-            // No explicit points but is a correct answer → add 1 point
-            questionScore += 1;
-          }
-          // else no points added for incorrect answers without points
-        }
-
-        totalScore += questionScore;
-
-        print("Question ID: $questionId");
-        print("  Question: ${questionData.question}");
-        print("  Your selections: ${userSelections.map((idx) => questionData.answers[idx].text).toList()}");
-        print("  Correct answers: ${correctIndices.map((idx) => questionData.answers[idx].text).toList()}");
-        print("  Question Score: $questionScore");
-      });
-
-      _scoreStore.setScore('M${widget.moduleId}C${widget.section.chapterIndex}S', totalScore.toInt());
-      final score = _scoreStore.getScore('M${widget.moduleId}C${widget.section.chapterIndex}S');
-      print("ChapterPage: Score set for M${widget.moduleId}C${widget.section.chapterIndex}S: $totalScore");
-      print("ChapterPage: Score retrieved from store: $score");
-    } else {
-      print("Error: _checkboxBuilder was not initialized when trying to calculate results.");
+    if(newSelections.isEmpty){
+      return;
     }
-    print("-------------------------------");
+
+    final Map<String, Set<int>> currentAnswers = newSelections.map((questionId, questionData) {
+      return MapEntry(questionId, questionData.selectedAnswers);
+    });
+
+    // Calculate the total score from all selected answers
+    int totalScore = 0;
+    newSelections.forEach((questionId, questionData) {
+      totalScore += questionData.score;
+    });
+
+    log.info("totalScore: $totalScore");
+
+    _scoreStore.setChapterAnswers(chapterKey, currentAnswers);
+    _scoreStore.setChapterScore('${chapterKey}S', totalScore);
   }
 
   @override
@@ -198,13 +166,6 @@ class _ChapterPageState extends State<ChapterPage> {
     super.initState();
     _scrollController.addListener(_updateMaxScrollPixels);
     _loadNextChapter();
-
-    // Initialize the builder here, after super.initState()
-    _checkboxBuilder = CheckboxQuestionViewerBuilder(
-      _userSelectionsNotifier,
-      _onCheckboxChanged,
-    );
-
     _scoreStore = ScoreStore(); // shared instance
   }
 
@@ -254,15 +215,15 @@ class _ChapterPageState extends State<ChapterPage> {
                 ),
             ],
             onIconPressed: () {
-              _calculateCheckboxResults();
+              _saveCurrentAnswersAndScore();
               _updateSectionProgress();
               moduleNavigator.currentState!.pop(); //Go Backwards
             }),
         body: FutureBuilder<List<dynamic>>(
           future: Future.wait([
             _chapterService.fetchChapterContent('${widget.section.folderPath}/content_${LocalizationService().getSelectedLanguage().code}.md'),
-            if (widget.section.isExercise)
-              _chapterService.fetchAnswerByChapterId(widget.section.chapterId),
+            _scoreStore.getChapterAnswers(chapterKey),
+            if (widget.section.isExercise) _chapterService.fetchAnswerByChapterId(widget.section.chapterId),
           ]),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -276,13 +237,11 @@ class _ChapterPageState extends State<ChapterPage> {
             // Extract data
             final String markdownContent = snapshot.data![0];
 
-            if (widget.section.isExercise && snapshot.data![1] != null) {
-              Answer answer = snapshot.data![1];
-              _answers.addAll(answer.text);
-            }
+            final Map<String, Set<int>> previousAnswers = snapshot.data![1];
 
-            if (_checkboxBuilder == null) {
-              log.severe("_checkboxBuilder not initialized!");
+            if (widget.section.isExercise && snapshot.data![2] != null) {
+              Answer answer = snapshot.data![2];
+              _answers.addAll(answer.text);
             }
 
             return Padding(
@@ -295,7 +254,6 @@ class _ChapterPageState extends State<ChapterPage> {
                         radius: const Radius.circular(10.0),
                         thickness: 5,
                         thumbVisibility: true,
-                        //trackVisibility: true,
                         child: SingleChildScrollView(
                           controller: _scrollController,
                           child: MarkdownBody(
@@ -308,9 +266,17 @@ class _ChapterPageState extends State<ChapterPage> {
                               'a': VideoViewerBuilder(),
                               'img': ImageViewerBuilder(widget.section.folderPath),
                               'h3': CenteredHeaderBuilder(),
-                              'question': QuestionViewerBuilder(_questions, _answers, _controllers),
-                              'checkbox': _checkboxBuilder!,
-                              "ul": UnderlineBuilder(),
+                              'question': QuestionViewerBuilder(
+                                  _questions,
+                                  _answers,
+                                  _controllers
+                              ),
+                              'checkbox': CheckboxQuestionViewerBuilder(
+                                  _userSelectionsNotifier,
+                                  previousAnswers,
+                                  _onCheckboxChanged
+                              ),
+                              'ul': UnderlineBuilder(),
                               'rl': RightAlignBuilder(),
                               'if': ConditionalTextBuilder(_scoreStore),
                             },
