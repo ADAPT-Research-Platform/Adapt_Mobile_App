@@ -47,20 +47,7 @@ class ChapterCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                const SizedBox(width: 16), // This SizedBox provides a guaranteed minimum space between the two texts.
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    formatTimeAgo(chapter.timeStamp),
-                    textAlign: TextAlign.end,
-                    style: const TextStyle(
-                      fontSize: AppFontSizes.mini,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
+                )
               ],
             ),
             const SizedBox(height: 4),
