@@ -48,6 +48,7 @@ class ImageViewer extends StatelessWidget {
             headers: headers,
           ),
           doubleTapZoomable: true,
+          swipeDismissible: true,
         );
       },
       child: Image.network(
