@@ -35,26 +35,6 @@ class ChapterService {
     }
   }
 
-  Future<String> fetchChapterContentOld(String filePath) async {
-    try {
-      final response = await SessionManager().client.get(
-            Uri.parse('${AppConfig.baseUrl}/uploads/$filePath'),
-            headers: SessionManager().getHeaders(),
-          );
-
-      if (response.statusCode == 200) {
-        return utf8.decode(response.bodyBytes, allowMalformed: true);
-      } else {
-        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        log.severe('Error in Get Chapter Content', jsonResponse['message']);
-        throw HttpException(jsonResponse['message']);
-      }
-    } catch (e) {
-      log.severe("Error in Get Chapter Content", e);
-      rethrow;
-    }
-  }
-
   void addAnswer(String chapterId, Map<String, String> answers) async {
     try {
       final response = await SessionManager().client.post(

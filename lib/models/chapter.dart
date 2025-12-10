@@ -20,13 +20,13 @@ class Chapter {
     required this.isExercise
   });
 
-  factory Chapter.parse(Map<String, dynamic> json) {
+  factory Chapter.parse(Map<String, dynamic> json, String? title) {
     return Chapter(
       chapterId: json['id'].toString(),
       chapterIndex: json['index'].toString(),
       timeStamp: DateTime.parse(json['updatedAt']),
       folderPath: json['folderUrl'] ?? '',
-      title: json['title'] ?? '',
+      title: title ?? '',
       progress: (json['progress'] as num).toDouble(),
       numOfComments: (json['numOfComments'] as num).toInt(),
       isExercise: json['isExercise'] ?? false,

@@ -13,9 +13,9 @@ class Module {
     required this.chapters
   });
 
-  factory Module.parse(Map<String, dynamic> json) {
+  factory Module.parse(Map<String, dynamic> json, Map<String, dynamic> titles) {
     List<Chapter> chapters = (json['chapters'] as List<dynamic>)
-        .map((chapterJson) => Chapter.parse(chapterJson))
+        .map((chapterJson) => Chapter.parse(chapterJson, titles[chapterJson['index'].toString()]))
         .toList();
 
     // Calculate the average progress of the module based on its chapters' progress
