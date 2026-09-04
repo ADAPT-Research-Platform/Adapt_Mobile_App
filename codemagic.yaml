@@ -1,0 +1,92 @@
+workflows:
+  # =========================================================
+  # 1. ANDROID RELEASE WORKFLOW (Manual Firebase App Distribution)
+  # =========================================================
+  flutter-android:
+    name: Android Release Build
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      groups:
+        - app_configuration
+        # Uncomment below when you set up Android Keystore variables
+        # - android_signing
+      vars:
+        CONFIG_OUTPUT_PATH: "app_config.json"
+      flutter: stable
+      java: 17
+    scripts:
+      - name: Decode Base64 app_config
+        script: |
+          python3 -c "import base64, os; open(os.environ['CONFIG_OUTPUT_PATH'], 'wb').write(base64.b64decode(os.environ['APP_CONFIG_BASE64']))"
+          echo "Decoded config into $CONFIG_OUTPUT_PATH successfully."
+
+      - name: Install dependencies
+        script: |
+          flutter packages pub get
+
+      - name: Build Android Release APK
+        script: |
+          flutter build apk --release \
+            --dart-define-from-file="$CONFIG_OUTPUT_PATH" \
+            --build-number="$BUILD_NUMBER"
+
+      - name: Build Android App Bundle (Optional - for Google Play)
+        script: |
+          flutter build appbundle --release \
+            --dart-define-from-file="$CONFIG_OUTPUT_PATH" \
+            --build-number="$BUILD_NUMBER"
+    artifacts:
+      # Download app-release.apk to drag & drop into Firebase Console manually
+      - build/app/outputs/flutter-apk/*-release.apk
+      - build/app/outputs/bundle/**/*.aab
+
+  # =========================================================
+  # 2. IOS WORKFLOW (App Store Connect / TestFlight)
+  # =========================================================
+  flutter-ios:
+    name: iOS App Store Connect Release
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      groups:
+        - app_configuration
+        - app_store_credentials
+      vars:
+        BUNDLE_ID: "com.adapt.adapt"
+        CONFIG_OUTPUT_PATH: "app_config.json"
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Decode Base64 app_config
+        script: |
+          python3 -c "import base64, os; open(os.environ['CONFIG_OUTPUT_PATH'], 'wb').write(base64.b64decode(os.environ['APP_CONFIG_BASE64']))"
+          echo "Decoded config into $CONFIG_OUTPUT_PATH successfully."
+
+      - name: Install dependencies & CocoaPods
+        script: |
+          flutter packages pub get
+          find . -name "Podfile" -execdir pod install \;
+
+      - name: Fetch iOS signing files
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
+
+      - name: Flutter build IPA
+        script: |
+          flutter build ipa --release \
+            --dart-define-from-file="$CONFIG_OUTPUT_PATH" \
+            --build-number="$BUILD_NUMBER" \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
