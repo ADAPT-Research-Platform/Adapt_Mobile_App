@@ -1,52 +1,107 @@
+import 'package:adapt/enums/theme_type.dart';
+import 'package:adapt/pages/consent_page.dart';
 import 'package:adapt/pages/splash_page.dart';
+import 'package:adapt/services/localization_service.dart';
+import 'package:adapt/services/notification_service.dart';
+import 'package:adapt/services/session_manager.dart';
 import 'package:adapt/utils/app_keys.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:adapt/utils/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../pages/login_page.dart';
 import '../../pages/main_page.dart';
-import '../../pages/signup_page.dart';
 import '../../utils/app_routes.dart';
-import 'firebase_options.dart';
+import 'enums/language.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(const MyApp());
+
+  // Configure the logger
+  Logger.root.level = Level.ALL; // Set the global logging level
+  Logger.root.onRecord.listen((LogRecord record) {
+    // Customize the log output
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
+
+  // Initialize Services
+  await LocalizationService().init();
+  await NotificationService.init();
+
+  //Timezone Initialization
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Europe/Berlin'));
+  //TODO: Need to Initialize Timezone Dynamically
+  // final timeZoneName = await FlutterNativeTimezone.getLocalTimezone(); // get device timezone
+  // tz.setLocalLocation(tz.getLocation(timeZoneName)); // set tz.local correctly
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown, // Optional if you want only `portraitUp`
+  ]).then((_) {
+    runApp(const MyApp());
+  });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeType _themeType = ThemeType.system; // default until loaded
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThemeType();
+  }
+
+  Future<void> _loadThemeType() async {
+    final themeType = await SessionManager().getSelectedThemeType();
+    setThemeType(themeType);
+  }
+
+  void setThemeType(ThemeType type) {
+    setState(() {
+      _themeType = type;
+    });
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'ADAPT',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: _themeType.mode, // Switches between light and dark themes
         debugShowCheckedModeBanner: false,
         navigatorKey: mainNavigator,
         onGenerateRoute: (settings) {
           switch (settings.name) {
             case Routes.routeMain:
               return MaterialPageRoute(
-                builder: (context) => const MainPage(),
+                builder: (context) => MainPage(onThemeChanged: setThemeType),
               );
             case Routes.routeLogin:
               return MaterialPageRoute(
                 builder: (context) => const LoginPage(),
               );
-            case Routes.routeSignUp:
+            case Routes.routeConsent:
               return MaterialPageRoute(
-                builder: (context) => const SignUpPage(),
+                builder: (context) => ConsentPage(),
               );
             default:
               return MaterialPageRoute(
                 builder: (context) => const SplashPage(),
               );
           }
-        }
-    );
+        });
   }
 }

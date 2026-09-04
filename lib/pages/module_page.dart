@@ -1,60 +1,137 @@
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
+import '../enums/section_filter.dart';
+import '../models/chapter.dart';
 import '../models/module.dart';
-import '../utils/app_colors.dart';
-import '../utils/app_font_sizes.dart';
-import '../utils/app_routes.dart';
+import '../services/localization_service.dart';
+import '../services/module_service.dart';
 import '../utils/app_keys.dart';
-import '../utils/string_formatter.dart';
-import '../widgets/exercise_card.dart';
+import '../utils/app_routes.dart';
+import '../widgets/chapter_card.dart';
 import '../widgets/main_title.dart';
-import '../widgets/sub_title.dart';
 
-class ModulePage extends StatelessWidget {
-  final Module module;
+class ModulePage extends StatefulWidget {
+  final String moduleId;
 
-  const ModulePage({
-    super.key,
-    required this.module,
-  });
+  const ModulePage({super.key, required this.moduleId});
+
+  @override
+  _ModulePageState createState() => _ModulePageState();
+}
+
+class _ModulePageState extends State<ModulePage> {
+  final log = Logger('ChapterPage');
+  final ModuleService _moduleService = ModuleService();
+
+  SectionFilter selectedFilter = SectionFilter.all; // Default filter
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: MainTitle(
-            title: convertIdToName(module.moduleId),
-            leadingIcon: Icons.arrow_back_ios,
-            onIconPressed: () {
-              moduleNavigator.currentState!.pop(); //Go Backwards
-            }),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Column(
-            children: [
-              SubTitle(text: module.title),
-              const SizedBox(height: 8),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: module.exercises.length,
-                  itemBuilder: (context, index) {
-                    final exercise = module.exercises[index];
-                    return Padding(
+      appBar: MainTitle(
+        title: '${LocalizationService().get('Module')} ${widget.moduleId}',
+        leadingIcon: Icons.arrow_back_ios_rounded,
+        onIconPressed: () {
+          moduleNavigator.currentState!.pop(); // Go Backwards
+        },
+      ),
+      body: FutureBuilder<Module>(
+        future: _moduleService.fetchModuleById(widget.moduleId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark),
+            );
+          } else if (snapshot.hasError) {
+            return Center(child: Text(LocalizationService().get("error_loading_chapters")));
+          } else if (!snapshot.hasData || snapshot.data!.chapters.isEmpty) {
+            return Center(child: Text(LocalizationService().get("no_chapters")));
+          }
+
+          final module = snapshot.data!;
+          final filteredChapters = _getFilteredChapters(module.chapters);
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              children: [
+                _buildSegmentedButton(),
+                const SizedBox(height: 5),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredChapters.length,
+                    itemBuilder: (context, index) {
+                      final chapter = filteredChapters[index];
+                      return Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
-                        // Adds gap between cards
-                        child: ExerciseCard(
-                          title: exercise.title,
-                          period: "${DateTime.now().difference(exercise.timeStamp).inDays} Days Ago",
-                          answers: 2, //Hard Coded
-                          progress: 0.75, //Hard Coded
+                        child: ChapterCard(
+                          chapter: chapter,
                           onPressed: () {
-                            moduleNavigator.currentState!.pushNamed(Routes.routeExercises, arguments: exercise);
+                            moduleNavigator.currentState!.pushNamed(
+                              Routes.routeSections,
+                              arguments: {'section': chapter, 'moduleId': widget.moduleId},
+                            );
                           },
-                        ));
-                  },
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // Filters the chapters based on the selected filter
+  List<Chapter> _getFilteredChapters(List<Chapter> chapters) {
+    if (selectedFilter == SectionFilter.all) return chapters;
+
+    return chapters.where((chapter) {
+      return selectedFilter == SectionFilter.readings
+          ? !chapter.isExercise
+          : chapter.isExercise;
+    }).toList();
+  }
+
+  // Builds the segmented button for filtering
+  Widget _buildSegmentedButton() {
+    return SegmentedButton<SectionFilter>(
+      style: SegmentedButton.styleFrom(
+        backgroundColor: Theme.of(context).cardColor,
+        foregroundColor: Theme.of(context).textTheme.displayLarge?.color,
+        selectedForegroundColor: Theme.of(context).primaryColorDark,
+        selectedBackgroundColor: Theme.of(context).primaryColorLight,
+        side: BorderSide(
+          color: Theme.of(context).primaryColorDark,
+          width: 2.2,
+        ),
+      ),
+      segments: SectionFilter.values.map((filter) {
+        return ButtonSegment(
+          value: filter,
+          label: SizedBox(
+            width: 70,
+            child: Center(
+                child: Text(
+                    filter.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis
+                )
+            ),
           ),
-        ));
+        );
+      }).toList(),
+      selected: <SectionFilter>{selectedFilter},
+      onSelectionChanged: (Set<SectionFilter> newSelection) {
+        setState(() {
+          selectedFilter = newSelection.first;
+        });
+      },
+    );
   }
 }
+

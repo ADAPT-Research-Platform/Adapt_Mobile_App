@@ -1,11 +1,11 @@
-import 'package:adapt/utils/app_colors.dart';
+
 import 'package:flutter/material.dart';
 
 class StarSlider extends StatefulWidget {
   final int sliderLength; // Maximum value for the slider
   final ValueChanged<int> onChanged;
 
-  const StarSlider({Key? key, this.sliderLength = 10, required this.onChanged}) : super(key: key); // Default max value is 10
+  const StarSlider({super.key, this.sliderLength = 10, required this.onChanged}); // Default max value is 10
 
   @override
   _StarSliderState createState() => _StarSliderState();
@@ -16,8 +16,14 @@ class _StarSliderState extends State<StarSlider> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the device width
+    double deviceWidth = MediaQuery.of(context).size.width;
+
+    // Calculate the maximum size for each star. Adjust padding value accordingly
+    double starSize = (deviceWidth - 24 - 24 - 16 - 16) / widget.sliderLength;
+
     return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child:
         GestureDetector(
           onHorizontalDragUpdate: (details) {
@@ -43,12 +49,12 @@ class _StarSliderState extends State<StarSlider> {
               ),
               // Custom star icons over the line
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(widget.sliderLength, (index) {
                   return Icon(
                     Icons.star_rounded,
-                    color: index < _sliderValue ? AppColors.primaryYellow : AppColors.darkGrey,
-                    size: 30,
+                    color: index < _sliderValue ? Theme.of(context).primaryColorLight : Theme.of(context).highlightColor,
+                    size: starSize.clamp(0, 30),
                   );
                 }),
               ),

@@ -1,234 +1,356 @@
+import 'package:adapt/enums/language.dart';
+import 'package:adapt/enums/theme_type.dart';
+import 'package:adapt/services/session_manager.dart';
+import 'package:adapt/services/user_service.dart';
 import 'package:adapt/widgets/main_title.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
-import '../models/user.dart';
-import '../services/firebase_auth_service.dart';
-import '../utils/app_colors.dart';
+import '../services/auth_service.dart';
+import '../services/localization_service.dart';
+import '../services/notification_service.dart';
 import '../utils/app_font_sizes.dart';
+import '../utils/app_keys.dart';
+import '../widgets/snack_bar_shower.dart';
 import '../widgets/sub_title.dart';
 import '../widgets/task_button.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  final Function(ThemeType) onThemeChanged;
 
+  const SettingsPage({super.key, required this.onThemeChanged});
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
+  final log = Logger('SettingsPage');
 
-  final TextEditingController _displayNameController = TextEditingController();
-  final TextEditingController _userEmailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  final UserService _userService = UserService();
 
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _confirmCurrentPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmNewPasswordController = TextEditingController();
+
+  bool _changePassword = false; // Toggle for the collapsible password fields
   // State variables for the appearance section
-  String _selectedLanguage = 'German'; // Default selected language
-  String _selectedTheme = 'System'; // Default selected theme
+  Language _selectedLanguage = Language.german; // Default selected language
+  ThemeType _selectedTheme = ThemeType.system; // Default selected theme
 
   // State variables for the notifications section
   bool _isNotificationSoundEnabled = true;
   bool _isMuteNotifications = false;
-
-  late Future<User> _loggedInUser; // Declare the Future
+  TimeOfDay? _selectedNotificationTime; // For storing the selected notification time
 
   @override
   void initState() {
     super.initState();
-    _loggedInUser = _firebaseAuthService.getLoggedInUser(); // Initialize the Future
+    _userNameController.text = 'Loading...';
+    _initializeUserData(); // Call an async helper method
+    _loadNotificationTime(); // Load the notification time
   }
 
   @override
   void dispose() {
-    _displayNameController.dispose();
-    _userEmailController.dispose();
-    _passwordController.dispose();
+    _userNameController.dispose();
+    _currentPasswordController.dispose();
+    _confirmCurrentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmNewPasswordController.dispose();
     super.dispose();
   }
 
-  void _saveData() async {
-    String displayName = _displayNameController.text.trim();
-    String userEmail = _userEmailController.text.trim();
-    String password = _passwordController.text.trim();
+  void _initializeUserData() async {
+    final sessionUser = await SessionManager().getSessionUser();
+    if (sessionUser != null) {
+      setState(() {
+        _userNameController.text = sessionUser.userName;
+      });
+    }
 
-    print('Account Data: $displayName, $userEmail, $password');
+    _selectedTheme = await SessionManager().getSelectedThemeType();
+    _selectedLanguage = LocalizationService().getSelectedLanguage();
+  }
+
+  void _updateUser() async {
+    String userName = _userNameController.text.trim();
+    String currentPassword = _currentPasswordController.text.trim();
+    String newPassword = _newPasswordController.text.trim();
+    String confirmNewPassword = _confirmNewPasswordController.text.trim();
+
+    _userService.updateUser(userName, currentPassword, newPassword, confirmNewPassword);
+  }
+
+  Future<void> _loadNotificationTime() async {
+    // This method from your service gets the saved time
+    final TimeOfDay time = await NotificationService.getScheduledTime();
+
+    // Use setState to update the UI once the time is fetched
+    if (mounted) {
+      setState(() {
+        _selectedNotificationTime = time;
+      });
+    }
+  }
+
+  Future<void> _pickNotificationTime() async {
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: _selectedNotificationTime ?? TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.inputOnly,
+
+      // Use a builder to wrap the picker in a custom Theme
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            timePickerTheme: TimePickerThemeData(
+              dayPeriodTextColor: Theme.of(context).primaryColorDark, // AM/PM color
+              hourMinuteTextColor: Theme.of(context).primaryColorDark, // Main time text color
+              backgroundColor: Theme.of(context).cardColor,
+              dialHandColor: Theme.of(context).primaryColorLight,
+              entryModeIconColor: Theme.of(context).primaryColorDark,
+            ),
+
+            textButtonTheme: TextButtonThemeData(
+              style: ButtonStyle(
+                foregroundColor: WidgetStateProperty.all(Theme.of(context).primaryColorDark),
+              ),
+            ),
+          ),
+
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        _selectedNotificationTime = pickedTime;
+      });
+
+      // Schedule the notification with the selected time
+      await NotificationService.updateMoodScheduledTime(pickedTime);
+
+      SnackBarShower.info(settingPageScaffold, "${LocalizationService().get('notification_schedule')} ${pickedTime.format(context)}");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const MainTitle(title: 'Settings'),
-      body: FutureBuilder<User>(
-        future: _loggedInUser, // Use the initialized Future here
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
-          } else if (snapshot.hasError) {
-            return const Center(child: Text("Error loading modules"));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text("No modules available"));
-          }
+    return ScaffoldMessenger(
+      key: settingPageScaffold,
+      child: Scaffold(
+        appBar: MainTitle(title: LocalizationService().get('settings')),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: ListView(
+            children: [
+              SubTitle(text: LocalizationService().get('Account')),
+              const SizedBox(height: 10),
+              _buildTextField(LocalizationService().get('user_name'), _userNameController),
+              const SizedBox(height: 10),
 
-          final user = snapshot.data!;
+              // Checkbox for Change Password
+              Row(
+                children: [
+                  Checkbox(
+                    value: _changePassword,
+                    fillColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return Theme.of(context).primaryColorDark;
+                      }
+                      return null;
+                    }),
+                    onChanged: (value) {
+                      setState(() {
+                        _changePassword = value!;
 
-          return  Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ListView(
-              children: [
-                const SubTitle(text: 'Account'),
-                const SizedBox(height: 10),
-                const Text(
-                  'User Code',
-                  style: TextStyle(
-                    color: AppColors.fontColor,
-                    fontSize: AppFontSizes.small,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: user.userCode.toString(),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Display Name',
-                  style: TextStyle(
-                    color: AppColors.fontColor,
-                    fontSize: AppFontSizes.small,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextField(
-                  controller: _displayNameController,
-                  decoration: InputDecoration(
-                    labelText: user.displayName,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Email Address',
-                  style: TextStyle(
-                    color: AppColors.fontColor,
-                    fontSize: AppFontSizes.small,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextField(
-                  controller: _userEmailController,
-                  decoration: InputDecoration(
-                    labelText: user.email,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Password',
-                  style: TextStyle(
-                    color: AppColors.fontColor,
-                    fontSize: AppFontSizes.small,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: user.role,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: TaskButton(
-                        text: 'Save',
-                        onPressed: _saveData,
-                        icon: Icons.save,
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child:  TaskButton(
-                        text: 'Delete',
-                        onPressed: () {
-                          // Delete action
-                        },
-                        backgroundColor: AppColors.darkYellow,
-                        icon: Icons.delete,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                const Divider(
-                  color: AppColors.lightGrey,
-                  thickness: 2.5,
-                ),
-                const SubTitle(text: 'Appearance'),
-                _buildRadioOption('Language', ['German', 'English'], _selectedLanguage, (value) {
-                  setState(() {
-                    _selectedLanguage = value!;
-                  });
-                }),
-                _buildRadioOption('Theme', ['System', 'Light', 'Dark'], _selectedTheme, (value) {
-                  setState(() {
-                    _selectedTheme = value!;
-                  });
-                }),
-
-                const Divider(
-                  color: AppColors.lightGrey,
-                  thickness: 2.5,
-                ),
-                const SubTitle(text: 'Notifications'),
-                _buildSwitchOption('Mute Notifications', _isMuteNotifications, (value) {
-                  setState(() {
-                    _isMuteNotifications = value;
-                  });
-                }),
-                _buildSwitchOption('Notification Sound', _isNotificationSoundEnabled, (value) {
-                  setState(() {
-                    _isNotificationSoundEnabled = value;
-                  });
-                }),
-                const Divider(
-                  color: AppColors.lightGrey,
-                  thickness: 2.5,
-                ),
-                const SizedBox(height: 5),
-                // Logout button at the bottom
-                TaskButton(
-                    text: 'Logout',
-                    onPressed: () {
-                      _firebaseAuthService.logout();
+                        if (!_changePassword) {
+                          _currentPasswordController.clear();
+                          _newPasswordController.clear();
+                          _confirmNewPasswordController.clear();
+                        }
+                      });
                     },
-                  icon: Icons.logout,
-                ),
+                  ),
+                  Text(
+                    LocalizationService().get('change_password'),
+                    style: const TextStyle(
+                      fontSize: AppFontSizes.small,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
+              // Collapsible password fields
+              if (_changePassword) ...[
+                _buildTextField(LocalizationService().get('current_password'), _currentPasswordController, obscureText: true),
+                const SizedBox(height: 10),
+                _buildTextField(LocalizationService().get('new_password'), _newPasswordController, obscureText: true),
+                const SizedBox(height: 10),
+                _buildTextField(LocalizationService().get('confirm_new_password'), _confirmNewPasswordController, obscureText: true),
                 const SizedBox(height: 15),
               ],
-            ),
-          );
-        },
-      )
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: TaskButton(
+                      text: LocalizationService().get('Update'),
+                      onPressed: _updateUser,
+                      icon: Icons.update_rounded,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TaskButton(
+                      text: LocalizationService().get('Delete'),
+                      onPressed: _showDeleteConfirmationDialog,
+                      backgroundColor: Theme.of(context).primaryColorDark,
+                      icon: Icons.delete_rounded,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+              Divider(color: Theme.of(context).dividerColor, thickness: 2.5),
+              SubTitle(text: LocalizationService().get('Appearance')),
+              _buildRadioOption<Language>(LocalizationService().get('Language'), Language.values, _selectedLanguage, (option) => option.value, (value) {
+                  setState(() {
+                    _selectedLanguage = value!;
+                    LocalizationService().load(_selectedLanguage);
+                    NotificationService.scheduleNextMoodNotification();
+                  });
+                },
+              ),
+              _buildRadioOption<ThemeType>(LocalizationService().get('Theme'), ThemeType.values, _selectedTheme, (option) => option.value, (value) {
+                  setState(() {
+                    _selectedTheme = value!;
+                    widget.onThemeChanged(_selectedTheme);
+                    SessionManager().setSelectedThemeType(_selectedTheme);
+                  });
+                },
+              ),
+              Divider(color: Theme.of(context).dividerColor, thickness: 2.5),
+              SubTitle(text: LocalizationService().get('Notifications')),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8.0), // Consistent padding
+                dense: true, // Makes the tile vertically compact, like SwitchListTile
+                title: Text(
+                  LocalizationService().get('scheduled_time'),
+                  style: const TextStyle(fontSize: AppFontSizes.small),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis
+                ),
+                trailing: ElevatedButton(
+                  onPressed: _selectedNotificationTime == null ? null : _pickNotificationTime,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColorLight,
+                    foregroundColor: Theme.of(context).primaryColorDark,
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 0.0),
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: _selectedNotificationTime == null
+                    // Show a loading indicator while fetching
+                    ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.0,
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                    )
+                    // Show the time once it's loaded
+                    : Text(
+                      _selectedNotificationTime!.format(context),
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColorDark,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10
+                      ),
+                    ),
+                ),
+              ),
+              _buildSwitchOption(
+                  LocalizationService().get('mute_notifications'),
+                  _isMuteNotifications,
+                  (value) {
+                    setState(() {
+                      _isMuteNotifications = value;
+                      NotificationService.toggleMuteNotifications(value);
+                    });
+                  }
+              ),
+              _buildSwitchOption(
+                  LocalizationService().get('notification_sound'),
+                  _isNotificationSoundEnabled,
+                  (value) {
+                    setState(() {
+                      _isNotificationSoundEnabled = value;
+                      NotificationService.toggleSoundNotifications(value);
+                    });
+                  }
+              ),
+              Divider(
+                color: Theme.of(context).dividerColor,
+                thickness: 2.5,
+              ),
+              const SizedBox(height: 5),
+              // Logout button at the bottom
+              TaskButton(
+                text: LocalizationService().get('Logout'),
+                onPressed: () {
+                  _authService.logout();
+                },
+                icon: Icons.logout_rounded,
+              ),
+              const SizedBox(height: 15),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  //TODO: Move this to a separate widget later
-  Widget _buildRadioOption(String title, List<String> options, String selectedValue, Function(String?) onChanged) {
+  Widget _buildTextField(String label, TextEditingController controller, {bool enabled = true, bool obscureText = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: AppFontSizes.small,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 5),
+        TextField(
+          controller: controller,
+          enabled: enabled,
+          obscureText: obscureText,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6.0),
+            ),
+            isDense: true,
+          ),
+        ),
+
+      ],
+    );
+  }
+
+  Widget _buildRadioOption<T>(String title, List<T> options, T selectedValue, String Function(T) getValue, void Function(T?) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -237,45 +359,97 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Text(
             title,
             style: const TextStyle(
-              color: AppColors.fontColor,
               fontSize: AppFontSizes.small,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: options.map((option) {
-            return Row(
-              children: [
-                Radio<String>(
-                  value: option,
-                  groupValue: selectedValue,
-                  onChanged: onChanged,
-                  activeColor: Colors.amber,
-                ),
-                Text(option, style: const TextStyle(
-                  color: AppColors.fontColor,
-                  fontSize: AppFontSizes.small
-                )),
-              ],
-            );
-          }).toList(),
+        Padding(
+          padding: const EdgeInsets.only(left: 0.0), // Indent the radio options slightly
+          child: Wrap(
+            spacing: 0.0,
+            runSpacing: 0.0,
+            alignment: WrapAlignment.start, // Align children to the start
+            children: options.map((option) {
+              return Row(
+                mainAxisSize: MainAxisSize.min, // Crucial for Wrap to calculate child size correctly
+                children: [
+                  Radio<T>(
+                    value: option,
+                    groupValue: selectedValue,
+                    onChanged: onChanged,
+                    activeColor: Theme.of(context).primaryColorLight,
+                  ),
+                  Flexible( // Use Flexible to allow the text to wrap if it's extremely long
+                    child: Text(
+                      getValue(option),
+                      style: const TextStyle(fontSize: AppFontSizes.small),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
   }
 
-  //TODO: Move this to a separate widget later
   Widget _buildSwitchOption(String title, bool currentValue, Function(bool) onChanged) {
     return SwitchListTile(
-      title: Text(title, style: const TextStyle(
-          color: AppColors.fontColor,
-          fontSize: AppFontSizes.small
-      )),
+      title: Text(title,
+          style: const TextStyle(fontSize: AppFontSizes.small)
+      ),
       value: currentValue,
       onChanged: onChanged,
-      activeColor: AppColors.primaryYellow,
+      activeThumbColor: Theme.of(context).primaryColorLight,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
+      dense: true,
+    );
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12), // Rounded corners
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16), // Dialog padding
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                    alignment: Alignment.center,
+                    child: SubTitle(text: LocalizationService().get('Delete'))),
+                const SizedBox(height: 10),
+                _buildTextField(LocalizationService().get('current_password'),
+                    _confirmCurrentPasswordController,
+                    obscureText: true),
+                const SizedBox(height: 10),
+                // Confirm button
+                Align(
+                  alignment: Alignment.center,
+                  child: TaskButton(
+                    text: LocalizationService().get('Confirm'),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                      _userService.deleteUser(
+                          _confirmCurrentPasswordController.text.trim());
+                      _confirmCurrentPasswordController.clear();
+                    },
+                    backgroundColor: Theme.of(context).primaryColorDark,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

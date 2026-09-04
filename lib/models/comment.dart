@@ -1,17 +1,34 @@
-import 'package:adapt/models/user.dart';
 
 class Comment {
   final String commentId;
-  final User user;
+  final String moduleId;
+  final String chapterIndex;
+  final String commentUserName;
   final DateTime timeStamp;
   final String text;
-  List<Comment> replies;
+  List<Comment> comments;
 
   Comment({
     required this.commentId,
-    required this.user,
+    required this.moduleId,
+    required this.chapterIndex,
+    required this.commentUserName,
     required this.timeStamp,
     required this.text,
-    this.replies = const [], // Default value set to an empty list
+    this.comments = const [], // Default value set to an empty list
   });
+
+  factory Comment.parse(Map<String, dynamic> json) {
+    return Comment(
+      commentId: json['id'].toString(),
+      moduleId: json['moduleId'].toString(),
+      chapterIndex: json['chapterIndex'].toString(),
+      commentUserName: json['commentUserName'],
+      timeStamp: DateTime.parse(json['createdAt']),
+      text: json['text'] ?? '',
+      comments: (json['replies'] as List<dynamic>)
+          .map((chapterJson) => Comment.parse(chapterJson))
+          .toList(),
+    );
+  }
 }

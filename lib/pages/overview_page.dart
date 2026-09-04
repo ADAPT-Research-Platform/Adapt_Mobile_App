@@ -2,155 +2,179 @@ import 'package:adapt/widgets/module_grid.dart';
 import 'package:adapt/widgets/star_slider.dart';
 import 'package:adapt/widgets/task_button.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
-import '../models/module.dart';
-import '../services/firebase_mode_service.dart';
-import '../services/firebase_module_service.dart';
-import '../utils/app_colors.dart';
+import '../enums/feeling.dart';
+import '../services/localization_service.dart';
+import '../services/module_service.dart';
+import '../services/mood_service.dart';
+import '../services/notification_service.dart';
 import '../utils/app_font_sizes.dart';
 import '../widgets/main_title.dart';
-import '../widgets/module_grid.dart';
 import '../widgets/sub_title.dart';
 
 class OverviewPage extends StatefulWidget {
-  const OverviewPage({super.key});
+  final VoidCallback reloadModePage;
+
+  const OverviewPage({super.key, required this.reloadModePage});
 
   @override
   _OverviewPageState createState() => _OverviewPageState();
 }
 
 class _OverviewPageState extends State<OverviewPage> {
-  final FirebaseModuleService _firebaseModuleService = FirebaseModuleService();
-  final FirebaseModeService _firebaseModeService = FirebaseModeService();
+  final log = Logger('OverviewPage');
 
-  int _selectedFeeling = 0; // 0 for no selection, 1 for happy, 2 for sad, etc.
-  int _selectedMotivation = 5;
+  final ModuleService _moduleService = ModuleService();
+  final MoodService _modeService = MoodService();
 
-  late Future<List<Module>> _modulesFuture; // Declare the Future
+  Feeling _selectedFeeling = Feeling.none;
+  int _selectedMotivation = 0;
+
+  late Future<List<String>> _modulesIdFuture; // Declare the Future
 
   @override
   void initState() {
     super.initState();
-    _modulesFuture = _firebaseModuleService.fetchModuleList(); // Initialize the Future
+    _modulesIdFuture = _moduleService.fetchModuleIdList(); // Initialize the Future
+
+    NotificationService.scheduleNextMoodNotification();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const MainTitle(title: 'Overview'),
-        body: FutureBuilder<List<Module>>(
-          future: _modulesFuture, // Use the initialized Future here
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.darkYellow));
-            } else if (snapshot.hasError) {
-              return const Center(child: Text("Error loading modules"));
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text("No modules available"));
-            }
+      appBar: MainTitle(title: LocalizationService().get('overview')),
+      body: FutureBuilder<List<String>>(
+        future: _modulesIdFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator(color: Theme.of(context).primaryColorDark));
+          } else if (snapshot.hasError) {
+            return Center(child: Text(LocalizationService().get("error_loading_modules")));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text(LocalizationService().get("no_modules")));
+          }
 
-            final modules = snapshot.data!;
+          final moduleIdList = snapshot.data!;
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                  //mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
                   children: [
-                    const SubTitle(text: 'Modules'),
-                    ModuleGrid(
-                      modules: modules,
-                      size: 100,
-                    ),
-                    const Divider(
-                      color: AppColors.lightGrey,
-                      // Customize the color as needed
-                      thickness: 2.5, // Customize the thickness as needed
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SubTitle(text: 'Everyday Questions'),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'I’m feeling today.',
-                          style: TextStyle(
-                            color: AppColors.fontColor, // Static text color
-                            fontSize: AppFontSizes.small, // Static font size
+                    // Modules section (shrinks if needed)
+                    Flexible(
+                      fit: FlexFit.loose,
+                      child: Column(
+                        children: [
+                          SubTitle(text: LocalizationService().get('Modules')),
+                          Expanded(
+                            child: ModuleGrid(
+                              moduleIdList: moduleIdList,
+                              // shrink relative to height instead of width
+                              //size: moduleSize,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        // Feeling Selector Row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildFeelingIcon(
-                                Icons.sentiment_satisfied_alt, 1, 'Happy'),
-                            _buildFeelingIcon(
-                                Icons.sentiment_dissatisfied, 2, 'Sad'),
-                            _buildFeelingIcon(
-                                Icons.sentiment_very_dissatisfied, 3, 'Angry'),
-                            _buildFeelingIcon(
-                                Icons.sentiment_neutral, 4, 'Tired'),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'I’m motivated today.',
-                          style: TextStyle(
-                            color: AppColors.fontColor, // Static text color
-                            fontSize: AppFontSizes.small, // Static font size
+                        ],
+                      ),
+                    ),
+
+                    Divider(
+                      color: Theme.of(context).dividerColor,
+                      thickness: 2.5,
+                    ),
+
+                    // Everyday questions section (reserve min height)
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight * 0.4, // at least 35% of screen
+                      ),
+                      child: Padding( // <--- Wrap the Column with Padding
+                        padding: const EdgeInsets.only(bottom: 16.0), // <--- Add your desired bottom padding here
+                        child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SubTitle(text: LocalizationService().get('everyday_questions')),
+                          Text(
+                            LocalizationService().get('im_feeling_today'),
+                            style: const TextStyle(fontSize: AppFontSizes.small),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
-                        ),
-                        StarSlider(
-                          sliderLength: 5, //How many stars
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedMotivation = value;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        TaskButton(
-                            text: 'Submit',
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildFeelingIcon(Feeling.happy),
+                              _buildFeelingIcon(Feeling.sad),
+                              _buildFeelingIcon(Feeling.angry),
+                              _buildFeelingIcon(Feeling.tired),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            LocalizationService().get('im_motivated_today'),
+                            style: const TextStyle(fontSize: AppFontSizes.small),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          StarSlider(
+                            sliderLength: MoodService.maxMotivation,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedMotivation = value;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          TaskButton(
+                            text: LocalizationService().get('Submit'),
                             onPressed: () {
-                              _firebaseModeService.saveMode(_selectedFeeling, _selectedMotivation);
-                            }
+                              _modeService.saveMode(_selectedFeeling, _selectedMotivation);
+                              widget.reloadModePage();
+                            },
                           ),
-                      ],
+                        ],
+                      ),
+                    )
                     ),
-                  ]),
-            );
-          },
-        ));
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
   }
 
-  Widget _buildFeelingIcon(IconData icon, int feelingValue, String label) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedFeeling = feelingValue;
-        });
-      },
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: _selectedFeeling == feelingValue
-                ? AppColors.primaryYellow
-                : AppColors.darkGrey,
-            size: 40,
+  Widget _buildFeelingIcon(Feeling feeling) {
+    return Flexible(
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedFeeling = _selectedFeeling == feeling ? Feeling.none : feeling;
+            });
+          },
+          child: Column(
+            children: [
+              Icon(
+                feeling.iconData,
+                color: _selectedFeeling == feeling ? Theme.of(context).primaryColorLight : Theme.of(context).highlightColor,
+                size: 40,
+              ),
+              Text(
+                feeling.value,
+                style: TextStyle(
+                  color: _selectedFeeling == feeling ? Theme.of(context).primaryColorDark : Theme.of(context).textTheme.displayLarge?.color,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
           ),
-          Text(
-            label,
-            style: TextStyle(
-              color: _selectedFeeling == feelingValue
-                  ? AppColors.darkYellow
-                  : AppColors.darkGrey,
-            ),
-          ),
-        ],
-      ),
+        )
     );
   }
 }

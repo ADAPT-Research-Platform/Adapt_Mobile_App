@@ -1,18 +1,30 @@
 
 class User {
   final String userId;
-  int? userCode;
-  final String displayName;
+  String userName;
   final String email;
-  final DateTime createdDate;
-  final String? role;
 
   User({
     required this.userId,
-    this.userCode,
-    required this.displayName,
+    required this.userName,
     required this.email,
-    required this.createdDate,
-    this.role
   });
+
+  // Create a User object from a JSON map
+  factory User.parse(Map<String, dynamic> json) {
+    return User(
+      userId: json['id'].toString(),
+      userName: json['username'].toString(),
+      email: json['email'].toString(),
+    );
+  }
+
+  // Convert a User object to a JSON map
+  Map<String, String> toJson() {
+    return {
+      'id': userId,
+      'username': userName,
+      'email': email,
+    };
+  }
 }

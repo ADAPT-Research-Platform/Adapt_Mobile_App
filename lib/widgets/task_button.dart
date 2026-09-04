@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../utils/app_colors.dart';
 import '../utils/app_font_sizes.dart';
 
 class TaskButton extends StatelessWidget {
@@ -13,12 +12,13 @@ class TaskButton extends StatelessWidget {
       super.key,
       required this.text,
       this.onPressed,
-      this.backgroundColor = AppColors.primaryYellow,
+      this.backgroundColor,
       this.icon
   });
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: icon != null ? Icon(icon, size: 18) : null,
@@ -27,11 +27,13 @@ class TaskButton extends StatelessWidget {
         style: const TextStyle(
           fontSize: AppFontSizes.small,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis
       ),
       style: ElevatedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 50), // Full-width button
-        foregroundColor: AppColors.white,
-        backgroundColor: backgroundColor,
+        minimumSize: Size(screenWidth / 2, 50), // Full-width button
+        foregroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: backgroundColor ?? Theme.of(context).primaryColorLight,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(6),
         ),
