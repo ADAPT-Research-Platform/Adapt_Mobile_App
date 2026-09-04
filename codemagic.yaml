@@ -53,8 +53,7 @@ workflows:
         - app_configuration
         - app_store_credentials
       vars:
-        # Replace with your actual iOS Bundle Identifier from Xcode
-        BUNDLE_ID: "com.example.adapt"
+        BUNDLE_ID: "com.adapt.adapt"
         CONFIG_OUTPUT_PATH: "app_config.json"
       flutter: stable
       xcode: latest
