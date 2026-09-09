@@ -26,6 +26,19 @@ class _AppNavigationBar extends State<BottomNavBar> {
   void initState() {
     super.initState();
     currentPageIndex = widget.currentIndex;
+    LocalizationService().addListener(_onLocaleChanged);
+  }
+
+  @override
+  void dispose() {
+    LocalizationService().removeListener(_onLocaleChanged);
+    super.dispose();
+  }
+
+  void _onLocaleChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override

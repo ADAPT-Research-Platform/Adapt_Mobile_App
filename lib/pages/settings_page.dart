@@ -222,12 +222,14 @@ class _SettingsPageState extends State<SettingsPage> {
               const SizedBox(height: 10),
               Divider(color: Theme.of(context).dividerColor, thickness: 2.5),
               SubTitle(text: LocalizationService().get('Appearance')),
-              _buildRadioOption<Language>(LocalizationService().get('Language'), Language.values, _selectedLanguage, (option) => option.value, (value) {
-                  setState(() {
-                    _selectedLanguage = value!;
-                    LocalizationService().load(_selectedLanguage);
+              _buildRadioOption<Language>(LocalizationService().get('Language'), Language.values, _selectedLanguage, (option) => option.value, (value) async {
+                  if (value != null) {
+                    setState(() {
+                      _selectedLanguage = value;
+                    });
+                    await LocalizationService().load(value);
                     NotificationService.scheduleNextMoodNotification();
-                  });
+                  }
                 },
               ),
               _buildRadioOption<ThemeType>(LocalizationService().get('Theme'), ThemeType.values, _selectedTheme, (option) => option.value, (value) {

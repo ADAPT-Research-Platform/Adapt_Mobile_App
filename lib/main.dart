@@ -60,6 +60,19 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _loadThemeType();
+    LocalizationService().addListener(_onLocaleChanged);
+  }
+
+  @override
+  void dispose() {
+    LocalizationService().removeListener(_onLocaleChanged);
+    super.dispose();
+  }
+
+  void _onLocaleChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadThemeType() async {
