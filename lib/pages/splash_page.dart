@@ -29,7 +29,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   Future<void> _checkLoginStatus() async {
     // Delay for splash screen visibility
     await Future.delayed(const Duration(seconds: 2));
-    _authService.verify();
+    await _authService.verify();
   }
 
   @override

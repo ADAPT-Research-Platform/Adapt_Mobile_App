@@ -11,6 +11,7 @@ import 'package:logging/logging.dart';
 import '../enums/language.dart';
 import '../enums/theme_type.dart';
 import '../models/user.dart';
+import '../utils/app_config.dart';
 
 class SessionManager {
   final log = Logger('SessionManager');
@@ -35,62 +36,89 @@ class SessionManager {
   );
 
   SessionManager._internal() {
-    if(kDebugMode){
-      //TODO: Remove this when solving the issue with intermediate CAs in backend
-      HttpClient httpClient = HttpClient()
-        ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    HttpClient httpClient = HttpClient();
 
-      client = IOClient(httpClient);
-    }else{
-      client = http.Client();
-    }
+    // Resolves Android-specific intermediate CA certificate chain issues
+    httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) {
+      final backendHost = Uri.tryParse(AppConfig.baseUrl)?.host;
+      if (kDebugMode ||
+          (backendHost != null && host == backendHost) ||
+          host == 'adapt.online.uni-marburg.de' ||
+          host.endsWith('.uni-marburg.de')) {
+        log.warning('Allowing SSL certificate for host $host (Subject: ${cert.subject}, Issuer: ${cert.issuer})');
+        return true;
+      }
+      log.severe('Rejecting untrusted SSL certificate for host $host (Subject: ${cert.subject})');
+      return false;
+    };
+
+    client = IOClient(httpClient);
   }
 
-  void setSessionInfo({required User user, String? cookie}) async {
+  Future<void> setSessionInfo({required User user, String? cookie}) async {
     _sessionUser = user;
-    await _secureStorage.write(
-      key: sessionUserKey,
-      value: jsonEncode(user.toJson()),
-    );
-
     if (cookie != null) {
       _sessionCookie = cookie;
-      await _secureStorage.write(key: sessionCookieKey, value: cookie);
     }
 
-    log.info('Session Info Updated');
+    try {
+      await _secureStorage.write(
+        key: sessionUserKey,
+        value: jsonEncode(user.toJson()),
+      );
+
+      if (cookie != null) {
+        await _secureStorage.write(key: sessionCookieKey, value: cookie);
+      }
+      log.info('Session info successfully written to secure storage');
+    } catch (e, stack) {
+      log.warning('Failed to write session info to secure storage: $e. Resetting storage and retrying...', e, stack);
+      try {
+        await _secureStorage.deleteAll();
+        await _secureStorage.write(
+          key: sessionUserKey,
+          value: jsonEncode(user.toJson()),
+        );
+        if (cookie != null) {
+          await _secureStorage.write(key: sessionCookieKey, value: cookie);
+        }
+        log.info('Session info successfully written after secure storage reset');
+      } catch (retryError, retryStack) {
+        log.severe('Permanent failure writing to secure storage: $retryError', retryError, retryStack);
+      }
+    }
   }
 
-  void clearSessionInfo() async {
+  Future<void> clearSessionInfo() async {
     _sessionUser = null;
-    await _secureStorage.delete(key: sessionUserKey);
-
     _sessionCookie = null;
-    await _secureStorage.delete(key: sessionCookieKey);
 
-    log.info('Session Info Cleared');
+    try {
+      await _secureStorage.delete(key: sessionUserKey);
+      await _secureStorage.delete(key: sessionCookieKey);
+      log.info('Session info cleared from secure storage');
+    } catch (e, stack) {
+      log.warning('Error clearing session keys from secure storage: $e. Attempting full reset.', e, stack);
+      try {
+        await _secureStorage.deleteAll();
+      } catch (_) {}
+    }
   }
 
   Future<User?> getSessionUser() async {
     if (_sessionUser == null) {
       try {
         final userJson = await _secureStorage.read(key: sessionUserKey);
-        log.info('Session User got from secure storage');
+        log.info('Session user read from secure storage: ${userJson != null}');
         if (userJson != null) {
           final Map<String, dynamic> userMap = jsonDecode(userJson);
           _sessionUser = User.parse(userMap);
         }
-      } catch (e) {
-        if (e is PlatformException &&
-            e.code == 'read' &&
-            e.message != null &&
-            e.message!.contains('BadPaddingException')) {
-          log.warning(
-              'BadPaddingException while reading session user. Deleting session_user key.');
+      } catch (e, stack) {
+        log.warning('Exception reading session user from secure storage: $e. Clearing corrupted key.', e, stack);
+        try {
           await _secureStorage.delete(key: sessionUserKey);
-        } else {
-          log.severe('Unhandled exception while reading session user: $e');
-        }
+        } catch (_) {}
       }
     }
 
@@ -99,20 +127,14 @@ class SessionManager {
 
   Future<String?> getSessionCookie() async {
     if (_sessionCookie == null) {
-      log.info('Session Cookie got from secure storage');
       try {
         _sessionCookie = await _secureStorage.read(key: sessionCookieKey);
-      } catch (e) {
-        if (e is PlatformException &&
-            e.code == 'read' &&
-            e.message != null &&
-            e.message!.contains('BadPaddingException')) {
-          log.warning(
-              'BadPaddingException while reading session cookie. Deleting session_cookie key.');
+        log.info('Session cookie read from secure storage: ${_sessionCookie != null}');
+      } catch (e, stack) {
+        log.warning('Exception reading session cookie from secure storage: $e. Clearing corrupted key.', e, stack);
+        try {
           await _secureStorage.delete(key: sessionCookieKey);
-        } else {
-          log.severe('Unhandled exception while reading session cookie: $e');
-        }
+        } catch (_) {}
       }
     }
 

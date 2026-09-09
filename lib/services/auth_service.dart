@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:adapt/services/session_manager.dart';
 import 'package:adapt/widgets/snack_bar_shower.dart';
@@ -12,128 +14,174 @@ import '../utils/app_routes.dart';
 class AuthService {
   final log = Logger('AuthService');
 
-  void login(String userName, String password) async {
-    if(userName.isEmpty){
+  Future<bool> login(String userName, String password) async {
+    if (userName.isEmpty) {
       SnackBarShower.warn(loginPageScaffold, 'username_missing');
-      return;
+      return false;
     }
 
-    if(password.isEmpty){
+    if (password.isEmpty) {
       SnackBarShower.warn(loginPageScaffold, 'password_missing');
-      return;
+      return false;
     }
+
+    final loginUri = Uri.parse('${AppConfig.baseUrl}/auth/login');
+    log.info('Initiating login request to $loginUri for user: $userName');
 
     try {
       final response = await SessionManager().client.post(
-            Uri.parse('${AppConfig.baseUrl}/auth/login'),
+            loginUri,
             headers: SessionManager().getHeaders(),
             body: jsonEncode({
               'username': userName,
               'password': password,
             }),
-          );
+          ).timeout(const Duration(seconds: 15));
 
-      log.info('Login Response: ${response.body}');
+      log.info('Login Response Status: ${response.statusCode}, Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Extract the connect.sid cookie
-        final cookies = response.headers['set-cookie'];
-        if (cookies != null) {
-          final Map<String, dynamic> data = jsonDecode(response.body);
-          final sessionCookie = cookies.split(';')[0];
+        // Extract session cookie (specifically connect.sid or first valid cookie)
+        final setCookieHeader = response.headers['set-cookie'];
+        log.info('Received Set-Cookie header: $setCookieHeader');
 
+        String? sessionCookie;
+        if (setCookieHeader != null) {
+          final match = RegExp(r'(connect\.sid=[^;,]+)').firstMatch(setCookieHeader);
+          if (match != null) {
+            sessionCookie = match.group(1);
+          } else {
+            sessionCookie = setCookieHeader.split(';')[0].trim();
+          }
+        }
+
+        if (sessionCookie != null && sessionCookie.isNotEmpty) {
+          final Map<String, dynamic> data = jsonDecode(response.body);
           User loggedIdUser = User.parse(data);
-          SessionManager().setSessionInfo(
-              user: loggedIdUser,
-              cookie: sessionCookie
-          ); // Extract the cookie value
+
+          log.info('Login successful. Storing session for user: ${loggedIdUser.userName}, cookie: $sessionCookie');
+          await SessionManager().setSessionInfo(
+            user: loggedIdUser,
+            cookie: sessionCookie,
+          );
 
           mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
 
-          // Add a short delay to wait until the next page is built
-          Future.delayed(const Duration(milliseconds: 1000), () {
+          Future.delayed(const Duration(milliseconds: 500), () {
             SnackBarShower.info(mainPageScaffold, 'login_success');
           });
+          return true;
         } else {
-          log.severe('No cookies found in Login Response.');
+          log.severe('No valid session cookie found in Set-Cookie: $setCookieHeader');
           SnackBarShower.error(loginPageScaffold, 'login_failure');
+          return false;
         }
       } else {
-        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
+        log.warning('Login failed with status ${response.statusCode}: ${response.body}');
+        try {
+          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+          final message = jsonResponse['message'] ?? 'login_failure';
+          SnackBarShower.error(loginPageScaffold, message);
+        } catch (_) {
+          SnackBarShower.error(loginPageScaffold, 'login_failure');
+        }
+        return false;
       }
-    } catch (e) {
-      log.severe('Error in Login', e);
+    } on TimeoutException catch (e) {
+      log.severe('Login timed out after 15 seconds: $e', e);
+      SnackBarShower.error(loginPageScaffold, 'login_failure');
+      return false;
+    } on SocketException catch (e) {
+      log.severe('Network error during login (SocketException): $e', e);
+      SnackBarShower.error(loginPageScaffold, 'login_failure');
+      return false;
+    } on HandshakeException catch (e) {
+      log.severe('TLS/SSL handshake error during login: $e', e);
+      SnackBarShower.error(loginPageScaffold, 'login_failure');
+      return false;
+    } catch (e, stackTrace) {
+      log.severe('Unexpected error during login: $e', e, stackTrace);
       SnackBarShower.error(loginPageScaffold, 'internal_app_error');
+      return false;
     }
-
-    return null;
   }
 
-  void verify() async {
+  Future<bool> verify() async {
     final sessionCookie = await SessionManager().getSessionCookie();
     if (sessionCookie == null || sessionCookie.isEmpty) {
-      log.warning('Session cookie not found!');
+      log.warning('Session cookie not found in storage. Redirecting to login.');
       mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
-      return;
+      return false;
     }
 
     final loggedIdUser = await SessionManager().getSessionUser();
     if (loggedIdUser == null) {
-      log.warning('Session user not found!');
+      log.warning('Session user not found in storage. Redirecting to login.');
       mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
-      return;
+      return false;
     }
+
+    final verifyUri = Uri.parse('${AppConfig.baseUrl}/auth/verify-cookie');
+    log.info('Verifying session at $verifyUri with cookie: $sessionCookie');
 
     try {
       final response = await SessionManager().client.get(
-        Uri.parse('${AppConfig.baseUrl}/auth/verify-cookie'),
-        headers: {
-          'Cookie': sessionCookie.split('=')[1],
-        },
-      );
+        verifyUri,
+        headers: SessionManager().getHeaders(),
+      ).timeout(const Duration(seconds: 15));
 
-      log.info('Verify Response: ${response.body}');
+      log.info('Verify Response Status: ${response.statusCode}, Body: ${response.body}');
       if (response.statusCode == 200) {
-        log.info('Session is verified and redirecting to main page');
+        log.info('Session verified successfully. Redirecting to main page.');
         mainNavigator.currentState!.pushReplacementNamed(Routes.routeMain);
-        return;
+        return true;
       } else {
-        log.warning('Session verify failed!');
+        log.warning('Session verify returned status: ${response.statusCode}');
       }
-    } catch (e) {
-      log.severe('Error verifying session: $e');
+    } on TimeoutException catch (e) {
+      log.severe('Verify session timed out: $e', e);
+    } on SocketException catch (e) {
+      log.severe('Verify session network error: $e', e);
+    } catch (e, stackTrace) {
+      log.severe('Error verifying session: $e', e, stackTrace);
     }
 
-    // Navigate to the login screen if not logged in or validation fails
+    log.info('Session validation failed. Redirecting to login screen.');
     mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
+    return false;
   }
 
-  void logout() async {
+  Future<void> logout() async {
     try {
       final response = await SessionManager().client.post(
             Uri.parse('${AppConfig.baseUrl}/auth/logout'),
             headers: SessionManager().getHeaders(),
-          );
+          ).timeout(const Duration(seconds: 10));
 
-      // Navigate to the login page on any circumstances
       mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
 
       log.info('Logout Response: ${response.body}');
       if (response.statusCode == 200) {
-        SessionManager().clearSessionInfo();
+        await SessionManager().clearSessionInfo();
 
         Future.delayed(const Duration(milliseconds: 1000), () {
           SnackBarShower.info(loginPageScaffold, 'logout_success');
         });
       } else {
+        await SessionManager().clearSessionInfo();
         Future.delayed(const Duration(milliseconds: 1000), () {
-          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-          SnackBarShower.error(loginPageScaffold, jsonResponse['message']);
+          try {
+            final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+            SnackBarShower.error(loginPageScaffold, jsonResponse['message'] ?? 'internal_app_error');
+          } catch (_) {
+            SnackBarShower.error(loginPageScaffold, 'internal_app_error');
+          }
         });
       }
-    } catch (e) {
-      log.severe('Error in Logout', e.toString());
+    } catch (e, stackTrace) {
+      log.severe('Error in Logout: $e', e, stackTrace);
+      await SessionManager().clearSessionInfo();
+      mainNavigator.currentState!.pushReplacementNamed(Routes.routeLogin);
       Future.delayed(const Duration(milliseconds: 1000), () {
         SnackBarShower.error(loginPageScaffold, 'internal_app_error');
       });

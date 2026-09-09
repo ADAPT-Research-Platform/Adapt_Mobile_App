@@ -26,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isChecked = false;
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -35,10 +36,23 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login() async {
+    if (_isLoading) return;
     String userEmail = _userEmailController.text.trim();
     String password = _passwordController.text.trim();
 
-    _authService.login(userEmail, password);
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _authService.login(userEmail, password);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -179,10 +193,16 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      TaskButton(
-                          text: LocalizationService().get('Login'),
-                          onPressed: _isChecked ? _login : null,
-                      ),
+                      _isLoading
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                color: Theme.of(context).primaryColorDark,
+                              ),
+                            )
+                          : TaskButton(
+                              text: LocalizationService().get('Login'),
+                              onPressed: _isChecked ? _login : null,
+                            ),
                       const SizedBox(height: 20),
                     ],
                   ),
