@@ -22,6 +22,22 @@ class _AppNavigationBar extends State<BottomNavBar> {
   int currentPageIndex = 0;
   double margin = 8.0;
 
+  @override
+  void initState() {
+    super.initState();
+    currentPageIndex = widget.currentIndex;
+  }
+
+  @override
+  void didUpdateWidget(covariant BottomNavBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentIndex != widget.currentIndex) {
+      setState(() {
+        currentPageIndex = widget.currentIndex;
+      });
+    }
+  }
+
   double _getMaxLabelWidth(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
     return (deviceWidth - (margin * 2)) / 5.5;
