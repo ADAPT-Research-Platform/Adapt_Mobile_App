@@ -69,20 +69,22 @@ workflows:
         script: |
           keychain initialize
           
+          # 1. Decode Base64 key
           python3 -c "import base64, os; open('/tmp/AuthKey.p8', 'wb').write(base64.b64decode(os.environ['APP_STORE_CONNECT_PRIVATE_KEY_BASE64']))"
           export APP_STORE_CONNECT_PRIVATE_KEY=$(cat /tmp/AuthKey.p8)
           
+          # 2. Export to CM_ENV for the publishing block (with an explicit newline)
           echo "APP_STORE_CONNECT_PRIVATE_KEY<<EOF" >> $CM_ENV
           cat /tmp/AuthKey.p8 >> $CM_ENV
+          echo "" >> $CM_ENV
           echo "EOF" >> $CM_ENV
           
-          echo "Issuer ID length: ${#APP_STORE_CONNECT_ISSUER_ID} (Should be 36)"
-          echo "Key ID length: ${#APP_STORE_CONNECT_KEY_IDENTIFIER} (Should be 10)"
-          
+          # 3. Generate local RSA key for certificates
           if [ -z "$CERTIFICATE_PRIVATE_KEY" ]; then
             export CERTIFICATE_PRIVATE_KEY=$(openssl genrsa 2048)
           fi
           
+          # 4. Fetch profiles passing credentials explicitly
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
