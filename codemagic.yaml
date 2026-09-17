@@ -100,28 +100,28 @@ workflows:
           keychain add-certificates
           xcode-project use-profiles
 
-      - name: Auto-increment TestFlight build number
+      - name: Auto-increment and Build IPA
         script: |
+          echo "Fetching latest build number from Apple for $BUNDLE_ID..."
+          
           LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" \
             --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
             --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --private-key "$APP_STORE_CONNECT_PRIVATE_KEY")
+            --private-key @env:APP_STORE_CONNECT_PRIVATE_KEY 2>/dev/null | tr -d '[:space:]')
           
-          if [ -z "$LATEST_BUILD" ]; then
-            LATEST_BUILD=0
+          # CRITICAL FIX: Catch '0' as well as empty results
+          if [ -z "$LATEST_BUILD" ] || [ "$LATEST_BUILD" = "0" ]; then
+            echo "WARNING: Apple returned 0 (no active TestFlight builds). Jumping over ghost builds to 11."
+            LATEST_BUILD=11
           fi
           
           NEW_BUILD=$((LATEST_BUILD + 1))
-          echo "Latest TestFlight build is $LATEST_BUILD. Next build will be $NEW_BUILD."
+          echo "Next TestFlight build will be: $NEW_BUILD"
           
-          echo "IOS_BUILD_NUMBER=$NEW_BUILD" >> $CM_ENV
-
-      - name: Flutter build IPA
-        script: |
           flutter build ipa --release \
             --dart-define-from-file="$CONFIG_OUTPUT_PATH" \
-            --build-number="IOS_BUILD_NUMBER" \
-            --export-options-plist=/Users/builder/export_options.plist
+            --build-number="$NEW_BUILD"
+
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
