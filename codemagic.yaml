@@ -68,9 +68,15 @@ workflows:
       - name: Fetch iOS signing files
         script: |
           keychain initialize
+          
+          if [ -z "$CERTIFICATE_PRIVATE_KEY" ]; then
+            export CERTIFICATE_PRIVATE_KEY=$(openssl genrsa 2048)
+          fi
+          
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create
+          
           keychain add-certificates
           xcode-project use-profiles
 
