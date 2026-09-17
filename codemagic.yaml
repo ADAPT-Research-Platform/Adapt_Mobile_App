@@ -95,6 +95,26 @@ workflows:
           keychain add-certificates
           xcode-project use-profiles
 
+      - name: Auto-increment TestFlight build number
+        script: |
+          # Fetch the highest build number currently on TestFlight
+          LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" \
+            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
+            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+            --private-key "$APP_STORE_CONNECT_PRIVATE_KEY")
+          
+          # If no build exists yet, default to 0
+          if [ -z "$LATEST_BUILD" ]; then
+            LATEST_BUILD=0
+          fi
+          
+          # Increment by 1
+          NEW_BUILD=$((LATEST_BUILD + 1))
+          echo "Latest TestFlight build is $LATEST_BUILD. Next build will be $NEW_BUILD."
+          
+          # Override the BUILD_NUMBER variable for the Flutter build step
+          echo "BUILD_NUMBER=$NEW_BUILD" >> $CM_ENV
+
       - name: Flutter build IPA
         script: |
           flutter build ipa --release \
