@@ -9,8 +9,6 @@ workflows:
     environment:
       groups:
         - app_configuration
-        # Uncomment below when you set up Android Keystore variables
-        # - android_signing
       vars:
         CONFIG_OUTPUT_PATH: "app_config.json"
       flutter: stable
@@ -37,7 +35,6 @@ workflows:
             --dart-define-from-file="$CONFIG_OUTPUT_PATH" \
             --build-number="$BUILD_NUMBER"
     artifacts:
-      # Download app-release.apk to drag & drop into Firebase Console manually
       - build/app/outputs/flutter-apk/*-release.apk
       - build/app/outputs/bundle/**/*.aab
 
@@ -51,7 +48,6 @@ workflows:
     environment:
       groups:
         - app_configuration
-        - app_store_credentials
       vars:
         BUNDLE_ID: "com.adapt.adapt"
         CONFIG_OUTPUT_PATH: "app_config.json"
@@ -72,11 +68,52 @@ workflows:
       - name: Fetch iOS signing files
         script: |
           keychain initialize
+          
+          # 1. Decode Base64 key
+          python3 -c "import base64, os; open('/tmp/AuthKey.p8', 'wb').write(base64.b64decode(os.environ['APP_STORE_CONNECT_PRIVATE_KEY_BASE64']))"
+          export APP_STORE_CONNECT_PRIVATE_KEY=$(cat /tmp/AuthKey.p8)
+          
+          # 2. Export to CM_ENV for the publishing block (with an explicit newline)
+          echo "APP_STORE_CONNECT_PRIVATE_KEY<<EOF" >> $CM_ENV
+          cat /tmp/AuthKey.p8 >> $CM_ENV
+          echo "" >> $CM_ENV
+          echo "EOF" >> $CM_ENV
+          
+          # 3. Generate local RSA key for certificates
+          if [ -z "$CERTIFICATE_PRIVATE_KEY" ]; then
+            export CERTIFICATE_PRIVATE_KEY=$(openssl genrsa 2048)
+          fi
+          
+          # 4. Fetch profiles passing credentials explicitly
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
+            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
+            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+            --private-key "$APP_STORE_CONNECT_PRIVATE_KEY" \
             --create
+          
           keychain add-certificates
           xcode-project use-profiles
+
+      - name: Auto-increment TestFlight build number
+        script: |
+          # Fetch the highest build number currently on TestFlight
+          LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number "$BUNDLE_ID" \
+            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
+            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+            --private-key "$APP_STORE_CONNECT_PRIVATE_KEY")
+          
+          # If no build exists yet, default to 0
+          if [ -z "$LATEST_BUILD" ]; then
+            LATEST_BUILD=0
+          fi
+          
+          # Increment by 1
+          NEW_BUILD=$((LATEST_BUILD + 1))
+          echo "Latest TestFlight build is $LATEST_BUILD. Next build will be $NEW_BUILD."
+          
+          # Override the BUILD_NUMBER variable for the Flutter build step
+          echo "BUILD_NUMBER=$NEW_BUILD" >> $CM_ENV
 
       - name: Flutter build IPA
         script: |
@@ -88,5 +125,7 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        auth: integration
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:adapt/pages/settings_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 
 import '../enums/theme_type.dart';
@@ -77,11 +78,23 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return ScaffoldMessenger(
       key: mainPageScaffold,
-      child: Scaffold(
+      child: PopScope(
+        canPop: _currentIndex == 0,
+        onPopInvokedWithResult: (bool didPop, dynamic result) {
+          if (didPop) return;
+          if (_currentIndex != 0) {
+            setState(() {
+              _currentIndex = 0;
+            });
+          }
+        },
+        child: Scaffold(
           body: IndexedStack(
             index: _currentIndex,
             children: [
-              ModuleIndexPage(reloadModePage: reloadModePage),
+              ModuleIndexPage(
+                reloadModePage: reloadModePage,
+              ),
               const DiaryPage(),
               ModePage(shouldReload: shouldReloadModePage),
               SupportPage(),
@@ -95,7 +108,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                 _currentIndex = index;
               });
             },
-          )),
+          ),
+        ),
+      ),
     );
   }
 }
