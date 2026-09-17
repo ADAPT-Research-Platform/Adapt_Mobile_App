@@ -29,6 +29,7 @@ workflows:
       - name: Build Android Release APK
         script: |
           flutter build apk --release \
+            --android-skip-build-dependency-validation \
             --dart-define-from-file="$CONFIG_OUTPUT_PATH" \
             --build-number="$BUILD_NUMBER"
     artifacts:
