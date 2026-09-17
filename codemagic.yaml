@@ -9,8 +9,6 @@ workflows:
     environment:
       groups:
         - app_configuration
-        # Uncomment below when you set up Android Keystore variables
-        # - android_signing
       vars:
         CONFIG_OUTPUT_PATH: "app_config.json"
       flutter: stable
@@ -37,7 +35,6 @@ workflows:
             --dart-define-from-file="$CONFIG_OUTPUT_PATH" \
             --build-number="$BUILD_NUMBER"
     artifacts:
-      # Download app-release.apk to drag & drop into Firebase Console manually
       - build/app/outputs/flutter-apk/*-release.apk
       - build/app/outputs/bundle/**/*.aab
 
@@ -88,5 +85,7 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        auth: integration
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
