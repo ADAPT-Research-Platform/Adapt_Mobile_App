@@ -46,3 +46,6 @@ app.*.map.json
 .fvm/
 .fvmrc
 pubspec.lock
+
+# APP Config
+app_config.json

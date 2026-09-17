@@ -2,6 +2,7 @@ import 'package:adapt/widgets/module_grid.dart';
 import 'package:adapt/widgets/star_slider.dart';
 import 'package:adapt/widgets/task_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 
 import '../enums/feeling.dart';
@@ -10,13 +11,20 @@ import '../services/module_service.dart';
 import '../services/mood_service.dart';
 import '../services/notification_service.dart';
 import '../utils/app_font_sizes.dart';
+import '../utils/app_keys.dart';
 import '../widgets/main_title.dart';
+import '../widgets/snack_bar_shower.dart';
 import '../widgets/sub_title.dart';
 
 class OverviewPage extends StatefulWidget {
   final VoidCallback reloadModePage;
+  final DateTime Function()? nowProvider;
 
-  const OverviewPage({super.key, required this.reloadModePage});
+  const OverviewPage({
+    super.key,
+    required this.reloadModePage,
+    @visibleForTesting this.nowProvider,
+  });
 
   @override
   _OverviewPageState createState() => _OverviewPageState();
@@ -41,9 +49,34 @@ class _OverviewPageState extends State<OverviewPage> {
     NotificationService.scheduleNextMoodNotification();
   }
 
+  DateTime? _lastBackPressTime;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
+        if (didPop) return;
+
+        final now = widget.nowProvider?.call() ?? DateTime.now();
+
+        // Ignore rapid duplicate events (< 300ms) from the same physical gesture
+        if (_lastBackPressTime != null &&
+            now.difference(_lastBackPressTime!) < const Duration(milliseconds: 300)) {
+          return;
+        }
+
+        // Only exit if pressed a SECOND time between 300ms and 2000ms
+        if (_lastBackPressTime != null &&
+            now.difference(_lastBackPressTime!) <= const Duration(seconds: 2)) {
+          SystemNavigator.pop();
+        } else {
+          _lastBackPressTime = now;
+          mainPageScaffold.currentState?.clearSnackBars();
+          SnackBarShower.info(mainPageScaffold, 'press_back_again_to_exit');
+        }
+      },
+      child: Scaffold(
       appBar: MainTitle(title: LocalizationService().get('overview')),
       body: FutureBuilder<List<String>>(
         future: _modulesIdFuture,
@@ -146,6 +179,7 @@ class _OverviewPageState extends State<OverviewPage> {
           );
         },
       ),
+    ),
     );
   }
 

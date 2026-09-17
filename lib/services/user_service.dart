@@ -52,7 +52,7 @@ class UserService {
       if (response.statusCode == 200) {
         //Update username on current session!
         sessionUser.userName = userName;
-        SessionManager().setSessionInfo(
+        await SessionManager().setSessionInfo(
           user: sessionUser,
         ); // Extract the cookie value
 
