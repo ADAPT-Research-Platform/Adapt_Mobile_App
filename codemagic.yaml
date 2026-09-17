@@ -14,19 +14,13 @@ workflows:
       flutter: stable
       java: 17
     scripts:
-      - name: Decode Base64 files
+      - name: Decode app_config
         script: |
-          if [ -z "$APP_CONFIG_BASE64" ] || [ -z "$FIREBASE_SERVICE_ACCOUNT_BASE64" ]; then
-            echo "ERROR: Missing Base64 environment variables!"
+          if [ -z "$APP_CONFIG_BASE64" ]; then
+            echo "ERROR: Missing APP_CONFIG_BASE64 environment variable!"
             exit 1
           fi
-          
           python3 -c "import base64, os; open(os.environ['CONFIG_OUTPUT_PATH'], 'wb').write(base64.b64decode(os.environ['APP_CONFIG_BASE64']))"
-          
-          echo "FIREBASE_SERVICE_ACCOUNT<<EOF" >> $CM_ENV
-          echo "$FIREBASE_SERVICE_ACCOUNT_BASE64" | base64 --decode >> $CM_ENV
-          echo "" >> $CM_ENV
-          echo "EOF" >> $CM_ENV
 
       - name: Install dependencies
         script: |
