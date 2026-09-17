@@ -40,6 +40,7 @@ workflows:
           app_id: $FIREBASE_APP_ID_ANDROID
           groups:
             - internal-testers
+            - adapt-testers
 
   # =========================================================
   # 2. IOS WORKFLOW (App Store Connect / TestFlight)
