@@ -14,10 +14,19 @@ workflows:
       flutter: stable
       java: 17
     scripts:
-      - name: Decode Base64 app_config
+      - name: Decode Base64 files
         script: |
+          if [ -z "$APP_CONFIG_BASE64" ] || [ -z "$FIREBASE_SERVICE_ACCOUNT_BASE64" ]; then
+            echo "ERROR: Missing Base64 environment variables!"
+            exit 1
+          fi
+          
           python3 -c "import base64, os; open(os.environ['CONFIG_OUTPUT_PATH'], 'wb').write(base64.b64decode(os.environ['APP_CONFIG_BASE64']))"
-          echo "Decoded config into $CONFIG_OUTPUT_PATH successfully."
+          
+          echo "FIREBASE_SERVICE_ACCOUNT<<EOF" >> $CM_ENV
+          echo "$FIREBASE_SERVICE_ACCOUNT_BASE64" | base64 --decode >> $CM_ENV
+          echo "" >> $CM_ENV
+          echo "EOF" >> $CM_ENV
 
       - name: Install dependencies
         script: |
@@ -28,15 +37,15 @@ workflows:
           flutter build apk --release \
             --dart-define-from-file="$CONFIG_OUTPUT_PATH" \
             --build-number="$BUILD_NUMBER"
-
-      - name: Build Android App Bundle (Optional - for Google Play)
-        script: |
-          flutter build appbundle --release \
-            --dart-define-from-file="$CONFIG_OUTPUT_PATH" \
-            --build-number="$BUILD_NUMBER"
     artifacts:
       - build/app/outputs/flutter-apk/*-release.apk
-      - build/app/outputs/bundle/**/*.aab
+    publishing:
+      firebase:
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
+        android:
+          app_id: $FIREBASE_APP_ID_ANDROID
+          groups:
+            - internal-testers
 
   # =========================================================
   # 2. IOS WORKFLOW (App Store Connect / TestFlight)
