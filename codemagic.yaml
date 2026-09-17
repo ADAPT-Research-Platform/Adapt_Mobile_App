@@ -48,7 +48,6 @@ workflows:
     environment:
       groups:
         - app_configuration
-        - app_store_credentials
       vars:
         BUNDLE_ID: "com.adapt.adapt"
         CONFIG_OUTPUT_PATH: "app_config.json"
