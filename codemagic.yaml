@@ -111,8 +111,8 @@ workflows:
           
           # CRITICAL FIX: Catch '0' as well as empty results
           if [ -z "$LATEST_BUILD" ] || [ "$LATEST_BUILD" = "0" ]; then
-            echo "WARNING: Apple returned 0 (no active TestFlight builds). Jumping over ghost builds to 11."
-            LATEST_BUILD=11
+            echo "WARNING: Apple returned 0 (no active TestFlight builds). Jumping over ghost builds to 11-15."
+            LATEST_BUILD=16
           fi
           
           NEW_BUILD=$((LATEST_BUILD + 1))
