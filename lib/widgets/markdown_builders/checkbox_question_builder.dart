@@ -115,6 +115,12 @@ class _QuestionCardWidgetState extends State<_QuestionCardWidget> {
           ...List.generate(q.answers.length, (index) {
             final answer = q.answers[index];
             final isSelected = q.selectedAnswers.contains(index);
+            final WidgetStateProperty<Color?> fillColorResolver = WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return Theme.of(context).primaryColorLight;
+              }
+              return null;
+            });
 
             if (q.multiple) {
               return CheckboxListTile(
@@ -122,6 +128,7 @@ class _QuestionCardWidgetState extends State<_QuestionCardWidget> {
                 value: isSelected,
                 dense: true,
                 controlAffinity: ListTileControlAffinity.leading,
+                fillColor: fillColorResolver,
                 onChanged: (bool? val) async {
                   bool isChecked = val ?? false;
                   int points = answer.points; // Points from your CheckBoxAnswer model
@@ -140,12 +147,7 @@ class _QuestionCardWidgetState extends State<_QuestionCardWidget> {
                 groupValue: q.selectedAnswers.isEmpty ? null : q.selectedAnswers.first,
                 dense: true,
                 controlAffinity: ListTileControlAffinity.leading,
-                fillColor: WidgetStateProperty.resolveWith((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return Theme.of(context).primaryColorLight;
-                  }
-                  return null; // Uses default grey color when unselected
-                }),
+                fillColor: fillColorResolver,
                 onChanged: (int? val) async {
                   if (val != null) {
                     bool isCurrentlySelected = q.selectedAnswers.contains(val);
