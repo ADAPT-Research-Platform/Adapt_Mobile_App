@@ -15,14 +15,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 
-import '../models/checkbox_answer.dart';
-import '../models/checkbox_question.dart';
 import '../models/comment.dart';
 import '../services/localization_service.dart';
 import '../utils/app_font_sizes.dart';
 import '../utils/app_keys.dart';
 import '../utils/score_store.dart';
 import '../widgets/comment_card.dart';
+
 import '../widgets/markdown_builders/checkbox_question_builder.dart';
 import '../widgets/markdown_builders/conditional_text_builder.dart';
 import '../widgets/markdown_builders/header_builder.dart';
@@ -56,8 +55,6 @@ class _ChapterPageState extends State<ChapterPage> {
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, String> _questions = {};
   final Map<String, String> _answers = {};
-
-  final ValueNotifier<Map<String, CheckboxQuestion>> _userSelectionsNotifier = ValueNotifier({});
 
   // Make _checkboxBuilder nullable and initialize it in initState
   late final ScoreStore _scoreStore;
@@ -117,50 +114,6 @@ class _ChapterPageState extends State<ChapterPage> {
     return;
   }
 
-  void _onCheckboxChanged(String questionId, int index, bool isChecked) {
-    final newSelections = Map<String, CheckboxQuestion>.from(_userSelectionsNotifier.value);
-    final CheckboxQuestion? questionData = _userSelectionsNotifier.value[questionId];
-
-    if(questionData != null){
-      if(questionData.multiple){
-        if (isChecked) {
-          questionData.selectedAnswers.add(index);
-        } else {
-          questionData.selectedAnswers.remove(index);
-        }
-      }else{
-        questionData.selectedAnswers.clear();
-        questionData.selectedAnswers.add(index);
-      }
-
-      log.info("$chapterKey = ${questionData.selectedAnswers}");
-      _userSelectionsNotifier.value = newSelections;
-    }
-  }
-
-  void _saveCurrentAnswersAndScore() {
-    final newSelections = _userSelectionsNotifier.value;
-
-    if(newSelections.isEmpty){
-      return;
-    }
-
-    final Map<String, Set<int>> currentAnswers = newSelections.map((questionId, questionData) {
-      return MapEntry(questionId, questionData.selectedAnswers);
-    });
-
-    // Calculate the total score from all selected answers
-    int totalScore = 0;
-    newSelections.forEach((questionId, questionData) {
-      totalScore += questionData.score;
-    });
-
-    log.info("totalScore: $totalScore");
-
-    _scoreStore.setChapterAnswers(chapterKey, currentAnswers);
-    _scoreStore.setChapterScore('${chapterKey}S', totalScore);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -190,7 +143,6 @@ class _ChapterPageState extends State<ChapterPage> {
     }
     _scrollController.dispose();
     _commentTextController.dispose();
-    _userSelectionsNotifier.dispose();
     super.dispose();
   }
 
@@ -215,7 +167,6 @@ class _ChapterPageState extends State<ChapterPage> {
                 ),
             ],
             onIconPressed: () {
-              _saveCurrentAnswersAndScore();
               _updateSectionProgress();
               moduleNavigator.currentState!.pop(); //Go Backwards
             }),
@@ -234,10 +185,11 @@ class _ChapterPageState extends State<ChapterPage> {
               return Center(child: Text(LocalizationService().get("no_chapter_content")));
             }
 
-            // Extract data
+            // Load Markdown Content from Host
             final String markdownContent = snapshot.data![0];
 
-            final Map<String, Set<int>> previousAnswers = snapshot.data![1];
+            // Load Saved Answers for this chapter from the store
+            final Map<String, Map<int, int>> savedAnswers = snapshot.data![1];
 
             if (widget.section.isExercise && snapshot.data![2] != null) {
               Answer answer = snapshot.data![2];
@@ -272,11 +224,8 @@ class _ChapterPageState extends State<ChapterPage> {
                                   _controllers
                               ),
                               'checkbox': CheckboxQuestionViewerBuilder(
-                                  _userSelectionsNotifier,
-                                  previousAnswers,
-                                  _onCheckboxChanged,
-                                  Theme.of(context).cardColor,
-                                  Theme.of(context).primaryColorLight
+                                  chapterKey,
+                                  savedAnswers
                               ),
                               'ul': UnderlineBuilder(),
                               'rl': RightAlignBuilder(),

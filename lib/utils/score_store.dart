@@ -24,31 +24,35 @@ class ScoreStore extends ChangeNotifier {
 
   //-------------------------- Secure Storage Operations ----------------------//
 
-  Future<void> setChapterScore(String key, int value) async {
-    await secureStorage.write(key: key, value: value.toString());
-    log.info("Setting Key: $key, Score: $value");
-  }
-
+  //Get total score of a given chapter
   Future<int> getChapterScore(String key) async {
-    final value = await secureStorage.read(key: key);
-    int score = int.tryParse(value ?? '') ?? 0;
+    final answers = await getChapterAnswers(key);
+    int totalScore = 0;
 
-    log.info("Getting Key: $key, Answers: $score");
-    return score;
+    answers.forEach((questionId, indexPointMap) {
+      indexPointMap.forEach((index, points) {
+        totalScore += points;
+      });
+    });
+
+    return totalScore;
   }
 
-  Future<void> setChapterAnswers(String key, Map<String, Set<int>> answers) async {
-    final Map<String, List<int>> jsonCompatibleMap = answers.map((questionId, indexSet) {
-      return MapEntry(questionId, indexSet.toList());
+  // Save all answers as Map of Question ID -> Map of {selectedIndex -> answerPoints}
+  Future<void> setChapterAnswers(String key, Map<String, Map<int, int>> answers) async {
+    final Map<String, Map<String, dynamic>> jsonCompatibleMap = answers.map((questionId, indexPointMap) {
+
+      final stringKeyMap = indexPointMap.map((index, points) => MapEntry(index.toString(), points));
+      return MapEntry(questionId, stringKeyMap);
     });
 
     final String value = jsonEncode(jsonCompatibleMap);
-
     await secureStorage.write(key: key, value: value);
-    log.info("Setting Key: $key, Answers: $answers");
+    log.info("Setting Key: $key, Answers with Points: $answers");
   }
 
-  Future<Map<String, Set<int>>> getChapterAnswers(String key) async {
+  // Get all answers as Map of Question ID -> Map of {selectedIndex: answerPoints}
+  Future<Map<String, Map<int, int>>> getChapterAnswers(String key) async {
     final String? jsonString = await secureStorage.read(key: key);
 
     if (jsonString == null) {
@@ -59,13 +63,14 @@ class ScoreStore extends ChangeNotifier {
     try {
       final Map<String, dynamic> decodedMap = jsonDecode(jsonString);
 
-      final Map<String, Set<int>> answers = decodedMap.map((questionId, indexList) {
-        final List<int> intList = (indexList as List).cast<int>();
-        return MapEntry(questionId, intList.toSet());
+      final Map<String, Map<int, int>> answers = decodedMap.map((questionId, innerMap) {
+        final Map<int, int> indexPointMap = (innerMap as Map<String, dynamic>).map((indexStr, points) {
+          return MapEntry(int.parse(indexStr), points as int);
+        });
+        return MapEntry(questionId, indexPointMap);
       });
 
-      log.info("Getting Key: $key, Answers: $answers");
-
+      log.info("Getting Key: $key, Answers with Points: $answers");
       return answers;
     } catch (e) {
       log.severe('Failed to parse answers for key "$key". Error: $e');

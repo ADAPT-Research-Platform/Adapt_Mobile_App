@@ -30,6 +30,22 @@ class CheckboxQuestion {
     return currentScore;
   }
 
+  // Handle selection toggling cleanly inside the model
+  void toggleSelection(int index, bool isChecked) {
+    if (multiple) {
+      if (isChecked) {
+        selectedAnswers.add(index);
+      } else {
+        selectedAnswers.remove(index);
+      }
+    } else {
+      selectedAnswers.clear();
+      if (isChecked) {
+        selectedAnswers.add(index);
+      }
+    }
+  }
+
   factory CheckboxQuestion.fromJson(Map<String, dynamic> json) {
     final rawAnswers = json['Answers'];
     final List<CheckBoxAnswer> parsedAnswers = [];

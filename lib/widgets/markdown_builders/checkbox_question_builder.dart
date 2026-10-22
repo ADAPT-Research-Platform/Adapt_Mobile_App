@@ -5,26 +5,20 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:logging/logging.dart';
 import 'package:markdown/markdown.dart' as md;
 
-import '../../models/checkbox_answer.dart';
 import '../../models/checkbox_question.dart';
 import '../../utils/app_font_sizes.dart';
+import '../../utils/score_store.dart';
 
 class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
-  final log = Logger('CheckboxQuestionViewerBuilder');
+  final log = Logger('CleanCheckboxBuilder');
 
-  final ValueNotifier<Map<String, CheckboxQuestion>> _userSelectionsNotifier;
-  final Map<String, Set<int>> previousAnswers;
-  final Function(String, int, bool) onCheckboxChanged;
-  final Color cardColor;
-  final Color borderColor;
+  final String chapterKey;
+  final Map<String, Map<int, int>> savedAnswers;
 
   CheckboxQuestionViewerBuilder(
-    this._userSelectionsNotifier,
-    this.previousAnswers,
-    this.onCheckboxChanged,
-    this.cardColor,
-    this.borderColor
-  );
+      this.chapterKey,
+      this.savedAnswers,
+      );
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
@@ -32,120 +26,151 @@ class CheckboxQuestionViewerBuilder extends MarkdownElementBuilder {
       // Changed tag to 'checkbox'
       try {
         final jsonContent = element.children!.first.textContent;
-        final Map<String, dynamic> rawJson = jsonDecode(jsonContent);
+        final questionData = CheckboxQuestion.fromJson(jsonDecode(jsonContent));
 
-        final CheckboxQuestion questionData = CheckboxQuestion.fromJson(rawJson);
-
-        // Initialize user selections for this question if not already present
-        // When loading, these should be empty, so the user starts fresh.
-        if (!_userSelectionsNotifier.value.containsKey(questionData.id)) {
-          if(previousAnswers.containsKey(questionData.id)){
-            questionData.selectedAnswers = previousAnswers[questionData.id]!;
-          }
-
-          _userSelectionsNotifier.value[questionData.id] = questionData;
+        // Restore saved answers from device storage if available
+        if (savedAnswers.containsKey(questionData.id)) {
+          questionData.selectedAnswers = savedAnswers[questionData.id]!.keys.toSet();
         }
 
-        return ValueListenableBuilder<Map<String, CheckboxQuestion>>(
-            valueListenable: _userSelectionsNotifier,
-            builder: (context, userSelections, child) {
-              return Container(
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: borderColor,
-                    width: 2.2,
-                  ),
-                ),
-                padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      questionData.question,
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.small,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (questionData.multiple)
-                      Column(
-                        children: List.generate(questionData.answers.length, (index) {
-                          final isSelected = userSelections[questionData.id]!.selectedAnswers.contains(index);
-                          final WidgetStateProperty<Color?> fillColorResolver =
-                          WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.selected)) {
-                              return const Color(0xFFFEC63D);
-                            }
-                            return null;
-                          });
-                          final CheckBoxAnswer answer = questionData.answers[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 0.0),
-                            child: CheckboxListTile(
-                              title: Text(answer.text),
-                              value: isSelected,
-                              onChanged: (bool? newValue) {
-                                onCheckboxChanged(questionData.id, index, newValue!);
-                              },
-                              dense: true,
-                              controlAffinity: ListTileControlAffinity.leading,
-                              fillColor: fillColorResolver,
-                            ),
-                          );
-                        }),
-                      )
-                    else
-                      RadioGroup<int>(
-                        groupValue: userSelections[questionData.id]!.selectedAnswers.isEmpty
-                            ? null : userSelections[questionData.id]!.selectedAnswers.first,
-                        onChanged: (int? newValue) {
-                          if (newValue != null) {
-                            onCheckboxChanged(questionData.id, newValue, true);
-                          }
-                        },
-                        child: Column(
-                          children: List.generate(userSelections[questionData.id]!.answers.length, (index) {
-                            final WidgetStateProperty<Color?> fillColorResolver =
-                            WidgetStateProperty.resolveWith((states) {
-                              if (states.contains(WidgetState.selected)) {
-                                return const Color(0xFFFEC63D);
-                              }
-                              return null;
-                            });
-                            final CheckBoxAnswer answer = questionData.answers[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 0.0),
-                              child: RadioListTile<int>(
-                                title: Text(answer.text),
-                                value: index,
-                                dense: true,
-                                controlAffinity: ListTileControlAffinity.leading,
-                                fillColor: fillColorResolver,
-                              ),
-                            );
-                          }),
-                        ),
-                      )
-                    ,
-                    Text(
-                      "Score: ${questionData.score}",
-                      style: const TextStyle(
-                        fontSize: AppFontSizes.mini,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            });
+        // Return a self-contained stateful widget for this card only
+        return _QuestionCardWidget(questionData: questionData, chapterKey: chapterKey);
       } catch (e) {
         log.severe("Error parsing Checkbox Question JSON: $e");
         return Text('Error loading question: ${e.toString()}');
       }
     }
     return null;
+  }
+}
+
+class _QuestionCardWidget extends StatefulWidget {
+  final CheckboxQuestion questionData;
+  final String chapterKey;
+
+  const _QuestionCardWidget({
+    required this.questionData,
+    required this.chapterKey,
+  });
+
+  @override
+  State<_QuestionCardWidget> createState() => _QuestionCardWidgetState();
+}
+
+class _QuestionCardWidgetState extends State<_QuestionCardWidget> {
+  final ScoreStore _scoreStore = ScoreStore();
+
+  Future<void> _updateAnswerAndPointsInStore(int index, int points, bool isChecked) async {
+    // 1. Fetch current stored map
+    Map<String, Map<int, int>> currentAnswers = await _scoreStore.getChapterAnswers(widget.chapterKey);
+
+    // 2. Get or initialize the inner map for this specific question
+    Map<int, int> questionSelections = currentAnswers[widget.questionData.id] ?? {};
+
+    if (widget.questionData.multiple) {
+      if (isChecked) {
+        questionSelections[index] = points; // Store index -> points
+      } else {
+        questionSelections.remove(index);
+      }
+    } else {
+      questionSelections.clear();
+      if (isChecked) {
+        questionSelections[index] = points;
+      }
+    }
+
+    currentAnswers[widget.questionData.id] = questionSelections;
+
+    // 3. Save back instantly
+    await _scoreStore.setChapterAnswers(widget.chapterKey, currentAnswers);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final q = widget.questionData;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 0.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).primaryColorLight,
+          width: 2.2,
+        ),
+      ),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            q.question,
+            style: const TextStyle(
+              fontSize: AppFontSizes.small,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          ...List.generate(q.answers.length, (index) {
+            final answer = q.answers[index];
+            final isSelected = q.selectedAnswers.contains(index);
+
+            if (q.multiple) {
+              return CheckboxListTile(
+                title: Text(answer.text),
+                value: isSelected,
+                dense: true,
+                controlAffinity: ListTileControlAffinity.leading,
+                onChanged: (bool? val) async {
+                  bool isChecked = val ?? false;
+                  int points = answer.points; // Points from your CheckBoxAnswer model
+
+                  setState(() {
+                    q.toggleSelection(index, isChecked);
+                  });
+
+                  await _updateAnswerAndPointsInStore(index, points, isChecked);
+                },
+              );
+            } else {
+              return RadioListTile<int>(
+                title: Text(answer.text),
+                value: index,
+                groupValue: q.selectedAnswers.isEmpty ? null : q.selectedAnswers.first,
+                dense: true,
+                controlAffinity: ListTileControlAffinity.leading,
+                fillColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return Theme.of(context).primaryColorLight;
+                  }
+                  return null; // Uses default grey color when unselected
+                }),
+                onChanged: (int? val) async {
+                  if (val != null) {
+                    bool isCurrentlySelected = q.selectedAnswers.contains(val);
+                    bool willBeChecked = !isCurrentlySelected;
+                    int points = answer.points;
+
+                    setState(() {
+                      q.toggleSelection(val, willBeChecked);
+                    });
+
+                    await _updateAnswerAndPointsInStore(val, points, willBeChecked);
+                  }
+                },
+              );
+            }
+          }),
+          Text(
+            "Score: ${q.score}",
+            style: const TextStyle(
+              fontSize: AppFontSizes.mini,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
